@@ -1,0 +1,97 @@
+//全局公共样式
+.common-page-container {
+    background-color: var(--color-fill-2);
+    padding: 1rem 1.25rem;
+    display: flex;
+    height: 100%;
+    .common-panel {
+        background-color: var(--color-bg-2);
+        border-radius: .25rem;
+        overflow: auto;
+        flex: 1;
+        padding: 1.5rem;
+        .common-query-form-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: rgb(var(--gray-10));
+            .query-actions {
+                width: 80px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                .arco-btn {
+                    &:not(:last-child) {
+                        margin-bottom: .5rem;
+                    }
+                }
+               
+            }
+            .query-form-divider{
+                height: 3.75rem;
+                background-color: #ccc;
+                margin: 0px 1.25rem;
+            }
+            .form-item-group {
+                width: calc(100% - 100px);
+            }
+        }
+        .common-table-container {
+            .table-header {
+                margin-bottom: 10px;
+            }
+        }
+        .common-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            .header-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+            }
+            .header-actions {
+                display: flex;
+                align-items: center;
+                .arco-btn {
+                    &:not(:last-child) {
+                        margin-right: .5rem;
+                    }
+                }
+            }
+        
+        }
+    }
+}
+
+
+.primary-text {
+    color: #165DFF;
+}
+.normal-text {
+    color: #333;
+}
+
+
+button:hover svg, button:hover polygon, button:hover path, button.ql-active svg, button.ql-active polygon, button.ql-active path, span.ql-picker-label:hover svg, span.ql-picker-label:hover polygon, span.ql-picker-label:hover path, span.ql-picker-label.ql-active svg, span.ql-picker-label.ql-active polygon, span.ql-picker-label.ql-active path {
+    fill: transparent!important;
+}
+button svg, button polygon, button path, span.ql-picker-label svg, span.ql-picker-label polygon, span.ql-picker-label path {
+    fill: transparent!important;
+}
+
+.rich {
+    button:hover svg, button:hover polygon, button:hover path, button.ql-active svg, button.ql-active polygon, button.ql-active path, span.ql-picker-label:hover svg, span.ql-picker-label:hover polygon, span.ql-picker-label:hover path, span.ql-picker-label.ql-active svg, span.ql-picker-label.ql-active polygon, span.ql-picker-label.ql-active path {
+        fill: #252b3a!important;
+    }
+    button svg, button polygon, button path, span.ql-picker-label svg, span.ql-picker-label polygon, span.ql-picker-label path {
+        fill: #252b3a!important;
+    }
+}
+
+
+.text {
+    color: rgb(var(--gray-10));
+}
