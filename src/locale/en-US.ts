@@ -1,13 +1,8 @@
 import localeMessageBox from '@/components/message-box/locale/en-US';
 import localeLogin from '@/views/login/locale/en-US';
 
-import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
-import localAccount from '@/views/systemSetting/locale/en-US';
-
 import localCommon from './en-US/common';
 import localeSettings from './en-US/settings';
-import localStore from '@/views/store/locale/en-US';
-import localFinance from '@/views/finance/locale/en-US';
 
 export default {
   'menu.dashboard': 'Dashboard',
@@ -47,8 +42,4 @@ export default {
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
-  ...localeWorkplace,
-  ...localAccount,
-  ...localStore,
-  ...localFinance
 };

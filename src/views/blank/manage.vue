@@ -1,6 +1,6 @@
 <template>
-  <PageCard>
-  </PageCard>
+    <PageCard>
+    </PageCard>
 </template>
 
 <script lang="ts" setup>
