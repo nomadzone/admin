@@ -36,6 +36,9 @@ axiosInstance.interceptors.response.use(
       window.location.href = '/login'
      return Promise.reject(data.msg);
     }
+    if (data?.code != 200) {
+        Message.error(data.msg)
+    }
     return response.data;
   },
   (error: any) => {
