@@ -79,7 +79,6 @@ import optionsCity from './address.json'
 import { Message } from '@arco-design/web-vue';
 import Detail from './detail.vue'
 import Info from './info.vue'
-import func from 'vue-temp/vue-editor-bridge';
 
 const loading = ref(false)
 const infoRef = ref()
