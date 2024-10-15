@@ -16,6 +16,11 @@ export default mergeConfig(
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '/shop'), // 保持路径
         },
+        '/ws': {
+          target: 'https://apis.map.qq.com', // 目标地址
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/'), // 保持路径
+        },
       },
     },
     plugins: [

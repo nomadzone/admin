@@ -22,6 +22,27 @@ const DASHBOARD: AppRouteRecordRaw = {
         roles: ['*']
       },
     },
+    // {
+    //   path: 'refund',
+    //   name: 'orderRefund',
+    //   component: () => import('@/views/order/refund.vue'),
+    //   meta: {
+    //     locale: 'order.refund',
+    //     requiresAuth: true,
+    //     roles: ['*'],
+    //   },
+    // },
+    {
+      path: 'refundDetails',
+      name: 'orderRefundDetails',
+      component: () => import('@/views/order/refund-details.vue'),
+      meta: {
+        locale: 'order.refund.details',
+        requiresAuth: true,
+        hideInMenu: true,
+        roles: ['*'],
+      },
+    },
   ],
 };
 

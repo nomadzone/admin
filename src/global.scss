@@ -4,10 +4,16 @@
     padding: 1rem 1.25rem;
     display: flex;
     height: 100%;
+    &.transparent-bg {
+        .common-panel {
+            padding: 0;
+            background-color: transparent;
+        }
+    }
     .common-panel {
         background-color: var(--color-bg-2);
         border-radius: .25rem;
-        overflow: auto;
+        // overflow: auto;
         flex: 1;
         padding: 1.5rem;
         .common-query-form-container {
