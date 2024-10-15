@@ -57,4 +57,7 @@ const confirmModal = ref();
     margin: 0 0 20px 20px;
   }
 }
+.add_row{
+  margin-bottom: 20px;
+}
 </style>
