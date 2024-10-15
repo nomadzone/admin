@@ -48,6 +48,8 @@ export default {
   'menu.finance.withdrawalApply': '申请提现',
   'menu.finance.settlement': '结算明细',
   'menu.finance.withdrawal': '提现明细',
+  'activity.meal': '一起野',
+  'activity.manage': '活动管理',
   ...localCommon,
   ...localeSettings,
   ...localeMessageBox,

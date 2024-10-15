@@ -4,7 +4,6 @@ import { Message } from '@arco-design/web-vue';
 
 // 创建axios实例
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 60000, // 超时时间
 });
 
@@ -35,6 +34,9 @@ axiosInstance.interceptors.response.use(
       Message.error('token失效，请重新登录')
       window.location.href = '/login'
      return Promise.reject(data.msg);
+    }
+    if (data?.code != 200 && data?.code != 0) {
+        Message.error(data.msg)
     }
     return response.data;
   },

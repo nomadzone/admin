@@ -32,3 +32,32 @@ const confirmModal = ref();
 
 
 </script>
+<style lang="less">
+.layout-padding-auto {
+  position: relative;
+  padding-bottom: 80px;
+  width: 100%;
+}
+.search-from{
+  display: flex;
+  flex-wrap: wrap;
+  .search-from-left{
+    flex: 1;
+    min-width: 300px;
+    .el-input{
+      width: 100%;
+    }
+    .el-form-item:last-of-type {
+      margin-bottom: 20px !important;
+    }
+    .el-col{
+    }
+  }
+  .search-from-right{
+    margin: 0 0 20px 20px;
+  }
+}
+.add_row{
+  margin-bottom: 20px;
+}
+</style>
