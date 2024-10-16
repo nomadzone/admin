@@ -125,10 +125,9 @@ const useUserStore = defineStore('user', {
         const res: any = await userLogin({...loginForm });
         if (res.code === 200 || res.code === 0) {
           setToken(res.data.token);
-          // localStorage.setItem('isAuth', '0'); // 0已认证 1未认证
           localStorage.setItem('login', res?.data?.token?.toString());
-          localStorage.setItem('shopId', res?.data?.shopId?.toString() || null);
-          // localStorage.setItem('dimensionId', res?.dimensionId.toString() || null);
+          localStorage.setItem('token', res?.data?.token);
+          localStorage.setItem('userInfo', JSON.stringify(res?.data?.userInfo));
           // await this.routers();
           // await this.info();
         } else {

@@ -32,12 +32,13 @@ axiosInstance.interceptors.response.use(
     console.log(response.data, 'response.data')
     const data = response.data
     if (data?.code === 401) {
-      Message.error('token失效，请重新登录')
-      window.location.href = '/login'
+      // Message.error('token失效，请重新登录')
+      // window.location.href = '/login'
      return Promise.reject(data.msg);
     }
     if (data?.code != 200 && data?.code != 0) {
         Message.error(data.msg)
+        return Promise.reject(data.msg);
     }
     return response.data;
   },
