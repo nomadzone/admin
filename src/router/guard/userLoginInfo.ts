@@ -14,27 +14,6 @@ export default function setupUserLoginInfoGuard(router: Router) {
         next();
       } else {
         try {
-          // 不需要
-          // await userStore.routers()
-          // await userStore.info();
-          let token = localStorage.getItem('token')
-          let isAuth = localStorage.getItem('isAuth')
-          if (token && isAuth !== '0' && from.name && from.name !== 'login' && to.name !== 'verifie') {
-            Modal.warning({
-              title: '提示',
-              content: '您需要完成认证才能访问该页面。',
-              onOk: ()=> {
-                console.log('onOk')  
-                NProgress.done();
-                if (from.name === 'verifie' && to.name !== 'verifie') {
-                  next({
-                    name: 'verifie',
-                  });
-                }
-              }
-            });
-            // return
-          }
           next();
         } catch (error) {
           await userStore.logout();

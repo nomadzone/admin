@@ -1,6 +1,5 @@
 import http from './axios'
 
-
 export function getList(data) {
     return http({
       method: 'POST',
@@ -8,7 +7,6 @@ export function getList(data) {
       data
     })
   }
-  // /user/together/audit
   export function audit(data) {
     return http({
       method: 'GET',

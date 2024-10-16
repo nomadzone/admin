@@ -4,6 +4,7 @@ import { Message } from '@arco-design/web-vue';
 
 // 创建axios实例
 const axiosInstance: AxiosInstance = axios.create({
+  baseURL: process.env.VUE_APP_API_BASE_URL, // api的base_url
   timeout: 60000, // 超时时间
 });
 
@@ -14,7 +15,7 @@ axiosInstance.interceptors.request.use(
     // 例如设置请求头
     const token = getToken();
     if (token) {
-        config.headers['Authorization'] = token;
+        config.headers['Token'] = token;
     }
     return config;
   },

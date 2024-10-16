@@ -123,15 +123,14 @@ const useUserStore = defineStore('user', {
     async login(loginForm: LoginData) {
       try {
         const res: any = await userLogin({...loginForm });
-        if (res.code === 200) {
-          setToken(res.token);
+        if (res.code === 200 || res.code === 0) {
+          setToken(res.data.token);
           // localStorage.setItem('isAuth', '0'); // 0已认证 1未认证
-          localStorage.setItem('isAuth', res?.isAuth?.toString() || '1'); // 0已认证 1未认证
-          localStorage.setItem('login', res?.token?.toString());
-          localStorage.setItem('shopId', res?.shopId?.toString() || null);
-          localStorage.setItem('dimensionId', res?.dimensionId.toString() || null);
+          localStorage.setItem('login', res?.data?.token?.toString());
+          localStorage.setItem('shopId', res?.data?.shopId?.toString() || null);
+          // localStorage.setItem('dimensionId', res?.dimensionId.toString() || null);
           // await this.routers();
-          await this.info();
+          // await this.info();
         } else {
           throw res?.msg;
         }

@@ -15,8 +15,8 @@ export interface LoginRes {
 }
 export function login(data: LoginData) {
   return http({
-    method: 'POST',
-    url: '/shop/login',
+    method: 'GET',
+    url: '/user/login',
     data
   })
   // return axios.post<LoginRes>('/api/user/login', data);

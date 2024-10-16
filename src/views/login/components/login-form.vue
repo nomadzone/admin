@@ -4,10 +4,10 @@
     <div class="login-form-sub-title">请输入您的账号和密码</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form ref="loginForm" :model="userInfo" class="login-form" layout="vertical" @submit="handleSubmit">
-      <a-form-item field="username" :label="t('login.form.account')"
+      <a-form-item field="loginName" :label="t('login.form.account')"
         :rules="[{ required: true, message: $t('login.form.userName.errMsg') }]" :validate-trigger="['change', 'blur']"
         hide-asterisk>
-        <a-input v-model="userInfo.username" :placeholder="$t('login.form.userName.placeholder')" size="large">
+        <a-input v-model="userInfo.loginName" :placeholder="$t('login.form.userName.placeholder')" size="large">
 
         </a-input>
       </a-form-item>
@@ -53,13 +53,13 @@ const userStore = useUserStore();
 
 const loginConfig = useStorage('login-config', {
   rememberPassword: false,
-  username: process.env.NODE_ENV === 'production' ? '' : 'admin', // 根据环境判断默认值
+  loginName: process.env.NODE_ENV === 'production' ? '' : 'admin', // 根据环境判断默认值
   password: process.env.NODE_ENV === 'production' ? '' : 'admin123', // demo default value
   captchaId: '1',
   verifyCode: '1',
 });
 const userInfo = reactive({
-  username: loginConfig.value.username,
+  loginName: loginConfig.value.loginName,
   password: loginConfig.value.password,
 });
 
@@ -80,37 +80,28 @@ const handleSubmit = async ({
   if (loading.value) return;
   if (!errors) {
     setLoading(true);
-    try {
       await userStore.login(values as LoginData);
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
       let token = localStorage.getItem('token')
-      let isAuth = localStorage.getItem('isAuth')
+      console.log('token', token)
       if (token) {
-        if (isAuth !== '0') {
-          router.push({
-            name: 'verifie',
-          });
-        } else {
+
           router.push({
             name: (redirect as string) || defaultRouteName,
             query: {
               ...othersQuery,
             },
           });
-        }
+        
       }
       Message.success(t('login.form.login.success'));
       const { rememberPassword } = loginConfig.value;
-      const { username, password } = values;
+      const { loginName, password } = values;
       // 实际生产环境需要进行加密存储。
       // The actual production environment requires encrypted storage.
-      loginConfig.value.username = rememberPassword ? username : '';
+      loginConfig.value.loginName = rememberPassword ? loginName : '';
       loginConfig.value.password = rememberPassword ? password : '';
-    } catch (err) {
-      errorMessage.value = (err as Error).message;
-    } finally {
-      setLoading(false);
-    }
+
   }
 };
 const setRememberPassword = (value: boolean) => {
