@@ -9,7 +9,7 @@ const DASHBOARD: AppRouteRecordRaw = {
         locale: 'activity.manage',
         requiresAuth: true,
         icon: 'icon-bookmark',
-        order: 1,
+        order: 3,
     },
     children: [
         {
