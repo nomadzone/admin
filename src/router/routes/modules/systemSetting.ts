@@ -74,9 +74,43 @@ const SYSTEMSETTING: AppRouteRecordRaw = {
                 
                 },
 
+        },
+        {
+            path: 'dictInfo',
+            name: 'dictInfo',
+            component: () => import('@/views/systemSetting/dictInfo/index.vue'),
+            meta: {
+                locale: 'menu.systemSetting.dictInfo',
+                requiresAuth: true,
+                roles: ['*'],
+                
+                },
+        },
+        {
+            path: 'dictItemList',
+            name: 'dictItemList',
+            component: () => import('@/views/systemSetting/dictInfo/itemList.vue'),
+            meta: {
+                locale: 'menu.systemSetting.dictInfo',
+                requiresAuth: true,
+                roles: ['*'],
+                hideInMenu: true,
+                
+                },
+        },
+        {
+            path: 'systemCode',
+            name: 'systemCode',
+            component: () => import('@/views/systemSetting/systemCode/index.vue'),
+            meta: {
+                locale: 'menu.systemSetting.systemCode',
+                requiresAuth: true,
+                roles: ['*'],
+                
+                },
         }
     ]
     
 }
 
-export default [];
+export default SYSTEMSETTING;

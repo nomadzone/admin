@@ -40,5 +40,20 @@ export default {
     'systemSetting.roles.create': '创建角色',
     'systemSetting.roles.edit': '编辑角色',
 
+    'systemSetting.dict.name': '字典名称',
+    'systemSetting.dict.value': '字典值',
+    'systemSetting.dict.add': '新增字典',
+    'systemSetting.dict.edit': '编辑字典',
+    'systemSetting.dict.deleteTips': '是否确认删除字典',
+    'systemSetting.dict.itemName': '字典小项名称',
+    'systemSetting.dict.itemValue': '字典小项值',
+    'systemSetting.dict.relatedDict': '关联字典',
+
+    'systemSetting.systemCode.name': '系统编码名称',
+    'systemSetting.systemCode.value': '系统编码值',
+    'systemSetting.systemCode.add': '系统编码新增',
+    'systemSetting.systemCode.edit': '系统编码编辑',
+    'systemSetting.systemCode.deleteTips': '是否确认删除系统编码',
+
 
 }
