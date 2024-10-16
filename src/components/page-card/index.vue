@@ -1,5 +1,5 @@
 <template>
-  <div class="common-page-container">
+  <div class="common-page-container" :class="[isTransparent? 'transparent-bg' : '']">
     <div class="common-panel">
       <div class="common-query-form-container" style="flex-direction: column;">
         <PageTitle v-if="pageTitle"></PageTitle>
@@ -17,7 +17,11 @@ const props = defineProps({
   pageTitle: {
     type: Boolean,
     default: true
-  }
+  },
+  isTransparent: {
+    type: Boolean,
+    default: false
+  },
 })
 
 </script>

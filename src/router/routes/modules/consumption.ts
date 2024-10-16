@@ -2,24 +2,24 @@ import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const DASHBOARD: AppRouteRecordRaw = {
-  path: '/blank',
-  name: 'blank',
+  path: '/consumption',
+  name: 'consumption',
   component: DEFAULT_LAYOUT,
- redirect: '/blank/manage',
+ redirect: '/consumption/verify',
   meta: {
-    locale: '空白页',
+    locale: 'menu.consumption',
     requiresAuth: true,
-    icon: 'icon-user-group',
-    order: 2,
+    icon: 'icon-apps',
+    order: 1,
     hideChildrenInMenu: true,
   },
   children: [
     {
-      path: 'manage',
-      name: 'blankManage',
-      component: () => import('@/views/blank/manage.vue'),
+      path: 'verify',
+      name: 'verify',
+      component: () => import('@/views/consumption/verify.vue'),
       meta: {
-        locale: '空白页',
+        locale: 'menu.consumption',
         requiresAuth: true,
         roles: ['*'],
       },

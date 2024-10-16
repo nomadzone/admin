@@ -1,8 +1,13 @@
 import localeMessageBox from '@/components/message-box/locale/zh-CN';
 import localeLogin from '@/views/login/locale/zh-CN';
 
+import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
+import localAccount from '@/views/systemSetting/locale/zh-CN';
+
 import localCommon from './zh-CN/common';
 import localeSettings from './zh-CN/settings';
+import localStore from '@/views/store/locale/zh-CN';
+import localFinance from '@/views/finance/locale/zh-CN';
 
 
 export default {
@@ -49,4 +54,8 @@ export default {
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
+  ...localeWorkplace,
+  ...localAccount,
+  ...localStore,
+  ...localFinance
 };
