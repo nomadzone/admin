@@ -8,7 +8,7 @@ import localCommon from './zh-CN/common';
 import localeSettings from './zh-CN/settings';
 import localStore from '@/views/store/locale/zh-CN';
 import localFinance from '@/views/finance/locale/zh-CN';
-
+import localMerchart from '@/views/merchant/locale/zh-CN';
 
 export default {
   'menu.dashboard': '仪表盘',
@@ -53,6 +53,10 @@ export default {
   'menu.finance.withdrawal': '提现明细',
   'activity.meal': '一起野',
   'activity.manage': '活动管理',
+  'menu.merchant': '商家中心',
+  'menu.merchant.list': '商家列表',
+  'menu.merchant.category': '品类分类',
+
   ...localCommon,
   ...localeSettings,
   ...localeMessageBox,
@@ -60,5 +64,6 @@ export default {
   ...localeWorkplace,
   ...localAccount,
   ...localStore,
-  ...localFinance
+  ...localFinance,
+  ...localMerchart
 };
