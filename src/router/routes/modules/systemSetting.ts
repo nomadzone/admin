@@ -108,7 +108,38 @@ const SYSTEMSETTING: AppRouteRecordRaw = {
                 roles: ['*'],
                 
                 },
-        }
+        },
+        {
+          path: 'basic',
+          name: 'basic',
+          component: () => import('@/views/systemSetting/basic/index.vue'),
+          meta: {
+            locale: '基础设置',
+            requiresAuth: true,
+            roles: ['*']
+          },
+        },
+        {
+          path: 'adv',
+          name: 'adv',
+          component: () => import('@/views/systemSetting/adv/index.vue'),
+          meta: {
+            locale: '广告管理',
+            requiresAuth: true,
+            roles: ['*']
+          },
+        },
+        {
+          path: 'advCreate',
+          name: 'advCreate',
+          component: () => import('@/views/systemSetting/adv/create.vue'),
+          meta: {
+            locale: '新建广告',
+            requiresAuth: true,
+            hideInMenu: true,
+            roles: ['*'],
+          },
+        },
     ]
     
 }

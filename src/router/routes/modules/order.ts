@@ -13,34 +13,23 @@ const DASHBOARD: AppRouteRecordRaw = {
   },
   children: [
     {
-      path: 'meal',
-      name: 'orderIndex',
-      component: () => import('@/views/order/index.vue'),
+      path: 'active',
+      name: 'orderActive',
+      component: () => import('@/views/order/active.vue'),
       meta: {
-        locale: 'order.meal',
+        locale: '活动订单',
         requiresAuth: true,
         roles: ['*']
       },
     },
-    // {
-    //   path: 'refund',
-    //   name: 'orderRefund',
-    //   component: () => import('@/views/order/refund.vue'),
-    //   meta: {
-    //     locale: 'order.refund',
-    //     requiresAuth: true,
-    //     roles: ['*'],
-    //   },
-    // },
     {
-      path: 'refundDetails',
-      name: 'orderRefundDetails',
-      component: () => import('@/views/order/refund-details.vue'),
+      path: 'meal',
+      name: 'orderMeal',
+      component: () => import('@/views/order/meal.vue'),
       meta: {
-        locale: 'order.refund.details',
+        locale: 'order.meal',
         requiresAuth: true,
-        hideInMenu: true,
-        roles: ['*'],
+        roles: ['*']
       },
     },
   ],

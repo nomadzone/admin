@@ -2,24 +2,24 @@ import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const DASHBOARD: AppRouteRecordRaw = {
-  path: '/users',
-  name: 'users',
+  path: '/findPartner',
+  name: 'findPartner',
   component: DEFAULT_LAYOUT,
- redirect: '/users/manage',
+ redirect: '/findPartner/index',
   meta: {
-    locale: 'menu.users',
+    locale: '找搭子',
     requiresAuth: true,
-    icon: 'icon-user-group',
-    order: 2,
+    icon: 'icon-message',
+    order: 5,
     hideChildrenInMenu: true,
   },
   children: [
     {
-      path: 'manage',
-      name: 'usersManage',
-      component: () => import('@/views/users/manage.vue'),
+      path: 'index',
+      name: 'findPartnerIndex',
+      component: () => import('@/views/findPartner/index.vue'),
       meta: {
-        locale: 'menu.users',
+        locale: '找搭子',
         requiresAuth: true,
         roles: ['*'],
       },

@@ -15,7 +15,7 @@
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item field="name" label="最近消费时间">
+                <a-form-item field="name" label="状态">
                   <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部">
                     <a-option value="">全部</a-option>
                     <a-option value="0">已上线</a-option>
@@ -42,6 +42,12 @@
               </template>
               查询
             </a-button>
+            <a-button  @click="reset">
+              <template #icon>
+                <icon-eraser />
+              </template>
+              重置
+            </a-button>
           </a-space>
         </a-col>
       </a-row>
@@ -54,8 +60,8 @@
       <template #optional="{ record, rowIndex }">
         <a-space>
           <a-link type="primary" @click="doLook(record, rowIndex)" size="mini">查看</a-link>
-          <a-link status="danger" size="mini">不通过</a-link>
-          <a-link status="success" size="mini">通过</a-link>
+          <a-link status="danger" @click="optionIndex = rowIndex; isInject = true" size="mini">不通过</a-link>
+          <a-link status="success" @click="doAgree(record, rowIndex)" size="mini">通过</a-link>
           <a-link type="primary" @click="doUp(record, rowIndex)" size="mini">上线</a-link>
           <a-link type="primary" @click="doDown(record, rowIndex)" size="mini">下线</a-link>
         </a-space>
@@ -67,12 +73,21 @@
         <a-tag v-if="record.comboStatus == '3'" color="red">不通过</a-tag>
       </template>
     </a-table>
+
+    <!-- 不通过 -->
+    <a-modal v-model:visible="isInject" :on-before-ok="doInject" @cancel="isInject = false" unmountOnClose>
+      <template #title>审核不通过</template>
+      <div class="ineject">
+        <div :class="[!injectText && isInjectError?'error':'']"><span class="required">*</span>请输入不通过原因</div>
+        <a-input :style="{width:'320px'}" placeholder="请输入不通过原因" type="text" v-model="injectText" required allow-clear />
+      </div>
+    </a-modal>
   </PageCard>
 </template>
 
 <script setup>
 import PageCard from '@/components/page-card/index.vue';
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, inject } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useRouter } from 'vue-router';
 import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
@@ -80,6 +95,7 @@ import { useMeal } from '@/store';
 
 const router = useRouter()
 const buttonType = ref('0')
+const optionIndex = ref(-1)
 
 onMounted(() => {
   search()
@@ -121,7 +137,15 @@ const columns = [
 const data = reactive({
   list: [1]
 });
-
+const reset = ()=> {
+  formModel.pageNum = 1;
+  formModel.pageSize = 0;
+  formModel.storeName = '';
+  formModel.mealName = '';
+  formModel.status = '';
+  formModel.payDate = '';
+  search()
+}
 const search = async () => {
   loading.value = true
   try {
@@ -148,7 +172,18 @@ const search = async () => {
 const doLook = (item) => {
   router.push('/meal/create?id=' + item.id)
 }
-const doDown = async (item, index) => {
+
+// 不通过
+const isInject = ref(false)
+const injectText = ref('')
+const isInjectError = ref(false)
+const doInject = async () => {
+  if (!injectText.value) {
+    isInjectError.value = true;
+    return false
+  }
+  const index = optionIndex.value
+  const item = data.list[optionIndex.value]
   loading.value = true
   const res = await comboChangeStatus({
     id: item.id,
@@ -160,34 +195,93 @@ const doDown = async (item, index) => {
     return;
   }
   data.list[index].comboStatus = '1'
-  Message.success('下架成功');
+  Message.success('不通过成功');
+  return true;
 }
 
+
+// 通过
+const doAgree = async (item, index) => {
+  Modal.confirm({
+    titleAlign: 'start',
+    title: '通过商家',
+    content: '是否确认通过，通过后商家可进行店铺管理',
+    okText: '确定',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        let res = await orderCancel(item.id)
+        loading.value = false
+        if (res?.code == 200) {
+          Message.success('通过成功')
+          search()
+        } else {
+          Message.error(res?.msg)
+        }
+      } catch(error) {
+        Message.error(JSON.stringify(error) || '接口异常')
+      }
+    },
+    async onCancel() {
+
+    }
+  });
+}
+
+// 上线
 const doUp = async (item, index) => {
-  loading.value = true
-  const res = await comboChangeStatus({
-    id: item.id,
-    comboStatus: '0'
-  })
-  loading.value = false
-  if (res?.code != 200) {
-    Message.error(res?.msg);
-    return;
-  }
-  data.list[index].comboStatus = '0'
-  Message.success('上架成功');
+  Modal.confirm({
+    titleAlign: 'start',
+    title: '上线商家',
+    content: '是否确认上线，上线后小程序即可查看',
+    okText: '确定',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        let res = await orderCancel(item.id)
+        loading.value = false
+        if (res?.code == 200) {
+          Message.success('上线成功')
+          search()
+        } else {
+          Message.error(res?.msg)
+        }
+      } catch(error) {
+        Message.error(JSON.stringify(error) || '接口异常')
+      }
+    },
+    async onCancel() {
+
+    }
+  });
 }
 
-const doDelete = async (item, index) => {
-  loading.value = true
-  const res = await comboDelete(item.id)
-  if (res?.code != 200) {
-    Message.error(res?.msg);
-    return;
-  }
-  loading.value = false
-  search()
-  Message.success('删除成功');
+// 下线
+const doDown = async (item, index) => {
+  Modal.confirm({
+    titleAlign: 'start',
+    title: '下线商家',
+    content: '是否确认下线，上线后小程序将无法查看',
+    okText: '确定',
+    cancelText: '取消',
+    async onOk() {
+      try {
+        let res = await orderCancel(item.id)
+        loading.value = false
+        if (res?.code == 200) {
+          Message.success('下线成功')
+          search()
+        } else {
+          Message.error(res?.msg)
+        }
+      } catch(error) {
+        Message.error(JSON.stringify(error) || '接口异常')
+      }
+    },
+    async onCancel() {
+
+    }
+  });
 }
 
 </script>
@@ -206,6 +300,17 @@ const doDelete = async (item, index) => {
 .general-card {
   ::v-deep .arco-card-body {
     padding-bottom: 0;
+  }
+}
+.ineject {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  .required {
+    color: red;
+  }
+  .error {
+    color: red;
   }
 }
 </style>
