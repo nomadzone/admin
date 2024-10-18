@@ -38,4 +38,25 @@ export default {
     'systemSetting.roles.edit': 'Edit Role',
 
 
+    'systemSetting.dict.name': 'Dictionary Name',
+    'systemSetting.dict.value': 'Dictionary Value',
+    'systemSetting.dict.add': 'Add Dictionary',
+    'systemSetting.dict.edit': 'Edit Dictionary',
+    'systemSetting.dict.deleteTips': 'Are you sure to delete the dictionary',
+    'systemSetting.dict.itemName': 'Dictionary Item Name',
+    'systemSetting.dict.itemValue': 'Dictionary Item Value',
+    'systemSetting.dict.relatedDict': 'Related Dictionary',
+
+    'systemSetting.systemCode.name': 'System Code Name',
+    'systemSetting.systemCode.value': 'System Code Value',
+    'systemSetting.systemCode.add': 'System Code Add',
+    'systemSetting.systemCode.edit': 'System Code Edit',
+    'systemSetting.systemCode.deleteTips': 'Are you sure to delete the System Code',
+
+
+
+
+
+
+
 }

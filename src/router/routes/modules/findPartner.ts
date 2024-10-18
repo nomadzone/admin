@@ -2,24 +2,24 @@ import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const DASHBOARD: AppRouteRecordRaw = {
-  path: '/consumption',
-  name: 'consumption',
+  path: '/findPartner',
+  name: 'findPartner',
   component: DEFAULT_LAYOUT,
- redirect: '/consumption/verify',
+ redirect: '/findPartner/index',
   meta: {
-    locale: 'menu.consumption',
+    locale: '找搭子',
     requiresAuth: true,
-    icon: 'icon-apps',
-    order: 1,
+    icon: 'icon-message',
+    order: 5,
     hideChildrenInMenu: true,
   },
   children: [
     {
-      path: 'verify',
-      name: 'verify',
-      component: () => import('@/views/consumption/verify.vue'),
+      path: 'index',
+      name: 'findPartnerIndex',
+      component: () => import('@/views/findPartner/index.vue'),
       meta: {
-        locale: 'menu.consumption',
+        locale: '找搭子',
         requiresAuth: true,
         roles: ['*'],
       },

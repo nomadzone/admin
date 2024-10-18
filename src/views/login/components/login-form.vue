@@ -43,7 +43,7 @@ import { useUserStore } from '@/store';
 import useLoading from '@/hooks/loading';
 import type { LoginData } from '@/api/user';
 
-import {appRoutes} from '@/router/routes/index';
+import { appRoutes } from '@/router/routes/index';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -80,19 +80,21 @@ const handleSubmit = async ({
   if (loading.value) return;
   if (!errors) {
     setLoading(true);
+    try {
       await userStore.login(values as LoginData);
+      setLoading(false);
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
       let token = localStorage.getItem('token')
       console.log('token', token)
       if (token) {
 
-          router.push({
-            name: (redirect as string) || defaultRouteName,
-            query: {
-              ...othersQuery,
-            },
-          });
-        
+        router.push({
+          name: (redirect as string) || defaultRouteName,
+          query: {
+            ...othersQuery,
+          },
+        });
+
       }
       Message.success(t('login.form.login.success'));
       const { rememberPassword } = loginConfig.value;
@@ -101,12 +103,14 @@ const handleSubmit = async ({
       // The actual production environment requires encrypted storage.
       loginConfig.value.loginName = rememberPassword ? loginName : '';
       loginConfig.value.password = rememberPassword ? password : '';
-
+    } catch (error) {
+      setLoading(false);
+    }
   }
 };
-const setRememberPassword = (value: boolean) => {
-  loginConfig.value.rememberPassword = value;
-};
+  const setRememberPassword = (value: boolean) => {
+    loginConfig.value.rememberPassword = value;
+  };
 </script>
 
 <style lang="less" scoped>

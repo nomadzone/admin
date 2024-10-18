@@ -8,6 +8,7 @@ import localCommon from './en-US/common';
 import localeSettings from './en-US/settings';
 import localStore from '@/views/store/locale/en-US';
 import localFinance from '@/views/finance/locale/en-US';
+import localMerchart from '@/views/merchant/locale/zh-CN';
 
 export default {
   'menu.dashboard': 'Dashboard',
@@ -29,6 +30,9 @@ export default {
   'menu.systemSetting.accountDetail': 'Account Detail',
   'menu.systemSetting.accountCreate': 'Create Account',
   'menu.systemSetting.roles': 'Roles Management',
+  'menu.systemSetting.dictInfo': 'Dictionary Management',
+  'menu.systemSetting.dictItemList': 'Dictionary Item',
+  'menu.systemSetting.systemCode': 'System Code',
   'menu.store': 'Store Management',
   'menu.store.verifie': 'Verifie',
   'menu.store.setting': 'Store Setting',
@@ -43,6 +47,10 @@ export default {
   'menu.finance.withdrawalApply': 'Withdrawal Application',
   'menu.finance.settlement': 'Settlement',
   'menu.finance.withdrawal': 'Withdrawal',
+  'menu.merchant': 'Merchant Center',
+  'menu.merchant.list': 'Merchant List',
+  'menu.merchant.category': 'Merchant Category',
+
   ...localCommon,
   ...localeSettings,
   ...localeMessageBox,
@@ -50,5 +58,6 @@ export default {
   ...localeWorkplace,
   ...localAccount,
   ...localStore,
-  ...localFinance
+  ...localFinance,
+  ...localMerchart,
 };

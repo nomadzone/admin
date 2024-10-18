@@ -6,12 +6,24 @@
           <a-form :model="formModel" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
             label-align="right">
             <a-row :gutter="16">
-              <a-col :span="12">
+              <a-col :span="12"> 
+                <a-form-item field="number" label="套餐名称">
+                  <a-input v-model="formModel.shopComboName" placeholder="请输入套餐名称" />
+                </a-form-item>
                 <a-form-item field="number" label="订单号">
                   <a-input v-model="formModel.orderNo" placeholder="请输入订单号" />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
+                <a-form-item field="name" label="状态">
+                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部">
+                    <a-option value="">全部</a-option>
+                    <a-option value="0">已上线</a-option>
+                    <a-option value="1">已下线</a-option>
+                    <a-option value="2">待审批</a-option>
+                    <a-option value="3">不通过</a-option>
+                  </a-select>
+                </a-form-item>
                 <a-form-item field="name" label="验证时间">
                   <a-range-picker style="width: 360px; margin: 0 24px 24px 0;" show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }" format="YYYY-MM-DD HH:mm"
@@ -49,8 +61,7 @@
         FAIL("6", "微信支付回调失败"),
         FAIL_RETURN("7", "微信退款回调失败"); -->
         <a-space>
-          <a-link @click="doCancel(record)" v-if="record.orderStatus == 3" >取消</a-link>
-          <a-link @click="doVerify(record)" v-if="record.orderStatus == 2" status="warning">消费验证</a-link>
+          <a-link @click="doCancel(record)" >取消</a-link>
           <!-- <a-link @click="doRefund(record)" status="danger">退款维权</a-link> -->
         </a-space>
       </template>
@@ -69,24 +80,28 @@ import { orderList, orderCancel, orderTicketCode } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
 
 const columns = [
-  { title: '订单号', dataIndex: 'orderNo' },
+  { title: '订单号', dataIndex: 'order', width: 120 },
   { title: '套餐名套餐名套餐名套餐名套餐名…', dataIndex: 'shopComboName', ellipsis: true },
   { title: '数量', dataIndex: 'number', width: 60 },
+  { title: '商家昵称', dataIndex: 'sotreName', width: 120 },
   { title: '订单金额', dataIndex: 'orderAmount', width: 90 },
   { title: '服务费', dataIndex: 'serviceCost', width: 80 },
   { title: '状态', dataIndex: 'orderStatusName', width: 80 },
-  { title: '下单号码', dataIndex: 'phone', width: 130 },
-  { title: '操作', slotName: 'optional', width: 160 },
+  { title: '用户昵称', dataIndex: 'userName', width: 130 },
+  { title: '下单时间', dataIndex: 'startTime', width: 130 },
+  { title: '操作', slotName: 'optional', width: 80 },
 ];
 
 
 
 const formModel = reactive({
+  shopComboName: '',
   orderNo: '',
+  status: '',
   verifyTime: [],
   pageNum: 1,
   pageSize: 10,
-  list: []
+  list: [1]
 });
 const loading = ref(false)
 const pagination = ref({
@@ -110,8 +125,14 @@ const search = async() => {
     pageSize: formModel.pageSize,
     // verifyStatus: '1'
   }
+  if (formModel.shopComboName){
+    params.shopComboName = formModel.shopComboName
+  }
   if (formModel.orderNo){
     params.orderNo = formModel.orderNo
+  }
+  if (formModel.status){
+    params.status = formModel.status
   }
   if (formModel.verifyTime?.length === 2 && formModel.verifyTime[0] && formModel.verifyTime[1]) {
     params.beginVerifyTime = formModel.verifyTime[0]

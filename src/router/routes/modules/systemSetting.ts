@@ -74,9 +74,74 @@ const SYSTEMSETTING: AppRouteRecordRaw = {
                 
                 },
 
-        }
+        },
+        {
+            path: 'dictInfo',
+            name: 'dictInfo',
+            component: () => import('@/views/systemSetting/dictInfo/index.vue'),
+            meta: {
+                locale: 'menu.systemSetting.dictInfo',
+                requiresAuth: true,
+                roles: ['*'],
+                
+                },
+        },
+        {
+            path: 'dictItemList',
+            name: 'dictItemList',
+            component: () => import('@/views/systemSetting/dictInfo/itemList.vue'),
+            meta: {
+                locale: 'menu.systemSetting.dictInfo',
+                requiresAuth: true,
+                roles: ['*'],
+                hideInMenu: true,
+                
+                },
+        },
+        {
+            path: 'systemCode',
+            name: 'systemCode',
+            component: () => import('@/views/systemSetting/systemCode/index.vue'),
+            meta: {
+                locale: 'menu.systemSetting.systemCode',
+                requiresAuth: true,
+                roles: ['*'],
+                
+                },
+        },
+        {
+          path: 'basic',
+          name: 'basic',
+          component: () => import('@/views/systemSetting/basic/index.vue'),
+          meta: {
+            locale: '基础设置',
+            requiresAuth: true,
+            roles: ['*']
+          },
+        },
+        {
+          path: 'adv',
+          name: 'adv',
+          component: () => import('@/views/systemSetting/adv/index.vue'),
+          meta: {
+            locale: '广告管理',
+            requiresAuth: true,
+            roles: ['*']
+          },
+        },
+        {
+          path: 'advCreate',
+          name: 'advCreate',
+          component: () => import('@/views/systemSetting/adv/create.vue'),
+          meta: {
+            locale: '新建广告',
+            requiresAuth: true,
+            hideInMenu: true,
+            roles: ['*'],
+          },
+        },
     ]
     
 }
 
-export default [];
+export default SYSTEMSETTING;
