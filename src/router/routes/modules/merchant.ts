@@ -9,7 +9,7 @@ const MERCHANT: AppRouteRecordRaw = {
     locale: 'menu.merchant',
     requiresAuth: true,
     icon: 'icon-user',
-    order: 0,
+    order: 1,
   },
   children: [
     {
