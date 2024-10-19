@@ -81,11 +81,10 @@
   
   <script setup>
   import PageCard from '@/components/page-card/index.vue';
-  import { ref, reactive, watch, onMounted, inject } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
-  import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
-  import { useMeal } from '@/store';
+  import { comboList } from '@/api/combo';
   
   const router = useRouter()
   const buttonType = ref('0')
