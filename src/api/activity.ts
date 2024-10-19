@@ -3,7 +3,7 @@ import http from './axios'
 export function getList(data) {
     return http({
       method: 'POST',
-      url: '/user/activity/list',
+      url: '/user/activity/list',  // 找搭子 type传3  新鲜事 传2
       data
     })
   }

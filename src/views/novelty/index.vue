@@ -18,10 +18,10 @@
                 <a-form-item field="name" label="状态">
                   <a-select :style="{ width: '340px' }" v-model="formModel.status" placeholder="全部">
                     <a-option value="">全部</a-option>
-                    <a-option value="300">审核中</a-option>
-                    <a-option value="301">已上架</a-option>
-                    <!-- <a-option value="302">已删除</a-option> -->
-                    <a-option value="303">已下架</a-option>
+                    <a-option value="200">审核中</a-option>
+                    <a-option value="201">已上架</a-option>
+                    <!-- <a-option value="202">已删除</a-option> -->
+                    <a-option value="203">已下架</a-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item field="name" label="创建时间">
@@ -54,93 +54,55 @@
     </a-card>
     <a-divider />
     <div style="margin-bottom: 16px;display: flex;gap: 8px;">
-      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 301">审批通过</a-button>
-      <a-button  v-if="buttonType !== 301" @click="buttonType = 301">审批通过</a-button>
-      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 303">审批不通过</a-button>
-      <a-button @click="buttonType = 303"  v-if="buttonType !== 303">审批不通过</a-button>
+      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 201">审批通过</a-button>
+      <a-button  v-if="buttonType !== 201" @click="buttonType = 201">审批通过</a-button>
+      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 203">审批不通过</a-button>
+      <a-button @click="buttonType = 203"  v-if="buttonType !== 203">审批不通过</a-button>
     </div>
     <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>
-          <a-button @click="optionIndex = rowIndex; isLook = true" size="mini">
+          <a-button @click="doLook(record)" size="mini">
             <template #icon>
               <icon-find-replace />
             </template>
             查看</a-button>
           <a-button type="primary" size="mini" @click="optionIndex = rowIndex; isExamine = true"
-            v-if="record.status == 300">
+            v-if="record.status == 200">
             <template #icon>
               <icon-check-square />
             </template>
             审核
           </a-button>
           <a-button type="outline" size="mini" @click="optionIndex = rowIndex; isExamine = true"
-            v-if="record.status == 303">
+            v-if="record.status == 203">
             <template #icon>
               <icon-check-square />
             </template>
             再次审核
           </a-button>
-          <a-button type="primary" status="danger" size="mini" v-if="record.status == 301"
+          <a-button type="primary" status="danger" size="mini" v-if="record.status == 201"
             @click="doDown(record, rowIndex)">
             <template #icon>
               <icon-eye-invisible />
             </template>
             下架</a-button>
-          <!-- <a-link status="danger" @click="optionIndex = rowIndex; isExamine = true" size="mini" v-if="record.status == 300">不通过</a-link>
-            <a-link status="success" @click="doAgree(record, rowIndex)" size="mini" v-if="record.status == 300 || record.status == 303">通过</a-link>
-            <a-link type="primary" @click="doUp(record, rowIndex)" size="mini" v-if="record.status == 300 || record.status == 303">上架</a-link> -->
+          <!-- <a-link status="danger" @click="optionIndex = rowIndex; isExamine = true" size="mini" v-if="record.status == 200">不通过</a-link>
+            <a-link status="success" @click="doAgree(record, rowIndex)" size="mini" v-if="record.status == 200 || record.status == 203">通过</a-link>
+            <a-link type="primary" @click="doUp(record, rowIndex)" size="mini" v-if="record.status == 200 || record.status == 203">上架</a-link> -->
 
         </a-space>
       </template>
       <template #status="{ record }">
-        <a-tag v-if="record.status == 300" color="orange">审核中</a-tag>
-        <a-tag v-if="record.status == 301" color="green">已上架</a-tag>
-        <a-tag v-if="record.status == 302" color="green">已删除</a-tag>
-        <!-- <a-tag v-if="record.status == 303" color="red">未通过</a-tag> -->
-        <a-tag v-if="record.status == 303" color="red">已下架</a-tag>
+        <a-tag v-if="record.status == 200" color="orange">审核中</a-tag>
+        <a-tag v-if="record.status == 201" color="green">已上架</a-tag>
+        <a-tag v-if="record.status == 202" color="green">已删除</a-tag>
+        <!-- <a-tag v-if="record.status == 203" color="red">未通过</a-tag> -->
+        <a-tag v-if="record.status == 203" color="red">已下架</a-tag>
       </template>
     </a-table>
-    <!-- 查看详情 -->
-    <a-modal v-model:visible="isLook" width="600px">
-      <template #title>找搭子详情</template>
-      <div>
-        <div class="line">
-          <span>需求描述</span>
-          <span>{{ info.describe }}</span>
-        </div>
-        <div class="line">
-          <span>面基地点</span>
-          <span>{{ info.address }}</span>
-        </div>
-        <div class="line">
-          <span>期望时间</span>
-          <span>{{ info.expectdate }}</span>
-        </div>
-        <div class="line">
-          <span>状态</span>
-          <div>
-            <a-tag color="orangered" v-if="info.status === 300">审核中</a-tag>
-            <a-tag color="green" v-if="info.status === 301">已上架</a-tag>
-            <a-tag color="red" v-if="info.status === 302">已删除</a-tag>
-            <a-tag color="red" v-if="info.status === 303">已下架</a-tag>
-          </div>
-        </div>
-        <div class="line" v-if="info.status === 303 || info.status === 302">
-          <span>不通过原因</span>
-          <span>{{ info.remark }}</span>
-        </div>
-        <div class="line">
-          <span>联系方式</span>
-          <div class="columns">
-            <div style="padding-bottom: 8px;">{{ info.phone }}</div>
-            <a-image width="120" :src="info.images" />
-          </div>
-        </div>
-      </div>
-    </a-modal>
 
-    <!-- 不通过 -->
+    <!-- 审批 -->
     <a-modal v-model:visible="isExamine" :on-before-ok="doExamine" @cancel="isExamine = false" unmountOnClose>
       <template #title>审核</template>
       <div class="ineject">
@@ -167,25 +129,16 @@ import PageCard from '@/components/page-card/index.vue';
 import { ref, reactive, onMounted, watch, computed } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { getList, onlineUp, onlineDown, audit } from '@/api/activity';
+import router from '@/router';
 
-//   发布中(审核中) 300 
-// 301 已发布
-// 302 己删除
-// 303 未通过
+//   发布中(审核中) 200 
+// 201 已发布
+// 202 己删除
+// 203 未通过
 
 const buttonType = ref('')
 const optionIndex = ref(-1)
-const info = computed(() => data.list[optionIndex.value] || {
-  describe: '',
-  address: '',
-  expectdate: '',
-  status: 300,
-  remark: '',
-  phone: '',
-  images: '',
-})
 
-const isLook = ref(false)
 onMounted(() => {
   search()
 })
@@ -211,14 +164,13 @@ const pagination = ref({
 })
 const columns = [
   { title: 'ID', dataIndex: 'id' },
-  { title: '需求描述', dataIndex: 'describe' },
-  { title: '期望时间', dataIndex: 'expectdate' },
+  { title: '标题', dataIndex: 'title' },
   {
     title: '状态',
     dataIndex: 'status',
     slotName: 'status' // 使用 slot 来渲染状态列
   },
-  { title: '面基地点', dataIndex: 'address' },
+  { title: '定位', dataIndex: 'address' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
   { title: '操作', slotName: 'optional', width: 260 },
@@ -226,6 +178,10 @@ const columns = [
 const data = reactive({
   list: []
 });
+const doLook = (record)=> {
+  localStorage.setItem('noveltyInfo', JSON.stringify(record))
+  router.push('/novelty/info?id=' + record.id)
+}
 
 const onOkTime = (value) => { formModel.verifyTime = value }
 const onClear = () => { formModel.verifyTime = []; search() }
@@ -256,7 +212,7 @@ const search = async () => {
   const params = {
     pageNum: formModel.pageNum,
     pageSize: formModel.pageSize,
-    "type": 3
+    "type": 2
   }
   if (formModel.describe) {
     params.describe = formModel.describe
@@ -285,7 +241,7 @@ const search = async () => {
     Message.error(JSON.stringify(error) || '接口异常')
   }
 }
-// 审核
+// 审批
 const isExamine = ref(false)
 const examineText = ref('')
 const isExamineError = ref(false)
@@ -298,18 +254,21 @@ const doExamine = async () => {
   const index = optionIndex.value
   const record = data.list[optionIndex.value]
   loading.value = true
+
+  Message.loading('加载中...')
   const res = await audit({
     id: record.id,
     status: examineStatus.value,
     remark: examineStatus.value === '1' ? "" : examineText.value
   })
+  Message.clear()
   loading.value = false
   if (res?.code != 0) {
     Message.error(res?.msg);
     return;
   }
-  data.list[index].status = examineStatus.value === '1' ? 301 : 303
-  Message.success('拒绝成功');
+  data.list[index].status = examineStatus.value === '1' ? 201 : 203
+  Message.success(examineStatus.value === '1' ? "审核通过" : '拒绝通过');
   return true;
 }
 
@@ -325,7 +284,7 @@ const doDown = async (record, index) => {
       try {
         onlineDown({ id: record.id }).then(res => {
           if (res.code === 0) {
-            data.list[index].status = 303
+            data.list[index].status = 203
             Message.success('下架成功')
             togetList()
           } else {

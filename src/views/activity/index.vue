@@ -108,11 +108,6 @@ const options = ref([
 ]);
 const columns = [
   {
-    title: '活动id',
-    dataIndex: 'id',
-    width: 100
-  },
-  {
     title: '活动名称',
     dataIndex: 'title',
   },
