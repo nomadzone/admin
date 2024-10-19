@@ -46,7 +46,7 @@
           {{ record.startdate }}- {{ record.enddate }}
         </template>
         <template #status="{record}">
-          {{ options.find(item => item.value === record.status).label }}
+          {{ options.find(item => item.value === record.status)?.label }}
         </template>
         <template #actions="{record}">
           <a-button style="margin-left: 5px;" text type="primary" v-if="record.status === 100" @click="handleStatus(record)">审核</a-button>
@@ -86,6 +86,7 @@ const infoRef = ref()
 const form = ref({
   pageNum: 1,
   pageSize: 10,
+  type: 1
 })
 const actionformRef = ref()
 const detailRef = ref()
@@ -110,6 +111,7 @@ const columns = [
   {
     title: '活动名称',
     dataIndex: 'title',
+    width: 100
   },
   {
     title: '活动时间',
@@ -226,6 +228,7 @@ function resetQuery() {
   form.value = {
     pageNum: 1,
     pageSize: 10,
+    type: 1
   }
   form.value.time = []
   togetList()
