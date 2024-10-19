@@ -7,7 +7,7 @@ const DASHBOARD: AppRouteRecordRaw = {
   component: DEFAULT_LAYOUT,
  redirect: '/findPartner/index',
   meta: {
-    locale: '找搭子',
+    locale: '找搭子管理',
     requiresAuth: true,
     icon: 'icon-message',
     order: 5,

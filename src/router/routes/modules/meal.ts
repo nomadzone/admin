@@ -9,7 +9,7 @@ const DASHBOARD: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.meal',
     requiresAuth: true,
-    icon: 'icon-unordered-list',
+    icon: 'icon-select-all', 
     order: 1,
     hideChildrenInMenu: true,
   },

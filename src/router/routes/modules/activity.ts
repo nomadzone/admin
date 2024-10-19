@@ -6,7 +6,7 @@ const DASHBOARD: AppRouteRecordRaw = {
     name: 'activity',
     component: DEFAULT_LAYOUT,
     meta: {
-        locale: 'activity.manage',
+        locale: '一起野管理',
         requiresAuth: true,
         icon: 'icon-bookmark',
         order: 3,

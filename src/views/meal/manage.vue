@@ -91,7 +91,6 @@ import { ref, reactive, watch, onMounted, inject } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useRouter } from 'vue-router';
 import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
-import { useMeal } from '@/store';
 
 const router = useRouter()
 const buttonType = ref('0')

@@ -128,13 +128,10 @@
   
   <script setup>
   import PageCard from '@/components/page-card/index.vue';
-  import { ref, reactive, watch, onMounted, inject } from 'vue';
+  import { ref, reactive, onMounted } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
-  import { useRouter } from 'vue-router';
-  import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
-  import { useMeal } from '@/store';
+  import { findPartnerList } from '@/api/findPartner';
   
-  const router = useRouter()
   const buttonType = ref('0')
   const optionIndex = ref(-1)
   
@@ -190,7 +187,7 @@
   const search = async () => {
     loading.value = true
     try {
-      let res = await comboList({
+      let res = await findPartnerList({
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
         requirement: formModel.requirement,
