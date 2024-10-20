@@ -83,7 +83,7 @@
       </div>
     </div>
     <div class="card">
-      <div class="title">基本信息</div>
+      <div class="title">评论列表</div>
       <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>
