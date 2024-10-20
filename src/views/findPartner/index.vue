@@ -210,7 +210,6 @@ const pagination = ref({
   }, // 页码改变时的回调函数
 })
 const columns = [
-  { title: 'ID', dataIndex: 'id' },
   { title: '需求描述', dataIndex: 'describe' },
   { title: '期望时间', dataIndex: 'expectdate' },
   {

@@ -163,7 +163,6 @@ const pagination = ref({
   }, // 页码改变时的回调函数
 })
 const columns = [
-  { title: 'ID', dataIndex: 'id' },
   { title: '标题', dataIndex: 'title' },
   {
     title: '状态',
