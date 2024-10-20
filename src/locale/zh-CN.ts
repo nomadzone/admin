@@ -55,6 +55,7 @@ export default {
   'activity.manage': '活动管理',
   'menu.merchant': '商家中心',
   'menu.merchant.list': '商家列表',
+  'menu.merchant.detail': '商家详情',
   'menu.merchant.category': '品类分类',
 
   ...localCommon,

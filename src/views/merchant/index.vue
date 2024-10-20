@@ -90,6 +90,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
+const router = useRouter();
+
 const { t } = useI18n()
 const queryFormItemLayout = { xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }
 
@@ -114,8 +117,15 @@ const columns = ref([
 
 ])
 
-const data = ref([
+const data = ref([{}
 ])
+
+// 查看详情
+const handleShowDetail = (row: any) => {
+    router.push({
+        name: 'merchantDetail',
+    });
+}
 
 </script>
 
