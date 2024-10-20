@@ -16,6 +16,7 @@ export default {
 
     "table.createTime": "创建时间",
     "table.operation": "操作",
+    
 
     "days.monday": "周一",
     "days.tuesday": "周二",
@@ -24,4 +25,8 @@ export default {
     "days.friday": "周五",
     "days.saturday": "周六",
     "days.sunday": "周日",
+
+    "common.editSuccess": "编辑成功",
+    "common.addSuccess": "添加成功",
+    "common.deleteSuccess": "删除成功",
 }
