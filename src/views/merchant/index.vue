@@ -91,6 +91,7 @@
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
+import { shopList } from '@/api/merchant';
 const router = useRouter();
 
 const { t } = useI18n()
@@ -119,6 +120,13 @@ const columns = ref([
 
 const data = ref([{}
 ])
+// 查询列表
+
+const fetchData = async () => {
+    const res = await shopList()
+    data.value = res.rows
+}
+
 
 // 查看详情
 const handleShowDetail = (row: any) => {
@@ -126,6 +134,10 @@ const handleShowDetail = (row: any) => {
         name: 'merchantDetail',
     });
 }
+
+onMounted(() => {
+    fetchData()
+})
 
 </script>
 

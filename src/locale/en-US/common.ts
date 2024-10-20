@@ -29,5 +29,9 @@ export default {
     "days.friday": "Friday",
     "days.saturday": "Saturday",
     "days.sunday": "Sunday",
+
+    "common.editSuccess": "Edit Success",
+    "common.addSuccess": "Add Success",
+    "common.deleteSuccess": "Delete Success",
     
 }

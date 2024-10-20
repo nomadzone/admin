@@ -42,9 +42,10 @@
 
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { configList } from '@/api/system'
 
 const { t } = useI18n();
 const router = useRouter();
@@ -124,6 +125,12 @@ const handleCancel = () => {
     console.log('handleCancel')
     visible.value = false
 }
+
+
+onMounted(async () => {
+    const res = await configList()
+    data.value = res.data
+})
 </script>
 
 <style lang="scss" scoped></style>

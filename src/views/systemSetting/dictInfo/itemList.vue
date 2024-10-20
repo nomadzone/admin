@@ -43,20 +43,25 @@
 
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
+
+import { useRouter } from 'vue-router';
+import { dictItem } from '@/api/system'
 const { t } = useI18n();
+
+const router = useRouter();
 const columns = [
     {
         title: t('systemSetting.dict.itemName'),
-        dataIndex: 'dictItemName',
-        key: 'dictItemName',
+        dataIndex: 'dictLabel',
+        key: 'dictLabel',
         ellipsis: true,
     },
     {
         title: t('systemSetting.dict.itemValue'),
-        dataIndex: 'dictItemValue',
-        key: 'dictItemValue',
+        dataIndex: 'dictCode',
+        key: 'dictCode',
         ellipsis: true,
     },
     {
@@ -123,6 +128,34 @@ const handleCancel = () => {
     console.log('handleCancel')
     visible.value = false
 }
+
+
+// 获取列表
+
+const pageSize = ref(20)
+const pageNum = ref(1)
+const total = ref(0)
+
+
+const fetchList = async (page, size) => {
+    let params = {
+        dictType: router.currentRoute.value.query.dictType,
+        pageSize: size || pageSize.value,
+        pageNum: page || pageNum.value
+
+    }
+    let res = await dictItem(params)
+
+    if (res.code == 0) {
+        data.value = res.rows
+        total.value = res.total
+    }
+
+}
+
+onMounted(() => {
+    fetchList()
+})
 </script>
 
 <style lang="scss" scoped></style>
