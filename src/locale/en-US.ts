@@ -49,6 +49,7 @@ export default {
   'menu.finance.withdrawal': 'Withdrawal',
   'menu.merchant': 'Merchant Center',
   'menu.merchant.list': 'Merchant List',
+  'menu.merchant.detail': 'Merchant Detail',
   'menu.merchant.category': 'Merchant Category',
 
   ...localCommon,

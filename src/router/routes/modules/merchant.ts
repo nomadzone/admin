@@ -23,6 +23,16 @@ const MERCHANT: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'detail',
+      name: 'merchantDetail',
+      component: () => import('@/views/merchant/detail.vue'),
+      meta: {
+        locale: 'menu.merchant.detail',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'catagory',
       name: 'merchantCatagory',
       component: () => import('@/views/merchant/category.vue'),
