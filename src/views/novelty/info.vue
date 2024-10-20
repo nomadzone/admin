@@ -103,7 +103,7 @@
     <a-modal v-model:visible="isExamine" :on-before-ok="doExamine" @cancel="isExamine = false" unmountOnClose>
       <template #title>审核</template>
       <div class="ineject">
-        <div style="font-size: 18px;color: #333;padding-bottom: 10px;">请选择是否审批通过?</div>
+        <div style="font-size: 18px;color: #333;padding-bottom: 8px;">请选择是否审批通过?</div>
         <div>
           <a-radio-group type="button" v-model="examineStatus">
             <a-radio value="1">审批通过</a-radio>

@@ -144,7 +144,7 @@
     <a-modal v-model:visible="isExamine" :on-before-ok="doExamine" @cancel="isExamine = false" unmountOnClose>
       <template #title>审核</template>
       <div class="ineject">
-        <div style="font-size: 18px;color: #333;">请选择是否审批通过?</div>
+        <div style="font-size: 18px;color: #333;padding-bottom: 8px;">请选择是否审批通过?</div>
         <div>
           <a-radio-group type="button" v-model="examineStatus">
             <a-radio value="1">审批通过</a-radio>
@@ -220,7 +220,7 @@ const columns = [
   { title: '面基地点', dataIndex: 'address' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
-  { title: '操作', slotName: 'optional', width: 260 },
+  { title: '操作', slotName: 'optional', width: 200 },
 ];
 const data = reactive({
   list: []
@@ -309,6 +309,7 @@ const doExamine = async () => {
   }
   data.list[index].status = examineStatus.value === '1' ? 301 : 303
   Message.success('拒绝成功');
+  search()
   return true;
 }
 
@@ -326,7 +327,6 @@ const doDown = async (record, index) => {
           if (res.code === 0) {
             data.list[index].status = 303
             Message.success('下架成功')
-            togetList()
           } else {
             Message.error('下架失败')
           }

@@ -78,3 +78,19 @@ export function orderUsedList(data:any) {
   })
   // return axios.post<UserState>('/api/user/info');
 }
+
+export function accountList(data:any) {
+  return http({
+    method: 'POST',
+    url: '/user/account/list',
+    data
+  })
+}
+
+export function fansList(data:any, url?: string) {
+  return http({
+    method: 'POST',
+    url: url || '/user/fans/list',
+    data
+  })
+}

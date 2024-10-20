@@ -106,7 +106,7 @@
     <a-modal v-model:visible="isExamine" :on-before-ok="doExamine" @cancel="isExamine = false" unmountOnClose>
       <template #title>审核</template>
       <div class="ineject">
-        <div style="font-size: 18px;color: #333;">请选择是否审批通过?</div>
+        <div style="font-size: 18px;color: #333;padding-bottom: 8px;">请选择是否审批通过?</div>
         <div>
           <a-radio-group type="button" v-model="examineStatus">
             <a-radio value="1">审批通过</a-radio>
@@ -172,13 +172,19 @@ const columns = [
   { title: '定位', dataIndex: 'address' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
-  { title: '操作', slotName: 'optional', width: 260 },
+  { title: '操作', slotName: 'optional', width: 200 },
 ];
 const data = reactive({
   list: []
 });
 const doLook = (record)=> {
-  localStorage.setItem('noveltyInfo', JSON.stringify(record))
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+  localStorage.setItem('noveltyInfo', JSON.stringify(_record))
   router.push('/novelty/info?id=' + record.id)
 }
 
@@ -266,8 +272,9 @@ const doExamine = async () => {
     Message.error(res?.msg);
     return;
   }
-  data.list[index].status = examineStatus.value === '1' ? 201 : 203
+  data.list[index].status = examineStatus.value === '1' ? 201 : 203;
   Message.success(examineStatus.value === '1' ? "审核通过" : '拒绝通过');
+  search()
   return true;
 }
 
@@ -285,7 +292,7 @@ const doDown = async (record, index) => {
           if (res.code === 0) {
             data.list[index].status = 203
             Message.success('下架成功')
-            togetList()
+            search()
           } else {
             Message.error('下架失败')
           }

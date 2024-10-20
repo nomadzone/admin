@@ -7,7 +7,7 @@
                         <a-avatar :size="98">
                             <img
                                 alt="avatar"
-                                src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
+                                :src="info.avatarUrl"
                             />
                         </a-avatar>
                     </div>
@@ -16,11 +16,11 @@
                     <div class="line">
                         <div>
                             <span>用户昵称:</span>
-                            <span>王立群</span>
+                            <span>{{info.nickname}}</span>
                         </div>
                         <div>
                             <span>用户ID:</span>
-                            <span>awtk-55975980</span>
+                            <span>{{info.id}}</span>
                         </div>
                     </div>
                 </a-col>
@@ -28,12 +28,13 @@
                     <div class="line">
                         <div>
                             <span>认证状态:</span>
-                            <a-tag checkable color="red" :default-checked="true">未认证</a-tag>
-                            <a-tag checkable color="green" :default-checked="true">已认证</a-tag>
+                            <a-tag  color="red" v-if="info.status === '0'" :default-checked="true">未认证</a-tag>
+                            <a-tag  color="green" v-if="info.status === '1'" :default-checked="true">已认证</a-tag>
                         </div>
                         <div>
                             <span>用户类型:</span>
-                            <span>发起人</span>
+                            <span v-if="info.userType === '1'">发起人</span>
+                            <span v-else>普通用户</span>
                         </div>
                     </div>
                 </a-col>
@@ -45,7 +46,7 @@
                     <span @click="doTag(index)" :class="[index === tagIndex ? 'active' : '']">{{ item.name }}</span>
                 </div>
             </div>
-            <a-descriptions v-if="tagIndex == 0" style="margin-top: 40px; margin-left: 20px" :data="data" :size="'large'" title="" :column="1"/>
+            <a-descriptions v-if="tagIndex == 0" style="margin-top: 40px; margin-left: 20px" :data="data.value" :size="'large'" title="" :column="1"/>
             <fen v-if="tagIndex === 1"></fen>
             <yue v-if="tagIndex === 2"></yue>
             <xian v-if="tagIndex === 3"></xian>
@@ -64,7 +65,67 @@
   import xian from './commponents/xian.vue'
   import dazi from './commponents/dazi.vue'
   import revenue  from './commponents/revenue.vue'
-    import { reactive, ref } from 'vue';
+    import { onMounted, reactive, ref } from 'vue';
+
+    let info = ref({
+      id: '',
+      avatarUrl: '',
+      phoneNumber: '',
+      gender: '',
+      birthdayTime: '',
+      nickname: '',
+      introduce: '', // 简介
+      status: '0', // 认证状态 0未认领  1已认证
+      userType: '0', // userType是否发起过活动 1 发起过 其他没有
+    })
+
+  const data = reactive({
+    value: [{
+      label: '联系方式',
+      key: 'phoneNumber',
+      value: 'phoneNumber',
+    }, {
+      label: '二维码',
+      key: '',
+      value: '',
+    }, {
+      label: '简介',
+      key: 'introduce',
+      value: ''
+    }, {
+      label: '性别',
+      key: 'gender',
+      value: '',
+    },  {
+      label: '生日',
+      key: 'birthdayTime',
+      value: '',
+    }, {
+      label: '推荐偏好',
+      key: '',
+      value: ''
+    }]
+  });
+    onMounted(()=> {
+      const userListInfo = JSON.parse(localStorage.getItem('userListInfo'))
+      data.value.map(item=> {
+        const id = item.key
+        if (id === 'gender') {
+          // 0男 1女 2未知
+          if (userListInfo[id] == '0') {
+            userListInfo[id] = '男'
+          } else if (userListInfo[id] == '1') {
+            userListInfo[id] = '女'
+          } else {
+            userListInfo[id] = '未知'
+          }
+        }
+        item.value = userListInfo[id] ? userListInfo[id] : '--'
+      })
+      info.value = userListInfo
+    })
+
+
   const tags = reactive({
     list: [
         { id: 0, name: '基础信息' },
@@ -80,26 +141,6 @@
   const doTag = (index)=> {
     tagIndex.value = index
   }
-
-  const data = [{
-      label: '联系方式',
-      value: 'mobile',
-    }, {
-      label: '二维码',
-      value: '123-1234-1234',
-    }, {
-      label: '简介',
-      value: 'Beijing'
-    }, {
-      label: '性别',
-      value: '男',
-    },  {
-      label: '生日',
-      value: '2012-29-34',
-    }, {
-      label: '推荐偏好',
-      value: 'Yingdu Building, Zhichun Road, Beijing'
-    }];
   </script>
   
   <style lang="scss" scoped>

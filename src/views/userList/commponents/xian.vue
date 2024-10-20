@@ -1,29 +1,93 @@
 <template>
     <div style="padding-top: 48px;">
-        <a-table size="small" :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading"
-            :pagination='pagination' />
+        <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
+            <template #optional="{ record, rowIndex }">
+                <a-space>
+                    <a-button @click="doLook(record)" size="mini">
+                        <template #icon>
+                            <icon-find-replace />
+                        </template>
+                        查看</a-button>
+                    <a-button type="primary" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+                        v-if="record.status == 200">
+                        <template #icon>
+                            <icon-check-square />
+                        </template>
+                        审核
+                    </a-button>
+                    <a-button type="outline" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+                        v-if="record.status == 203">
+                        <template #icon>
+                            <icon-check-square />
+                        </template>
+                        再次审核
+                    </a-button>
+                    <a-button type="primary" status="danger" size="mini" v-if="record.status == 201"
+                        @click="doDown(record, rowIndex)">
+                        <template #icon>
+                            <icon-eye-invisible />
+                        </template>
+                        下架</a-button>
+
+                </a-space>
+            </template>
+            <template #status="{ record }">
+                <a-tag v-if="record.status == 200" color="orange">审核中</a-tag>
+                <a-tag v-if="record.status == 201" color="green">已上架</a-tag>
+                <a-tag v-if="record.status == 202" color="green">已删除</a-tag>
+                <a-tag v-if="record.status == 203" color="red">已下架</a-tag>
+            </template>
+        </a-table>
+        <!-- 审批 -->
+        <a-modal v-model:visible="isExamine" :on-before-ok="doExamine" @cancel="isExamine = false" unmountOnClose>
+            <template #title>审核</template>
+            <div class="ineject">
+                <div style="font-size: 18px;color: #333;padding-bottom: 8px;">请选择是否审批通过?</div>
+                <div>
+                    <a-radio-group type="button" v-model="examineStatus">
+                        <a-radio value="1">审批通过</a-radio>
+                        <a-radio value="2">审批不通过</a-radio>
+                    </a-radio-group>
+                </div>
+                <div v-if="examineStatus === '2'">
+                    <div style="padding-bottom: 8px;" :class="[!examineText && isExamineError ? 'error' : '']"><span
+                            class="required">*</span>请输入不通过原因</div>
+                    <a-input :style="{ width: '320px' }" placeholder="请输入不通过原因" type="text" v-model="examineText"
+                        required allow-clear />
+                </div>
+            </div>
+        </a-modal>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { orderUsedList } from '@/api/user'
-import { Message } from '@arco-design/web-vue'
+import { getList, onlineUp, onlineDown, audit } from '@/api/activity';
+import { Message, Modal } from '@arco-design/web-vue';
+import router from '@/router';
 
 const columns = [
-    { title: '用户ID', dataIndex: 'appUserId' },
-    { title: '用户昵称', dataIndex: 'appNikeName' },
-    { title: '手机号码', dataIndex: 'phone' },
-    { title: '消费次数', dataIndex: 'number' },
-    { title: '消费金额', dataIndex: 'orderAmount' },
-    { title: '最近消费时间', width: 170, dataIndex: 'payDate' },
+    { title: '标题', dataIndex: 'title' },
+    {
+        title: '状态',
+        dataIndex: 'status',
+        slotName: 'status' // 使用 slot 来渲染状态列
+    },
+    { title: '定位', dataIndex: 'address' },
+    { title: '用户昵称', dataIndex: 'nickname' },
+    { title: '创建时间', dataIndex: 'createTime' },
+    { title: '操作', slotName: 'optional', width: 200 },
 ];
+const data = reactive({
+    list: []
+});
 
 const formModel = reactive({
     pageNum: 1,
     pageSize: 10,
     list: []
 });
+
 const pagination = ref({
     total: 0, // 数据总条数
     current: 1, // 当前页
@@ -36,27 +100,104 @@ const pagination = ref({
     }, // 页码改变时的回调函数
 })
 const loading = ref(false)
-onMounted(() => { search() })
+let userId = ref('')
+onMounted(() => {
+    const userListInfo = JSON.parse(localStorage.getItem('userListInfo'))
+    userId.value = userListInfo ? userListInfo?.id : ''
+    search()
+})
 const search = async () => {
     loading.value = true
     const params = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
-        shopId: localStorage.getItem('shopId') || '',
-        isUsed: '0'
+        userId: userId.value,
+        "type": 2
     }
     try {
-        let res: any = await orderUsedList(params)
+        let res = await getList(params)
         loading.value = false
-        if (res?.code == 200) {
-            pagination.value.total = res.total;
-            formModel.list = res.rows
+        if (res?.code !== 0) {
+            Message.error(res?.msg)
         } else {
-            Message.error(res?.msg || res?.code?.toString() || '接口异常')
+            pagination.value.total = res.total;
+            data.list = res.rows;
         }
     } catch (error) {
-        Message.error('接口异常')
+        loading.value = false
+        Message.error(JSON.stringify(error) || '接口异常')
     }
+}
+
+const doLook = (record) => {
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+  localStorage.setItem('noveltyInfo', JSON.stringify(_record))
+    router.push('/novelty/info?id=' + record.id)
+}
+// 审批
+const optionIndex = ref(-1)
+const isExamine = ref(false)
+const examineText = ref('')
+const isExamineError = ref(false)
+const examineStatus = ref('1')
+const doExamine = async () => {
+    if (examineStatus.value === '2' && !examineText.value) {
+        isExamineError.value = true;
+        return false
+    }
+    const index = optionIndex.value
+    const record = data.list[optionIndex.value]
+    loading.value = true
+
+    Message.loading('加载中...')
+    const res = await audit({
+        id: record.id,
+        status: examineStatus.value,
+        remark: examineStatus.value === '1' ? "" : examineText.value
+    })
+    Message.clear()
+    loading.value = false
+    if (res?.code != 0) {
+        Message.error(res?.msg);
+        return;
+    }
+    data.list[index].status = examineStatus.value === '1' ? 201 : 203
+    Message.success(examineStatus.value === '1' ? "审核通过" : '拒绝通过');
+    return true;
+}
+
+// 下架
+const doDown = async (record, index) => {
+    Modal.confirm({
+        titleAlign: 'start',
+        title: '下架',
+        content: '是否确认下架，上架后小程序将无法查看',
+        okText: '确定',
+        cancelText: '取消',
+        async onOk() {
+            try {
+                onlineDown({ id: record.id }).then(res => {
+                    if (res.code === 0) {
+                        data.list[index].status = 203
+                        Message.success('下架成功')
+                        togetList()
+                    } else {
+                        Message.error('下架失败')
+                    }
+                })
+            } catch (error) {
+                Message.error(JSON.stringify(error) || '接口异常')
+            }
+        },
+        async onCancel() {
+
+        }
+    });
 }
 </script>
 
