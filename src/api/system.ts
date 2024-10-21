@@ -64,17 +64,17 @@ export function dictItemAdd(data: any) {
 export function dictItemUpdate(data: any) {
     return http({
       method: 'POST',
-      url: '/user/data/update',
+      url: '/user/data/edit',
       data
     })
 }
 
 // 删除字典小项
-export function dictItemDelete(id: string | number) {
+export function dictItemDelete(data: any) {
     return http({
       method: 'POST',
-      url: '/user/data/remove',
-      data: { id }
+      url: `/user/data/remove?id=${data.id}`,
+      
     })
 }
 
@@ -83,8 +83,7 @@ export function dictItemDelete(id: string | number) {
 export function configList(data: any) {
     return http({
       method: 'POST',
-      url: '/user/config/list',
-      data
+      url: `/user/config/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}`,
     })
 }
 
@@ -103,17 +102,17 @@ export function configAdd(data: any) {
 export function configUpdate(data: any) {
     return http({
       method: 'POST',
-      url: '/user/config/update',
+      url: '/user/config/edit',
       data
     })
 }
 
 
 // 删除系统编码配置
-export function configDelete(id: string | number) {
+export function configDelete(data: any) {
     return http({
       method: 'POST',
-      url: '/user/config/remove',
-      data: { id }
+      url: `/user/config/remove?configId=${data.configId}`,
+      
     })
 }

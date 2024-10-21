@@ -50,6 +50,7 @@ export default {
     'systemSetting.dict.relatedDict': '关联字典',
 
     'systemSetting.systemCode.name': '系统编码名称',
+    'systemSetting.systemCode.key': '系统编码KEY',
     'systemSetting.systemCode.value': '系统编码值',
     'systemSetting.systemCode.add': '系统编码新增',
     'systemSetting.systemCode.edit': '系统编码编辑',

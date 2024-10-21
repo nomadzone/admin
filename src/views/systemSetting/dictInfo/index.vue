@@ -115,6 +115,11 @@ const fetchList = async (page, size) => {
 }
 // 点击添加
 const handleAddDict = () => {
+
+    formInfo.value = {
+        dictName: '',
+        dictType: '',
+    }
     visible.value = true
     title.value = t('systemSetting.dict.add')
 }
@@ -158,7 +163,6 @@ const handleDelete = (record) => {
 
 // 点击确定
 const handleOk = () => {
-    console.log('handleOk')
 
     if (formInfo.value.dictId) {
         // 编辑
