@@ -9,7 +9,7 @@ import { ref,defineProps,defineEmits, watch, reactive } from 'vue'
 
 const emit = defineEmits(['updateFileList']);
 
-const action = ref(import.meta.env.VITE_API_BASE_URL + '/shop/oss/upload')
+const action = ref(import.meta.env.VITE_API_BASE_URL + '/admin/oss/upload')
 
 const props = defineProps({
    limit: {
@@ -41,7 +41,7 @@ const headerConfg = ref({
 const uploadSuccess = (res: any) => {
      // 更新至父组件
      if (res.status === 'done') {
-        emit('updateFileList', res.response.msg);
+        emit('updateFileList', res.response.data);
     }
 }
 

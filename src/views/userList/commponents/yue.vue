@@ -64,6 +64,7 @@ const infoRef = ref()
 const tagIndex = ref(0)
 const doTag = (index) => {
     tagIndex.value = index
+    search()
 }
 let userId = ref('')
 
@@ -130,11 +131,14 @@ onMounted(() => {
 })
 const search = async () => {
     loading.value = true
-    const params = {
+    const params:any = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
         type: '1',
         userId: userId.value
+    }
+    if (tagIndex.value === 1) {
+        params.typeUserEd = '1'
     }
     try {
         let res: any = await getList(params)

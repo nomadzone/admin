@@ -27,6 +27,11 @@ export default mergeConfig(
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '/user'), // 保持路径
         },
+        '/admin': {
+          target: 'http://120.26.208.147:9002', // 目标地址
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/admin'), // 保持路径
+        },
         '/system': {
           target: 'http://120.26.208.147:9002/admin', // 目标地址
           changeOrigin: true,

@@ -4,7 +4,7 @@
             <a-row  :gutter="24" style="align-items: center;">
                 <a-col :span="6">
                     <div style="text-align: center;">
-                        <a-avatar :size="98">
+                        <a-avatar :size="98" v-if="info.avatarUrl">
                             <img
                                 alt="avatar"
                                 :src="info.avatarUrl"
@@ -83,10 +83,10 @@
     value: [{
       label: '联系方式',
       key: 'phoneNumber',
-      value: 'phoneNumber',
+      value: '',
     }, {
       label: '二维码',
-      key: '',
+      key: 'contactphoto',
       value: '',
     }, {
       label: '简介',
@@ -102,7 +102,7 @@
       value: '',
     }, {
       label: '推荐偏好',
-      key: '',
+      key: 'userPreference',
       value: ''
     }]
   });
@@ -119,6 +119,13 @@
           } else {
             userListInfo[id] = '未知'
           }
+        }
+        if(id === 'userPreference') {
+          let name = []
+          userListInfo.userPreferenceList.map(item=> {
+            name.push(item.name)
+          })
+          userListInfo[id] = name.join(', ')
         }
         item.value = userListInfo[id] ? userListInfo[id] : '--'
       })

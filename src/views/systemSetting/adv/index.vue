@@ -8,17 +8,15 @@
               <a-row :gutter="16">
                 <a-col :span="12">
                   <a-form-item field="number" label="广告名称">
-                    <a-input v-model="formModel.advName" placeholder="请输广告名称" />
+                    <a-input v-model="formModel.advName" placeholder="请输广告名称" allow-clear/>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
                   <a-form-item field="status" label="状态">
-                    <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部">
+                    <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
                       <a-option value="">全部</a-option>
-                      <a-option value="0">已上线</a-option>
-                      <a-option value="1">已下线</a-option>
-                      <a-option value="2">待审批</a-option>
-                      <a-option value="3">不通过</a-option>
+                      <a-option value="0">已下架</a-option>
+                      <a-option value="1">已上架</a-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -26,9 +24,9 @@
             </a-form>
           </a-col>
           <a-divider style="height: 32px" direction="vertical" />
-          <a-col :flex="'86px'" style="text-align: right">
-            <a-space direction="vertical" :size="18">
-              <a-button type="primary" @click="search">
+          <a-col :flex="'180px'" style="text-align: right">
+            <a-space direction="" :size="18">
+              <a-button type="primary" @click="search" style="margin-right: 10px;">
                 <template #icon>
                   <icon-search />
                 </template>
@@ -58,21 +56,25 @@
         <template #optional="{ record, rowIndex }">
           <a-space>
             <a-link @click="doLook(record, rowIndex)" size="mini">查看</a-link>
-            <a-link @click="doEdit(record, rowIndex)" size="mini">编辑</a-link>
-            <a-link status="success" @click="doUp(record, rowIndex)" size="mini">上线</a-link>
-            <a-link status="warning" @click="doDown(record, rowIndex)" size="mini">下线</a-link>
-            <a-link status="danger" @click="doDelete(record, rowIndex)" size="mini">删除</a-link>
+            <a-link @click="doEdit(record, rowIndex)" v-if="record.status == 0" size="mini">编辑</a-link>
+            <a-link status="success" @click="doUp(record, rowIndex)" v-if="record.status == 0" size="mini">上架</a-link>
+            <a-link status="warning" @click="doDown(record, rowIndex)" v-if="record.status == 1" size="mini">下架</a-link>
+            <a-link status="danger" @click="doDelete(record, rowIndex)" v-if="record.status == 0" size="mini">删除</a-link>
           </a-space>
         </template>
         <template #images="{ record }">
             <a-image
+                v-if="record.image"
                 width="32"
-                src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a8c8cdb109cb051163646151a4a5083b.png~tplv-uwbnlip3yd-webp.webp"
+                :src="record.image"
             />
         </template>
+        <template #orderNumber="{ record }">
+          <span>{{ record.type === '1' ? '首页': (record.type === '2' ? '用户默认头像' : '商家') }}</span>/<span>{{ record.orderNumber }}</span>
+        </template>
         <template #status="{ record }">
-          <a-tag v-if="record.status == '0'" color="orange">已上线</a-tag>
-          <a-tag v-if="record.status == '1'" color="blue">已下线</a-tag>
+          <a-tag v-if="record.status == 1" color="blue">已上架</a-tag>
+          <a-tag v-if="record.status == 0" color="red">已下架</a-tag>
         </template>
       </a-table>
       
@@ -84,7 +86,7 @@
   import { ref, reactive, onMounted } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
-  import { comboList } from '@/api/combo';
+  import { noticeList, noticeRemove, noticeAdd, noticeEdit, noticeUp, noticeDown } from '@/api/adv';
   
   const router = useRouter()
   const buttonType = ref('0')
@@ -113,23 +115,27 @@
   })
   const columns = [
     { title: '广告ID', dataIndex: 'id' },
-    { title: '广告标题', dataIndex: 'name', width: 240, ellipsis: true },
+    { title: '广告标题', dataIndex: 'title', ellipsis: true },
     {
       title: '广告封面',
       dataIndex: 'images',
       slotName: 'images' // 使用 slot 来渲染状态列
     },
-    { title: '位置/排列', dataIndex: 'sort' },
+    {
+      title: '位置/排列',
+      dataIndex: 'orderNumber',
+      slotName: 'orderNumber' // 0下架 1上架
+    },
     {
       title: '状态',
       dataIndex: 'status',
-      slotName: 'status' // 使用 slot 来渲染状态列
+      slotName: 'status' // 0下架 1上架
     },
-    { title: '发布时间', dataIndex: 'startTime' },
-    { title: '操作', slotName: 'optional', width: 260 },
+    { title: '发布时间', dataIndex: 'createTime' },
+    { title: '操作', slotName: 'optional', width: 160 },
   ];
   const data = reactive({
-    list: [1]
+    list: []
   });
   const reset = ()=> {
     formModel.pageNum = 1;
@@ -140,16 +146,25 @@
   const search = async () => {
     loading.value = true
     try {
-      let res = await comboList({
+      const params = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
-        advName: formModel.advName,
-      })
+      }
+      if (formModel.advName) {
+        params.title = formModel.advName
+      }
+      if (formModel.status) {
+        params.status = formModel.status
+      }
+      let res = await noticeList(params)
       loading.value = false
-      if (res?.code !== 200) {
+      if (res?.code !== 0) {
         Message.error(res?.msg)
       } else {
         pagination.value.total = res.total;
+        res.rows.map(item=> {
+          item.image = item.images.split(',')[0]
+        })
         data.list = res.rows;
       }
     } catch (error) {
@@ -158,14 +173,28 @@
     }
   }
   
-  const doLook = (item) => {
+  const doLook = (record) => {
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+  localStorage.setItem('advInfo', JSON.stringify(_record))
     router.push({
       name: 'advCreate',
-      query: { id: item.id || '111', type: 'look' }
+      query: { id: item.id, type: 'look' }
     })
   }
 
-  const doCreate = (item) => {
+  const doCreate = (record) => {
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+  localStorage.setItem('advInfo', JSON.stringify(_record))
     router.push({
       name: 'advCreate',
       query: { type: 'add' }
@@ -175,11 +204,11 @@
   const doEdit = (item) => {
     router.push({
       name: 'advCreate',
-      query: { id: item.id || '111', type: 'edit' }
+      query: { id: item.id, type: 'edit' }
     })
   }
   
-  // 通过
+  // 删除
   const doDelete = async (item, index) => {
     Modal.confirm({
       titleAlign: 'start',
@@ -189,9 +218,9 @@
       cancelText: '取消',
       async onOk() {
         try {
-          let res = await orderCancel(item.id)
+          let res = await noticeRemove({id: item.id})
           loading.value = false
-          if (res?.code == 200) {
+          if (res?.code == 0) {
             Message.success('删除成功')
             search()
           } else {
@@ -209,6 +238,7 @@
   
   // 上线
   const doUp = async (item, index) => {
+    loading.value = true
     Modal.confirm({
       titleAlign: 'start',
       title: '上架广告',
@@ -217,26 +247,25 @@
       cancelText: '取消',
       async onOk() {
         try {
-          let res = await orderCancel(item.id)
+          let res = await noticeUp({id: item.id})
           loading.value = false
-          if (res?.code == 200) {
+          if (res?.code == 0) {
             Message.success('上架成功')
-            search()
+            data.list[index].status = 1
           } else {
             Message.error(res?.msg)
           }
         } catch(error) {
+          loading.value = false
           Message.error(JSON.stringify(error) || '接口异常')
         }
       },
-      async onCancel() {
-  
-      }
     });
   }
   
   // 下线
   const doDown = async (item, index) => {
+    loading.value = true
     Modal.confirm({
       titleAlign: 'start',
       title: '下架广告',
@@ -245,16 +274,18 @@
       cancelText: '取消',
       async onOk() {
         try {
-          let res = await orderCancel(item.id)
+          let res = await noticeDown({id: item.id})
           loading.value = false
-          if (res?.code == 200) {
+          if (res?.code == 0) {
             Message.success('下架成功')
-            search()
+            data.list[index].status = 0
           } else {
             Message.error(res?.msg)
           }
         } catch(error) {
+          loading.value = false
           Message.error(JSON.stringify(error) || '接口异常')
+          debugger
         }
       },
       async onCancel() {
