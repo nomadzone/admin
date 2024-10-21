@@ -1,6 +1,7 @@
 export default {
     "merchant.index.name": "商家名称",
     "merchant.index.status": "状态",
+    "merchant.index.identifyStatus": "认证状态",
     "merchant.index.category": "品类分类",
     "merchant.index.createTime": "创建时间",
     "merchant.index.id": "ID",
@@ -11,6 +12,13 @@ export default {
     "merchant.index.batchApproval": "批量通过",
     "merchant.index.batchNotPassed": "批量不通过",
     "merchant.index.download": "下载",
+    "merchant.index.identifyed": "已认证",
+    "merchant.index.authenticationFailed": "认证未通过",
+    "merchant.index.pendingApproval": "待审核",
+    "merchant.index.toBeCertified": "待认证",
+    "merchant.index.inBusiness": "营业中",
+    "merchant.index.restedAlready": "已休息",
+    "merchant.index.offlineAlready": "已下线",
 
 
 

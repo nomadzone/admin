@@ -76,6 +76,12 @@
 
                             </div>
                         </template>
+                        <template #isAuth="{ record }">
+                            <span>{{ approveStatusMap[record.isAuth] }}</span>
+                        </template>
+                        <template #shopStatus="{ record }">
+                            <span>{{ statusMap[record.shopStatus] }}</span>
+                        </template>
                         <template #action="{ record }">
                             <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.detail") }}</a-button>
                         </template>
@@ -105,12 +111,26 @@ const form = ref({
 
 })
 
+const approveStatusMap = {
+    '0': t('merchant.index.identifyed'),
+    '1': t('merchant.index.authenticationFailed'),
+    '2': t('merchant.index.pendingApproval'),
+    '4': t('merchant.index.toBeCertified')
+}
+
+const statusMap = {
+    '0': t('merchant.index.inBusiness'),
+    '1': t('merchant.index.restedAlready'),
+    '2': t('merchant.index.offlineAlready')
+}
+
 
 const columns = ref([
     { title: t('merchant.index.id'), dataIndex: 'id', key: 'id', width: 100, ellipsis: true },
     { title: t('merchant.index.name'), dataIndex: 'name', key: 'name', width: 160, ellipsis: true },
     { title: t('merchant.index.category'), dataIndex: 'category', key: 'category', width: 100, ellipsis: true },
-    { title: t('merchant.index.status'), dataIndex: 'status', key: 'status', width: 120, ellipsis: true },
+    { title: t('merchant.index.identifyStatus'), dataIndex: 'isAuth', key: 'isAuth', slotName: 'isAuth', width: 120, ellipsis: true },
+    { title: t('merchant.index.status'), dataIndex: 'shopStatus', key: 'shopStatus', slotName: 'shopStatus', width: 120, ellipsis: true },
     { title: t('merchant.index.packageNum'), dataIndex: 'packageNum', key: 'packageNum', width: 120, ellipsis: true },
     { title: t('merchant.index.accumulatedRevenue'), dataIndex: 'accumulatedRevenue', key: 'accumulatedRevenue', width: 200, ellipsis: true, slotName: 'paymentMethod' },
     { title: t('merchant.index.accumulatedExpenses'), dataIndex: 'accumulatedExpenses', key: 'accumulatedExpenses', width: 180, ellipsis: true },
@@ -126,6 +146,8 @@ const fetchData = async () => {
     const res = await shopList()
     data.value = res.rows
 }
+
+
 
 
 // 查看详情

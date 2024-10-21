@@ -48,6 +48,7 @@ export default {
     'systemSetting.dict.relatedDict': 'Related Dictionary',
 
     'systemSetting.systemCode.name': 'System Code Name',
+    'systemSetting.systemCode.key': 'System Code Key',
     'systemSetting.systemCode.value': 'System Code Value',
     'systemSetting.systemCode.add': 'System Code Add',
     'systemSetting.systemCode.edit': 'System Code Edit',

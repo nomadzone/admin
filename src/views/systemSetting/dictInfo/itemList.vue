@@ -14,10 +14,9 @@
                 </div>
                 <a-table :columns="columns" :bordered="{ cell: true }" :data="data">
                     <template #action="{ record }">
-                        <a-button type="text" @click="handleDetail(record)">{{ $t("button.detail") }}</a-button>
                         <a-button type="text" @click="handleEdit(record)">{{ $t("button.edit") }}</a-button>
-                        <a-popconfirm :content="$t('systemSetting.dict.deleteTips')">
-                            <a-button type="text" @click="handleDelete(record)">{{ $t("button.delete") }}</a-button>
+                        <a-popconfirm :content="$t('systemSetting.dict.deleteTips')" @ok="handleDelete(record)">
+                            <a-button type="text">{{ $t("button.delete") }}</a-button>
                         </a-popconfirm>
                     </template>
                 </a-table>
@@ -30,8 +29,8 @@
             </template>
             <div>
                 <a-form :model="formInfo" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-                    <a-form-item field="dictName" :label="$t('systemSetting.dict.name')">
-                        <a-input v-model="formInfo.dictName" />
+                    <a-form-item field="dictLabel" :label="$t('systemSetting.dict.name')">
+                        <a-input v-model="formInfo.dictLabel" />
                     </a-form-item>
                     <a-form-item field="dictValue" :label="$t('systemSetting.dict.value')">
                         <a-input v-model="formInfo.dictValue" />
@@ -47,8 +46,12 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 
 import { useRouter } from 'vue-router';
-import { dictItem } from '@/api/system'
+import { dictItem, dictItemAdd, dictItemUpdate, dictItemDelete } from '@/api/system'
+import { Message } from '@arco-design/web-vue';
+
 const { t } = useI18n();
+
+
 
 const router = useRouter();
 const columns = [
@@ -60,8 +63,8 @@ const columns = [
     },
     {
         title: t('systemSetting.dict.itemValue'),
-        dataIndex: 'dictCode',
-        key: 'dictCode',
+        dataIndex: 'dictValue',
+        key: 'dictValue',
         ellipsis: true,
     },
     {
@@ -78,13 +81,18 @@ const columns = [
     },
 ]
 
-const data = ref([{}])
+const data = ref([])
 
 const visible = ref(false)
 const title = ref('')
 
 // 点击添加
 const handleAddDict = () => {
+    formInfo.value = {
+        dictLabel: '',
+        dictValue: '',
+        dictType: router.currentRoute.value.query.dictType,
+    }
     visible.value = true
     title.value = t('systemSetting.dict.add')
 }
@@ -97,8 +105,9 @@ const handleDetail = (record) => {
 const chooenRecord = ref({})
 
 const formInfo = ref({
-    dictName: '',
+    dictLabel: '',
     dictValue: '',
+    dictType: router.currentRoute.value.query.dictType,
 })
 
 // 点击编辑
@@ -113,13 +122,40 @@ const handleEdit = (record) => {
 // 点击删除
 
 const handleDelete = (record) => {
-    console.log('handleDelete', record)
+
+    let params = {
+        id: record.dictCode
+    }
+    dictItemDelete(params).then((res) => {
+        if (res.code === 0) {
+            Message.success(t('common.deleteSuccess'))
+            fetchList()
+        }
+    })
 }
 
 
 // 点击确定
 const handleOk = () => {
-    console.log('handleOk')
+    if (formInfo.value.dictCode) {
+        // 编辑
+        dictItemUpdate(formInfo.value).then((res) => {
+            if (res.code === 0) {
+                Message.success(t('common.editSuccess'))
+                visible.value = false
+                fetchList()
+            }
+        })
+    } else {
+        // 新增
+        dictItemAdd(formInfo.value).then((res) => {
+            if (res.code === 0) {
+                Message.success(t('common.addSuccess'))
+                visible.value = false
+                fetchList()
+            }
+        })
+    }
     visible.value = false
 }
 
