@@ -10,7 +10,7 @@ export interface DictRecord {}
 export function dictList(data: dictList & any) {
     return http({
       method: 'post',
-      url: `/user/type/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}`,
+      url: `/admin/user/type/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}`,
     })
 
   }
@@ -19,7 +19,7 @@ export function dictList(data: dictList & any) {
 export function dictAdd(data: any) {
     return http({
       method: 'POST',
-      url: '/user/type/add',
+      url: '/admin/user/type/add',
       data
     })
 }
@@ -28,7 +28,7 @@ export function dictAdd(data: any) {
 export function dictUpdate(data: any) {
     return http({
       method: 'POST',
-      url: '/user/type/edit',
+      url: '/admin/user/type/edit',
       data
     })
 }
@@ -37,7 +37,7 @@ export function dictUpdate(data: any) {
 export function dictDelete(data: any) {
     return http({
       method: 'POST',
-      url: `/user/type/remove?id=${data.id}`,
+      url: `/admin/user/type/remove?id=${data.id}`,
     })
 }
 
@@ -46,7 +46,7 @@ export function dictDelete(data: any) {
 export function dictItem(data: any) {
     return http({
       method: 'post',
-      url: `/user/data/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}&dictType=${data.dictType}`,
+      url: `/admin/user/data/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}&dictType=${data.dictType}`,
      
     })
 }
@@ -55,7 +55,7 @@ export function dictItem(data: any) {
 export function dictItemAdd(data: any) {
     return http({
       method: 'POST',
-      url: '/user/data/add',
+      url: '/admin/user/data/add',
       data
     })
 }
@@ -64,7 +64,7 @@ export function dictItemAdd(data: any) {
 export function dictItemUpdate(data: any) {
     return http({
       method: 'POST',
-      url: '/user/data/edit',
+      url: '/admin/user/data/edit',
       data
     })
 }
@@ -73,7 +73,7 @@ export function dictItemUpdate(data: any) {
 export function dictItemDelete(data: any) {
     return http({
       method: 'POST',
-      url: `/user/data/remove?id=${data.id}`,
+      url: `/admin/user/data/remove?id=${data.id}`,
       
     })
 }
@@ -83,7 +83,7 @@ export function dictItemDelete(data: any) {
 export function configList(data: any) {
     return http({
       method: 'POST',
-      url: `/user/config/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}`,
+      url: `/admin/user/config/list?pageSize=${data.pageSize}&pageNum=${data.pageNum}`,
     })
 }
 
@@ -92,7 +92,7 @@ export function configList(data: any) {
 export function configAdd(data: any) {
     return http({
       method: 'POST',
-      url: '/user/config/add',
+      url: '/admin/user/config/add',
       data
     })
 }
@@ -102,7 +102,7 @@ export function configAdd(data: any) {
 export function configUpdate(data: any) {
     return http({
       method: 'POST',
-      url: '/user/config/edit',
+      url: '/admin/user/config/edit',
       data
     })
 }
@@ -112,7 +112,7 @@ export function configUpdate(data: any) {
 export function configDelete(data: any) {
     return http({
       method: 'POST',
-      url: `/user/config/remove?configId=${data.configId}`,
+      url: `/admin/user/config/remove?configId=${data.configId}`,
       
     })
 }

@@ -19,8 +19,11 @@ export default {
     "merchant.index.inBusiness": "营业中",
     "merchant.index.restedAlready": "已休息",
     "merchant.index.offlineAlready": "已下线",
-
-
+    "merchant.index.pass": "通过",
+    "merchant.index.passConfirm": "确定通过该商家吗？",
+    "merchant.index.reject": "拒绝",
+    "merchant.index.rejectModalTitle": "审批不通过",
+    "merchant.index.rejectLabel": "请输入不通过原因",
 
     "merchant.category.name": "品类名称",
     "merchant.category.value": "品类值",

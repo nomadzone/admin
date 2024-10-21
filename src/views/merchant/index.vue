@@ -138,7 +138,7 @@ const columns = ref([
 
 ])
 
-const data = ref([{}
+const data = ref([
 ])
 // 查询列表
 
@@ -154,6 +154,9 @@ const fetchData = async () => {
 const handleShowDetail = (row: any) => {
     router.push({
         name: 'merchantDetail',
+        query: {
+            id: row.id,
+        }
     });
 }
 

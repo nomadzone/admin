@@ -19,9 +19,11 @@ export default {
     "merchant.index.inBusiness": "In Business",
     "merchant.index.restedAlready": "Rested Already",
     "merchant.index.offlineAlready": "Offline Already",
-
-    
-
+    "merchant.index.pass": "Pass",
+    "merchant.index.passConfirm": "Are you sure you want to pass this merchant?",
+    "merchant.index.reject": "Reject",
+    "merchant.index.rejectModalTitle": "Approval not approved",
+    "merchant.index.rejectLabel": "Please enter the reason for not passing",    
 
 
     "merchant.category.name": "Name",

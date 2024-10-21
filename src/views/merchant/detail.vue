@@ -33,8 +33,10 @@
 
                 <a-tabs type="rounded">
                     <a-tab-pane key="1" title="基础信息">
+                        <BasicInfo :info="basicInfo" />
                     </a-tab-pane>
                     <a-tab-pane key="2" title="认证信息">
+                        <IdentifyInfo :info="identifyInfoData" />
                     </a-tab-pane>
                     <a-tab-pane key="3" title="套餐列表">
                     </a-tab-pane>
@@ -49,7 +51,53 @@
 
     </div>
 </template>
-<script lang="ts" setup>
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import IdentifyInfo from './components/identifyInfo.vue';
+import BasicInfo from './components/basicInfo.vue';
+import { merchantIdentifyList, shopList } from '@/api/merchant';
+
+const router = useRouter();
+
+const info = ref({
+    shopName: '商家名称',
+    shopStatus: '商家状态',
+    shopId: '商家ID',
+    shopType: '商家类型',
+    isAuth: router.currentRoute.value.query.isAuth
+})
+
+// 查询商家信息
+
+let basicInfo = ref({})
+const getMerchantInfo = async () => {
+    let params = {
+        id: router.currentRoute.value.query.id
+    }
+    let res = await shopList(params);
+    basicInfo.value = res.rows[0];
+
+
+}
+
+// 获取商家认证信息
+let identifyInfoData = ref({})
+const getMerchantIdentifyInfo = async () => {
+    let params = {
+        shopId: router.currentRoute.value.query.id
+    }
+
+    let res = await merchantIdentifyList(params);
+    identifyInfoData.value = res.rows[0];
+
+}
+
+onMounted(() => {
+    getMerchantInfo();
+    getMerchantIdentifyInfo();
+})
+
 </script>
 
 <style lang="scss" scoped>
@@ -101,6 +149,18 @@
 
             ::v-deep .arco-tabs-content {
                 height: calc(100% - 40px) !important;
+
+                .arco-tabs-content-list {
+                    height: 100%;
+                }
+
+                .arco-tabs-content-item {
+                    height: 100%;
+
+                    .arco-tabs-pane {
+                        height: 100%;
+                    }
+                }
             }
         }
 
