@@ -1,5 +1,5 @@
 <template>
-    <a-modal v-model:visible="visible" title="审核" @cancel="handleCancel" :footer="false">
+    <a-modal v-model:visible="visible" title="审核"  :footer="false">
       <a-form ref="formRef" :rules="rules" :model="form" >
         <a-form-item label="活动名称:">
             {{ detail?.title }}
@@ -24,16 +24,27 @@
         <a-form-item label="详情:">
             {{ detail?.describe }}
         </a-form-item>
-        <a-form-item field="remark" label="理由:">
-          <a-input v-model="form.remark" placeholder="请输入理由" />
-        </a-form-item>
       </a-form>
       <div slot="footer">
         <div class="footer_content">
-          <a-button style="margin-right: 20px" type="dashed" @click="handleCancel">拒绝</a-button>
+          <a-button style="margin-right: 20px" type="dashed" @click="handleCancel">未通过</a-button>
           <a-button type="primary" @click="handleBeforeOk" :loading="loading">通过</a-button>
         </div>
       </div>
+    <a-modal v-model:visible="visibleCancel" title="未通过理由"  :footer="false">
+      <a-form ref="formRefTwo" :model="form" >
+        <a-form-item field="remark" label="理由:">
+          <a-input v-model="form.remark" placeholder="请输入理由" />
+        </a-form-item>
+        </a-form>
+        <div slot="footer">
+        <div class="footer_content">
+          <a-button style="margin-right: 20px" type="dashed" @click="handleCancelTwo">取消</a-button>
+          <a-button type="primary" @click="handleCancelT" :loading="loading">确定</a-button>
+        </div>
+      </div>
+    </a-modal>
+
     </a-modal>
   </template>
   <script setup lang="ts">
@@ -45,6 +56,7 @@
   const formRef = ref()
   const loading = ref(false)
   const iamges = ref([])
+  const visibleCancel = ref(false)
   const form = ref({
     name: '',
     password: '',
@@ -62,7 +74,10 @@
     detail.value = row;
     iamges.value = row.images.split(',')
   }
-  const handleCancel = () => {
+  function handleCancelTwo() {
+    visibleCancel.value = false;
+  }
+  function handleCancelT() {
     if (form.value.remark === '') {
         formRef.value.validateField('remark')
         return
@@ -75,12 +90,17 @@
     audit(data).then(() => {
         loading.value = false;
         visible.value = false;
+        visibleCancel.value = false;
         Message.success('拒绝成功')
         emit('revesh')
     }).catch(() => {
         loading.value = false;
     })
     loading.value = true;
+  }
+  const handleCancel = () => {
+    form.value.remark = ''
+    visibleCancel.value = true;
   }
   const handleBeforeOk = () => {
     let data = {

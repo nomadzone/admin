@@ -28,3 +28,11 @@ export function getList(data) {
       data
     })
   }
+  // /user/userActivity/list
+  export function userActivityList(data) {
+    return http({
+      method: 'POST',
+      url: '/user/userActivity/list',
+      data
+    })
+    }

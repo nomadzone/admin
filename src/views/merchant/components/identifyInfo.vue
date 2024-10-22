@@ -1,7 +1,64 @@
 <template>
     <div class="shop-identify-info">
-        <div class="info-body"></div>
-        <div class="bottom-action" v-if="props.info.isAuth == 2">
+        <div class="info-body">
+
+            <div class="identify-info-box company" v-if="indentifyInfo.authType == 1">
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.companyName') }}</div>
+                    <div class="item-value">{{ indentifyInfo.companyName }}</div>
+                </div>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.contacts') }}</div>
+                    <div class="item-value">{{ indentifyInfo.name }}</div>
+                </div>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.phone') }}</div>
+                    <div class="item-value">{{ indentifyInfo.phone }}</div>
+                </div>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.businessLicenseRegistrationNumber') }}</div>
+                    <div class="item-value">{{ indentifyInfo.businessLicenseCode }}</div>
+                </div>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.license') }}</div>
+                    <div class="item-value">
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <a-image width="80" :src="indentifyInfo.businessLicenseUrl" style="margin: 8;" />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.legalPersonIdCard') }}</div>
+                    <div class="item-value">
+
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <a-image width="80" :src="indentifyInfo.papersTopUrl" style="margin: 8;" />
+                            <a-image width="80" :src="indentifyInfo.papersBottomUrl" style="margin: 8;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="identify-info-box person" v-else>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.contacts') }}</div>
+                    <div class="item-value">{{ indentifyInfo.name }}</div>
+                </div>
+                <div class="info-item-row">
+                    <div class="item-label">{{ t('merchant.index.idCard') }}</div>
+                    <div class="item-value">
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <a-image width="80" :src="indentifyInfo.papersTopUrl" style="margin: 8;" />
+                            <a-image width="80" :src="indentifyInfo.papersBottomUrl" style="margin: 8;" />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="bottom-action">
             <a-button class="reject-btn" @click="handleReject()">{{ t('merchant.index.reject') }}</a-button>
 
             <a-popconfirm :content="$t('merchant.index.passConfirm')" @ok="handlePass()">
@@ -35,11 +92,17 @@ const props = defineProps({
 
 
 // 监听 info 的变化
+
+const indentifyInfo = ref({});
 watch(() => props.info, (newInfo) => {
     // 在这里处理 info 变化后的逻辑
     console.log('info 发生变化:', newInfo);
     // 例如，更新 rejectReason
-});
+
+    if (newInfo) {
+        indentifyInfo.value = newInfo;
+    }
+}, { immediate: true });
 const visible = ref(false);
 
 
@@ -102,6 +165,35 @@ const handlePass = () => {
 
     .info-body {
         height: calc(100% - 50px);
+
+        .identify-info-box {
+            margin: 32px;
+            padding: 16px;
+            background-color: #F2F4F5;
+            border-radius: 8px;
+
+            .info-item-row {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+                margin-bottom: 20px;
+
+                .item-label {
+                    width: 120px;
+                    font-size: 14px;
+                    text-align: right;
+                    color: #86909C;
+                }
+
+                .item-value {
+                    flex: 1;
+                    font-size: 14px;
+                    color: #000000;
+                    margin-left: 16px;
+                }
+            }
+        }
     }
 
     .bottom-action {

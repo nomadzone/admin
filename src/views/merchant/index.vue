@@ -142,8 +142,16 @@ const data = ref([
 ])
 // 查询列表
 
-const fetchData = async () => {
-    const res = await shopList()
+const pageSize = ref(10)
+const pageNum = ref(1)
+const total = ref(0)
+
+const fetchData = async (page, size) => {
+    let params = {
+        pageSize: size || pageSize.value,
+        pageNum: page || pageNum.value,
+    }
+    const res = await shopList(params)
     data.value = res.rows
 }
 
