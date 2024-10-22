@@ -8,16 +8,17 @@
                     <div class="desc">
                         <a-descriptions :column="2">
                             <a-descriptions-item label="商家名称">
-                                <!-- <a-tag></a-tag> -->
+                                {{ basicInfo.name }}
                             </a-descriptions-item>
                             <a-descriptions-item label="商家状态">
-                                <!-- <a-tag></a-tag> -->
+                                <span>{{ approveStatusMap[basicInfo.isAuth] }}</span>
                             </a-descriptions-item>
                             <a-descriptions-item label="商家ID">
-                                <!-- <a-tag></a-tag> -->
+                                {{ basicInfo.id }}
                             </a-descriptions-item>
                             <a-descriptions-item label="商家类型">
                                 <!-- <a-tag></a-tag> -->
+                                {{ authTypeMap[basicInfo.authType] }}
                             </a-descriptions-item>
                         </a-descriptions>
 
@@ -39,8 +40,10 @@
                         <IdentifyInfo :info="identifyInfoData" />
                     </a-tab-pane>
                     <a-tab-pane key="3" title="套餐列表">
+                        <SetMenu :shopId="basicInfo.id" />
                     </a-tab-pane>
                     <a-tab-pane key="4" title="订单记录">
+                        <OrderList :shopId="basicInfo.id" />
                     </a-tab-pane>
                     <a-tab-pane key="5" title="收支明细">
                     </a-tab-pane>
@@ -55,10 +58,25 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import IdentifyInfo from './components/identifyInfo.vue';
+import { useI18n } from 'vue-i18n';
 import BasicInfo from './components/basicInfo.vue';
+import SetMenu from './components/setMenu.vue';
+import OrderList from './components/orderList.vue';
 import { merchantIdentifyList, shopList } from '@/api/merchant';
+const { t } = useI18n()
 
 const router = useRouter();
+const approveStatusMap = {
+    '0': t('merchant.index.identifyed'),
+    '1': t('merchant.index.authenticationFailed'),
+    '2': t('merchant.index.pendingApproval'),
+    '4': t('merchant.index.toBeCertified')
+}
+
+const authTypeMap = {
+    '0': t('merchant.index.person'),
+    '1': t('merchant.index.enterprise')
+}
 
 const info = ref({
     shopName: '商家名称',
@@ -73,7 +91,9 @@ const info = ref({
 let basicInfo = ref({})
 const getMerchantInfo = async () => {
     let params = {
-        id: router.currentRoute.value.query.id
+        id: router.currentRoute.value.query.id,
+        pageSize: 1,
+        pageNum: 1
     }
     let res = await shopList(params);
     basicInfo.value = res.rows[0];
@@ -85,7 +105,9 @@ const getMerchantInfo = async () => {
 let identifyInfoData = ref({})
 const getMerchantIdentifyInfo = async () => {
     let params = {
-        shopId: router.currentRoute.value.query.id
+        shopId: router.currentRoute.value.query.id,
+        pageSize: 1,
+        pageNum: 1
     }
 
     let res = await merchantIdentifyList(params);
@@ -139,19 +161,22 @@ onMounted(() => {
     }
 
     .body-content {
-        height: calc(100% - 160px - 16px);
+        height: calc(100% - 180px);
         background-color: #fff;
         width: 100%;
         padding: 20px 12px;
+        overflow: hidden;
 
         .arco-tabs {
             height: 100%;
+            overflow: hidden;
 
             ::v-deep .arco-tabs-content {
-                height: calc(100% - 40px) !important;
+                height: calc(100% - 80px) !important;
 
                 .arco-tabs-content-list {
                     height: 100%;
+
                 }
 
                 .arco-tabs-content-item {
@@ -159,6 +184,7 @@ onMounted(() => {
 
                     .arco-tabs-pane {
                         height: 100%;
+
                     }
                 }
             }
