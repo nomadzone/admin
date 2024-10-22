@@ -15,6 +15,22 @@
               </a-form-item>
             </a-col>
             <a-col :xl="6" :lg="8" :md="12" :xs="24">
+              <a-form-item label="活动名称:" field="title">
+                <a-input placeholder="请输入" v-model="form.title"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :xl="6" :lg="8" :md="12" :xs="24">
+              <a-form-item label="发起人昵称:" field="nickname">
+                <a-input placeholder="请输入" v-model="form.nickname"></a-input>
+              </a-form-item>
+            </a-col>
+            
+            <a-col :xl="6" :lg="8" :md="12" :xs="24">
+              <a-form-item label="活动名称:" field="address">
+                <a-input placeholder="请输入" v-model="form.title"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :xl="6" :lg="8" :md="12" :xs="24">
               <a-form-item label="状态:" field="status">
                 <a-select v-model="form.status" placeholder="请选择" :options="options" :field-names="fieldNames" >
                 </a-select>
@@ -27,7 +43,7 @@
               </a-form-item>
             </a-col>
             <a-col :xl="6" :lg="8" :md="12" :xs="24">
-              <a-form-item label="所在城市:" field="address">
+              <a-form-item label="所在地址:" field="address">
                 <a-input placeholder="请输入" v-model="form.address"></a-input>
               </a-form-item>
             </a-col>
@@ -49,7 +65,7 @@
           {{ options.find(item => item.value === record.status)?.label }}
         </template>
         <template #actions="{record}">
-          <a-button style="margin-left: 5px;" text type="primary" v-if="record.status === 100" @click="handleStatus(record)">审核</a-button>
+          <a-button style="margin-right: 5px;" text type="primary" v-if="record.status === 100" @click="handleStatus(record)">审核</a-button>
           <a-popconfirm @ok="downOk(record)" v-if="record.status === 100|| record.status === 101 || record.status === 102 || record.status === 103 || record.status === 104 || record.status === 104" content="确认下架吗？">
             <a-button type="primary">下架</a-button>
           </a-popconfirm>
@@ -61,7 +77,6 @@
       </a-table>
       <div class="pagination_end">
         <a-pagination :total="total" show-page-size @change="changePage" :page-size="form.pageSize" :current-page="form.pageNum" @page-size-change="changePageSize" />
-
       </div>
     </div>
     <ActionForm ref="actionformRef"></ActionForm>
@@ -96,7 +111,6 @@ const field = {value: 'name', label: 'name'}
 const total = ref(0)
 
 
-
 const options = ref([
     {value: 100, label: '发布中(审核中)'},
     {value: 101, label: '已发布(报名中)'},
@@ -107,7 +121,7 @@ const options = ref([
     {value: 106, label: '已删除'},
     {value: 107, label: '未通过'}
 ]);
-const columns = [
+const columns = ref([
   {
     title: '活动名称',
     dataIndex: 'title',
@@ -130,7 +144,7 @@ const columns = [
     width: 100
   },
   {
-    title: '人均收费',
+    title: '报名费',
     dataIndex: 'price',
     width: 100
   },
@@ -165,8 +179,9 @@ const columns = [
     dataIndex: 'actions',
     slotName:'actions',
     fixed: 'right',
+    width: 240
   }
-];
+])
 const tableData = ref([])
 
 function getTimeList(e) {
