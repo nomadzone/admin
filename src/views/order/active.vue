@@ -7,11 +7,11 @@
             label-align="right">
             <a-row :gutter="16">
               <a-col :span="12"> 
-                <a-form-item field="number" label="套餐名称">
-                  <a-input v-model="formModel.shopComboName" placeholder="请输入套餐名称" />
+                <a-form-item field="number" label="用户昵称 ">
+                  <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " />
                 </a-form-item>
-                <a-form-item field="number" label="订单号">
-                  <a-input v-model="formModel.orderNo" placeholder="请输入订单号" />
+                <a-form-item field="number" label="手机号码">
+                  <a-input v-model="formModel.phone" placeholder="请输入手机号码" />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
@@ -24,7 +24,7 @@
                     <a-option value="3">不通过</a-option>
                   </a-select>
                 </a-form-item>
-                <a-form-item field="name" label="验证时间">
+                <a-form-item field="name" label="报名时间">
                   <a-range-picker style="width: 360px; margin: 0 24px 24px 0;" show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }" format="YYYY-MM-DD HH:mm"
                      @select="onSelectTime" @ok="onOkTime" @clear="onClear" />
@@ -47,61 +47,121 @@
       </a-row>
     </a-card>
     <a-table :columns="columns" :data="formModel.list" style="width: 100%" @row-click="handleRowClick" :loading="loading" :pagination='pagination'>
+      <template #status="{ record }">
+        <a-tag :color="record.status === '1' ? 'green' : record.status === '2' ? 'red' : 'blue'">
+          {{ record.status === '1' ? '报名成功' : record.status === '2' ? '取消报名' : '正在报名' }}
+        </a-tag>
+      </template>
+      <template #price="{ record }">
+        {{ record.price || '--' }}
+      </template>
       <template #optional="{ record }">
-        <!-- 1-待使用：点击消费验证，跳转至消费验证页； 2
-        2-待付款：点击取消直接订单取消 3
-        3-已使用、已完成、退款中、已取消、退款完成、微信支付回调失败、微信退款回调失败：无操作
-        4-已使用=已完成，可以合并成一个状态 -->
-        <!-- FINISH("0", "已完成"),
-        CANCEL("1", "已取消"),
-        UN_USE("2", "待使用"),
-        WAIT_PAYMENT("3", "待付款"),
-        REFUND_IN_PROGRESS("4", "退款中"),
-        REFUND_FINISH("5", "退款完成"),
-        FAIL("6", "微信支付回调失败"),
-        FAIL_RETURN("7", "微信退款回调失败"); -->
         <a-space>
-          <a-link @click="doCancel(record)" >取消</a-link>
-          <!-- <a-link @click="doRefund(record)" status="danger">退款维权</a-link> -->
+          <a-link @click="doLook(record)">查看详情</a-link>
         </a-space>
       </template>
     </a-table>
-    <consumptionVerify @submit="handleSubmit"></consumptionVerify>
+    <a-modal v-model:visible="visible">
+      <template #title>
+        票夹详情
+      </template>
+      <div>
+        <div class="line" v-for="field in fields" :key="field.key">
+          <span>{{ field.label }}</span>
+            <a-image
+                v-if="field.key === 'images'"
+                width="32"
+                :src="info[field.key]"
+            />
+          <span v-else-if="field.key === 'gender'">{{ info[field.key] == '0' ? '男' : (info[field.key] == '1' ? '女': '未知')  }}</span>
+          <a-tag v-else-if="field.key === 'status'" :color="info[field.key] === '1' ? 'green' : info[field.key] === '2' ? 'red' : 'blue'">
+          {{ info[field.key] === '1' ? '报名成功' : info[field.key] === '2' ? '取消报名' : '正在报名' }}
+          </a-tag>
+          <span v-else>{{ info[field.key] || '--' }}</span>
+        </div>
+      </div>
+    </a-modal>
+
   </PageCard>
 </template>
 
 <script setup>
 import PageCard from '@/components/page-card/index.vue';
-import consumptionVerify from '@/components/modal/consumption-verify.vue';
 import { ref, reactive, watch, onMounted } from 'vue';
 import { Modal } from '@arco-design/web-vue';
 import { useModalStore } from '../../store';
-import { orderList, orderCancel, orderTicketCode } from '@/api/order'
+import { userActivityList } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
-
 const columns = [
-  { title: '订单号', dataIndex: 'order', width: 120 },
-  { title: '套餐名套餐名套餐名套餐名套餐名…', dataIndex: 'shopComboName', ellipsis: true },
-  { title: '数量', dataIndex: 'number', width: 60 },
-  { title: '商家昵称', dataIndex: 'sotreName', width: 120 },
-  { title: '订单金额', dataIndex: 'orderAmount', width: 90 },
-  { title: '服务费', dataIndex: 'serviceCost', width: 80 },
-  { title: '状态', dataIndex: 'orderStatusName', width: 80 },
-  { title: '用户昵称', dataIndex: 'userName', width: 130 },
-  { title: '下单时间', dataIndex: 'startTime', width: 130 },
-  { title: '操作', slotName: 'optional', width: 80 },
+  { title: '手机号码', dataIndex: 'phone' },
+  { title: '用户昵称', dataIndex: 'nickname'},
+  { title: '订单金额', slotName: 'price', width: 90 },
+  { title: '状态', slotName: 'status' },
+  { title: '报名时间', dataIndex: 'createTime', width: 130 },
+  { title: '操作', slotName: 'optional', width: 100 },
 ];
 
+const visible = ref(false);
+const fields = [
+  // { label: '创建者', key: 'createBy' },
+  { label: '报名时间', key: 'createTime' },
+  // { label: '更新者', key: 'updateBy' },
+  // { label: '更新时间', key: 'updateTime' },
+  { label: '备注', key: 'remark' },
+  // { label: '维度ID', key: 'dimensionId' },
+  // { label: '管理员', key: 'adminNew' },
+  // { label: '页码', key: 'pageNum' },
+  // { label: '每页条数', key: 'pageSize' },
+  { label: '票夹ID', key: 'id' },
+  { label: '用户ID', key: 'userId' },
+  { label: '图片', key: 'images' },
+  { label: '用户昵称', key: 'nickname' },
+  { label: '价格', key: 'price' },
+  { label: '电话号码', key: 'phone' },
+  { label: '状态', key: 'status' },
+  { label: '性别', key: 'gender' },
+  { label: '活动ID', key: 'activityid' },
+  // { label: '结束时间', key: 'endTime' },
+];
 
+const info = ref({
+  "createBy": null,
+  "createTime": "2024-10-21 02:43:34",
+  "updateBy": null,
+  "updateTime": null,
+  "remark": "390c7f07-1baa-4958-92bd-e662b637abab",
+  "dimensionId": null,
+  "adminNew": null,
+  "pageNum": null,
+  "pageSize": null,
+  "id": "1eb6c8c8-91c9-4118-9a96-a1c1ad933ec4",
+  "userId": "a7aa4ec9-f8a9-44cb-80d4-00b23b4203da",
+  "images": null,
+  "nickname": "旷野RFQ1u4T3",
+  "price": 0.10,
+  "phone": "13484130157",
+  "status": "1",
+  "gender": null,
+  "activityid": "0b81f01e-d6df-49c3-8101-c4d09f194c94",
+  "endTime": null
+})
+
+const doLook = (item)=> {
+  for (let key in item) {
+    console.log(key, item[key])
+    info.value[key] = item[key] || ''
+  }
+  visible.value = true
+}
 
 const formModel = reactive({
-  shopComboName: '',
-  orderNo: '',
+  nickname: '',
+  phone: '',
   status: '',
   verifyTime: [],
   pageNum: 1,
   pageSize: 10,
-  list: [1]
+  list: []
 });
 const loading = ref(false)
 const pagination = ref({
@@ -125,11 +185,11 @@ const search = async() => {
     pageSize: formModel.pageSize,
     // verifyStatus: '1'
   }
-  if (formModel.shopComboName){
-    params.shopComboName = formModel.shopComboName
+  if (formModel.nickname){
+    params.nickname = formModel.nickname
   }
-  if (formModel.orderNo){
-    params.orderNo = formModel.orderNo
+  if (formModel.phone){
+    params.phone = formModel.phone
   }
   if (formModel.status){
     params.status = formModel.status
@@ -139,9 +199,9 @@ const search = async() => {
     params.endVerifyTime = formModel.verifyTime[1]
   }
   try {
-    let res = await orderList(params)
+    let res = await userActivityList(params)
     loading.value = false
-    if (res?.code == 200) {
+    if (res?.code == 0) {
       pagination.value.total = res.total;
       formModel.list = res.rows
     } else {
@@ -152,81 +212,6 @@ const search = async() => {
     Message.error(JSON.stringify(error) || '接口异常')
   }
  }
-
-const doCancel = (item) => {
-  console.log(item)
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '取消',
-    content: '是否确认取消',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('取消成功')
-          search()
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
-    }
-  });
-}
-
-// 消费验证
-const modalStore = useModalStore()
-const ticketId = ref('')
-const doVerify = (item) => {
-  modalStore.consumpitonVerifyForm.value = ''
-  modalStore.consumpitonVerifyVisible = true
-  ticketId.value = item.id
-}
-
-const handleSubmit = async(form)=> {
-    try {
-      Message.loading('加载中...')
-      let res = await orderTicketCode({
-        id: ticketId.value,
-        ticketCode: form.value
-      })
-      Message.clear()
-      if (res?.code != 200) {
-        Message.error(res?.msg)
-        return;
-      }
-      Message.success('验证成功')
-      modalStore.consumpitonVerifyVisible = false
-      modalStore.value = ''
-      search()
-    } catch(error) {
-      Message.clear()
-      Message.error(JSON.stringify(error) || '接口异常')
-    }
-}
-// 退款维权
-const doRefund = (item) => {
-  console.log(item)
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '退费维权',
-    content: '是否确认退费维权',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-    },
-    async onCancel() {
-
-    }
-  });
-}
 </script>
 
 <style scoped>
@@ -259,5 +244,28 @@ const doRefund = (item) => {
   ::v-deep .arco-card-body {
     padding-bottom: 0;
   }
+}
+.line {
+  padding: 8px 0;
+  display: flex;
+  gap: 10px;
+
+  >* {
+    display: flex;
+  }
+
+  >span:first-child {
+    color: #777;
+    width: 100px;
+    text-align: right;
+    flex: 0 0 100px;
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
 }
 </style>

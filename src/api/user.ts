@@ -80,17 +80,17 @@ export function orderUsedList(data:any) {
 }
 
 export function accountList(data:any) {
+  const queryParams = new URLSearchParams(data).toString();
   return http({
     method: 'POST',
-    url: '/user/account/list',
-    data
+    url: `/admin/user/account/list?${queryParams}`,
   })
 }
 
-export function fansList(data:any, url?: string) {
+export function fansList(data:any) {
+  const queryParams = new URLSearchParams(data).toString();
   return http({
     method: 'POST',
-    url: url || '/user/fans/list',
-    data
+    url: `/admin/user/fans/list?${queryParams}`,
   })
 }

@@ -3,15 +3,15 @@ import http from './axios'
 export function noticeList(data: any) {
     return http({
       method: 'POST',
-      url: '/user/notice/list',
+      url: '/admin/user/notice/list',
       data
     })
 }
 
 export function noticeRemove(data: any) {
     return http({
-      method: 'POST',
-      url: '/user/notice/remove',
+      method: 'GET',
+      url: '/admin/user/notice/remove',
       data
     })
 }
@@ -20,7 +20,7 @@ export function noticeRemove(data: any) {
 export function noticeEdit(data: any) {
     return http({
       method: 'POST',
-      url: '/user/notice/edit',
+      url: '/admin/user/notice/edit',
       data
     })
 }
@@ -28,23 +28,23 @@ export function noticeEdit(data: any) {
 export function noticeAdd(data: any) {
     return http({
       method: 'POST',
-      url: '/user/notice/add',
+      url: '/admin/user/notice/add',
       data
     })
 }
 
 export function noticeUp(data: any) {
     return http({
-      method: 'GET',
-      url: '/user/notice/onlineUp',
+      method: 'POST',
+      url: '/admin/user/notice/onlineUp',
       data
     })
 }
 
 export function noticeDown(data: any) {
     return http({
-        method: 'GET',
-      url: '/user/notice/onlineDown',
+        method: 'POST',
+      url: '/admin/user/notice/onlineDown',
       data
     })
 }

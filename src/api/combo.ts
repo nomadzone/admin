@@ -62,10 +62,10 @@ export interface ComboList {
     pageSize: string;
 }
 
-export function comboList(data: ComboList) {
+export function comboList(data: any) {
     return http({
       method: 'get',
-      url: '/shop/system/combo/list',
+      url: `/admin/system/combo/list`,
       data
     })
 }

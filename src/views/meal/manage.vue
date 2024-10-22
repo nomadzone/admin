@@ -59,11 +59,17 @@
     <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>
-          <a-link type="primary" @click="doLook(record, rowIndex)" size="mini">查看</a-link>
-          <a-link status="danger" @click="optionIndex = rowIndex; isInject = true" size="mini">不通过</a-link>
-          <a-link status="success" @click="doAgree(record, rowIndex)" size="mini">通过</a-link>
-          <a-link type="primary" @click="doUp(record, rowIndex)" size="mini">上线</a-link>
-          <a-link type="primary" @click="doDown(record, rowIndex)" size="mini">下线</a-link>
+          <a-link @click="doLook(record, rowIndex)" size="mini">查看</a-link>
+          <a-popconfirm content="是否下架?" v-if="record.comboStatus != '1'" @ok="doDown(record, rowIndex)">
+            <a-button status="warning"  size="mini">下架</a-button>
+          </a-popconfirm>
+          <a-popconfirm content="是否上架?" v-if="record.comboStatus == '1'" @ok="doUp(record, rowIndex)">
+            <a-button type="primary" size="mini">上架</a-button>
+          </a-popconfirm>
+          <a-button v-if="record.comboStatus == '1'" @click="doEdit(record, rowIndex)" size="mini">编辑</a-button>
+          <a-popconfirm content="是否删除?" v-if="record.comboStatus == '1'" @ok="doDelete(record, rowIndex)">
+            <a-button status="danger"   size="mini">删除</a-button>
+          </a-popconfirm>
         </a-space>
       </template>
       <template #comboStatus="{ record }">
@@ -71,6 +77,9 @@
         <a-tag v-if="record.comboStatus == '1'" color="blue">已下线</a-tag>
         <a-tag v-if="record.comboStatus == '2'" color="green">待审批</a-tag>
         <a-tag v-if="record.comboStatus == '3'" color="red">不通过</a-tag>
+      </template>
+      <template #rejectReason="{ record }">
+        <span> {{ record.comboStatus == 3 ? record.rejectReason : '--' }} </span>
       </template>
     </a-table>
 
@@ -120,21 +129,27 @@ const pagination = ref({
   }, // 页码改变时的回调函数
 })
 const columns = [
-  { title: '套餐ID', dataIndex: 'id' },
-  { title: '套餐名称', dataIndex: 'comboName', width: 240, ellipsis: true },
-  { title: '销量', dataIndex: 'number' },
-  { title: '套餐价', dataIndex: 'shopPrice' },
-  {
-    title: '状态',
-    dataIndex: 'comboStatus',
-    slotName: 'comboStatus' // 使用 slot 来渲染状态列
-  },
-  { title: '结束时间', dataIndex: 'validTimeEnd' },
-  { title: '最近变更时间', dataIndex: 'updateTime' },
-  { title: '操作', slotName: 'optional', width: 260 },
-];
+    { title: '套餐ID', dataIndex: 'id' },
+    { title: '套餐名称', dataIndex: 'comboName', width: 240, ellipsis: true },
+    { title: '销量', dataIndex: 'number' },
+    { title: '门店价', dataIndex: 'shopPrice' },
+    { title: '团购价', dataIndex: 'comboPrice' },
+    { 
+      title: '状态', 
+      dataIndex: 'comboStatus',
+      slotName: 'comboStatus' // 使用 slot 来渲染状态列
+    },
+    { 
+      title: '拒绝理由', 
+      dataIndex: 'rejectReason',
+      slotName: 'rejectReason' // 使用 slot 来渲染状态列
+    },
+    { title: '结束时间', dataIndex: 'validTimeEnd' },
+    { title: '最近变更时间', dataIndex: 'updateTime' },
+    { title: '操作', slotName: 'optional', width: 240 },
+  ];
 const data = reactive({
-  list: [1]
+  list: []
 });
 const reset = ()=> {
   formModel.pageNum = 1;
@@ -156,7 +171,7 @@ const search = async () => {
       status: formModel.status
     })
     loading.value = false
-    if (res?.code !== 200) {
+    if (res?.code !== 0) {
       Message.error(res?.msg)
     } else {
       pagination.value.total = res.total;
@@ -168,8 +183,15 @@ const search = async () => {
   }
 }
 
-const doLook = (item) => {
-  router.push('/meal/create?id=' + item.id)
+const doLook = (record) => {
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+    localStorage.setItem('mealEdit', JSON.stringify(_record))
+  router.push('/meal/create?id=' + record.id)
 }
 
 // 不通过

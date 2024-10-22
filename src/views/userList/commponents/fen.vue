@@ -76,11 +76,13 @@ const search = async () => {
     const params = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
+        userFansId: _userFansId,
+        userId: _userId
     }
     // userFansId不为空   userId空    则是关注列表
     // userFansId空   userId不为空    则是粉丝列表
     try {
-        let res: any = await fansList(params, `/user/fans/list?userFansId=${_userFansId}&userId=${_userId}`)
+        let res: any = await fansList(params)
         loading.value = false
         if (res?.code == 0) {
             pagination.value.total = res.total;
