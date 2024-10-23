@@ -9,12 +9,30 @@ export interface shopList {
 
 export interface MerchantRecord {}
 
+// 查询商户品类列表
+export function merchantCategoryList(data: any) {
+    return http({
+        method: 'get',
+        url: `/admin/system/categoryName/list`,
+        data
+      })
+}
+
 // 查询商户列表
 export function shopList(data: shopList & any) {
 
     return http({
         method: 'get',
         url: `/admin/system/header/list`,
+        data
+      })
+}
+
+// 修改商户状态
+export function shopStatusChange(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/header/changeStatus`,
         data
       })
 }
@@ -72,6 +90,24 @@ export function shopOrderList(data: any) {
     return http({
         method: 'get',
         url: `/admin/system/order/list`,
+        data
+      })
+}
+
+
+// 查询店铺结算列表
+export function shopSettlementList(data: any) {
+    return http({
+        method: 'get',
+        url: `/admin/system/record/list`,
+        data
+      })
+}
+// 查询店铺结算汇总
+export function shopSettlementTotal(data: any) {
+    return http({
+        method: 'get',
+        url: `/admin/system/record/findSettlementSum`,
         data
       })
 }

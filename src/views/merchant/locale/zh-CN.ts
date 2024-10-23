@@ -48,6 +48,18 @@ export default {
     'merchant.index.license':'营业执照',
     'merchant.index.legalPersonIdCard':'法人身份证',
     'merchant.index.idCard':'身份证',
+    'merchant.index.offlineMerchants':'下线商家',
+    'merchant.index.offlineMerchantsTips':'是否确认下线，上线后小程序将无法查看',
+    'merchant.index.onlineMerchants':'上线商家',
+    'merchant.index.onlineMerchantsTip':'是否确认上线，上线后小程序即可查看',
+    'merchant.index.passMerchants':'通过商家',
+    'merchant.index.passMerchantsTips':'是否确认通过，通过后商家可进行店铺管理',
+    'merchant.index.rejectMerchants':'拒绝商家',
+    'merchant.index.rejectMerchantsTips':'',
+
+
+
+    
     
 
     'merchant.setMenu.id':'套餐ID',
@@ -59,7 +71,9 @@ export default {
     'merchant.setMenu.latestChangeTime':'最近变更时间',
     'merchant.setMenu.goOnline':'上线',
     'merchant.setMenu.goOffline':'下线',
-
+    "finance.settlement.totalIncome": "全部收入",
+    "finance.settlement.pendingSettlement": "待结算",
+    "finance.settlement.alreadySettled": "已结算",
     'merchant.order.orderNumber':'订单号',
     'merchant.order.num':'数量',
     'merchant.order.merchantNickname':'商家昵称',
@@ -96,9 +110,10 @@ export default {
 
 
 
-
+    "merchant.category.id": "品类ID",
     "merchant.category.name": "品类名称",
-    "merchant.category.value": "品类值",
+    "merchant.category.img": "品类图片",
+    "merchant.category.shopNum": "商家数",
     "merchant.category.add": "添加",
     "merchant.category.edit": "编辑",
     "merchant.category.deleteTips": "确定删除该品类吗？",

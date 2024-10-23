@@ -10,6 +10,9 @@
                         </template>{{ $t("button.add") }}</a-button>
                 </div>
                 <a-table :columns="columns" :bordered="{ cell: true }" :data="data">
+                    <template #img="{ record }">
+                        <img :src="record.url" alt="" style="width: 50px; height: 50px;" />
+                    </template>
                     <template #action="{ record }">
                         <a-button type="text" @click="handleEdit(record)">{{ $t("button.edit") }}</a-button>
                         <a-popconfirm :content="$t('merchant.category.deleteTips')">
@@ -39,23 +42,36 @@
 
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { merchantCategoryList } from '@/api/merchant'
 
 const { t } = useI18n();
 const router = useRouter();
 
 const columns = [
-
     {
-        title: t('merchant.category.name'),
-        dataIndex: 'name',
-        key: 'name',
+        title: t('merchant.category.id'),
+        dataIndex: 'id',
+        key: 'id',
         ellipsis: true,
     },
     {
-        title: t('merchant.category.value'),
+        title: t('merchant.category.name'),
+        dataIndex: 'categoryName',
+        key: 'categoryName',
+        ellipsis: true,
+    },
+    {
+        title: t('merchant.category.img'),
+        dataIndex: 'img',
+        key: 'img',
+        slotName: 'img',
+        ellipsis: true,
+    },
+    {
+        title: t('merchant.category.shopNum'),
         dataIndex: 'value',
         key: 'value',
         ellipsis: true,
@@ -75,6 +91,19 @@ const columns = [
 ]
 
 const data = ref([{}])
+const pageSize = ref(20)
+const currentPage = ref(1)
+const total = ref(0)
+// 查询品类列表
+const fetchData = async (page, size) => {
+    let params = {
+        pageNum: page || currentPage.value,
+        pageSize: size || pageSize.value
+    }
+    const res = await merchantCategoryList(params)
+    data.value = res.rows
+    total.value = res.total
+}
 
 const visible = ref(false)
 const title = ref('')
@@ -121,6 +150,10 @@ const handleCancel = () => {
     console.log('handleCancel')
     visible.value = false
 }
+
+onMounted(() => {
+    fetchData(1, pageSize.value)
+})
 </script>
 
 <style lang="scss" scoped></style>

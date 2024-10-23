@@ -4,13 +4,19 @@
     <div class="shop-set-menu-comp">
 
         <a-table size="small" :columns="columns" :data="data" :pagination="false">
-
+            <template #comboStatus="{ record }">
+                <span>{{ statusMap[record.comboStatus] }}</span>
+            </template>
             <template #action="{ record }">
-                <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.submit") }}</a-button>
-                <a-button type="text" @click="handleShowDetail(record)">{{ $t("merchant.index.pass") }}</a-button>
-                <a-button type="text" @click="handleShowDetail(record)">{{ $t("merchant.index.reject") }}</a-button>
-                <a-button type="text" @click="handleShowDetail(record)">{{ $t("merchant.index.goOnline") }}</a-button>
-                <a-button type="text" @click="handleShowDetail(record)">{{ $t("merchant.index.goOffline") }}</a-button>
+                <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.view") }}</a-button>
+                <a-button type="text" @click="handleShowDetail(record)" v-if="record.comboStatus == 2">{{
+                    $t("merchant.index.pass") }}</a-button>
+                <a-button type="text" @click="handleShowDetail(record)" v-if="record.comboStatus == 2">{{
+                    $t("merchant.index.reject") }}</a-button>
+                <a-button type="text" @click="handleShowDetail(record)" v-if="record.comboStatus == 1">{{
+                    $t("merchant.setMenu.goOnline") }}</a-button>
+                <a-button type="text" @click="handleShowDetail(record)" v-if="record.comboStatus == 0">{{
+                    $t("merchant.setMenu.goOffline") }}</a-button>
 
             </template>
         </a-table>
@@ -26,11 +32,22 @@
 import { ref, defineProps, watch } from 'vue';
 import { shopPackageList, shopPackageApprove, shopPackageOnlineStatusChange } from '@/api/merchant';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 const { t } = useI18n()
+const router = useRouter()
 
 const props = defineProps({
     shopId: String
 })
+
+const statusMap = {
+    '0': t('merchant.setMenu.goOnline'),
+    '1': t('merchant.setMenu.goOffline'),
+    '2': t('merchant.index.pendingApproval'),
+    '3': t('merchant.index.authenticationFailed'),
+
+
+}
 
 const data = ref([])
 const columns = ref([
@@ -39,11 +56,11 @@ const columns = ref([
     { title: t('merchant.setMenu.name'), dataIndex: 'comboName', key: 'comboName', width: 100, ellipsis: true },
     { title: t('merchant.setMenu.salesVolume'), dataIndex: 'number', key: 'number', width: 100, ellipsis: true },
     { title: t('merchant.setMenu.packagePrice'), dataIndex: 'comboPrice', key: 'comboPrice', width: 100, ellipsis: true },
-    { title: t('merchant.setMenu.status'), dataIndex: 'comboStatus', key: 'comboStatus', width: 100, ellipsis: true },
+    { title: t('merchant.setMenu.status'), dataIndex: 'comboStatus', key: 'comboStatus', slotName: 'comboStatus', width: 100, ellipsis: true },
     { title: t('merchant.setMenu.endTime'), dataIndex: 'usedTimeEnd', key: 'usedTimeEnd', width: 100, ellipsis: true },
     { title: t('merchant.setMenu.latestChangeTime'), dataIndex: 'updateTime', key: 'updateTime', width: 160, ellipsis: true },
 
-    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 180, ellipsis: true, slotName: 'action', fixed: 'right' },
+    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 160, slotName: 'action', fixed: 'right' },
 ])
 
 const pageSize = ref(10)
@@ -76,6 +93,17 @@ const handleChangePageSize = (size) => {
     fetchData(1, size)
 }
 
+const handleShowDetail = (row) => {
+    console.log(row)
+
+    router.push({
+        name: 'mealCreate',
+        query: {
+            id: row.id,
+
+        }
+    });
+}
 watch(() => props.shopId, (newVal) => {
     if (newVal) {
         fetchData(1)
