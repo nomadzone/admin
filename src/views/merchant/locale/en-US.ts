@@ -48,6 +48,15 @@ export default {
     'merchant.index.license':'License',
     'merchant.index.legalPersonIdCard':'Legal Person Id Card',
     'merchant.index.idCard':'Id Card',
+    'merchant.index.offlineMerchants':'Offline Merchants',
+    'merchant.index.offlineMerchantsTips':'Are you sure you want to go offline, the mini program will not be able to view it after going online',
+    'merchant.index.onlineMerchants':'Online Merchants',
+    'merchant.index.onlineMerchantsTip':'Are you sure you want to go online, the mini program can view it after going online',
+    'merchant.index.passMerchants':'Pass Merchants',
+    'merchant.index.passMerchantsTips':'Are you sure it has been approved? Once approved, the merchant can proceed with store management',
+    'merchant.index.rejectMerchants':'Reject Merchants',
+    'merchant.index.rejectMerchantsTips':'',
+
 
 
     
@@ -61,6 +70,9 @@ export default {
     'merchant.setMenu.goOnline':'Go Online',
     'merchant.setMenu.goOffline':'Go Offline',
 
+    "finance.settlement.totalIncome": "Total income",
+    "finance.settlement.pendingSettlement": "Pending Settlement",
+    "finance.settlement.alreadySettled": "Already Settled",
     
     'merchant.order.orderNumber':'Order Number',
     'merchant.order.num':'Number',

@@ -12,6 +12,7 @@ export default {
     "button.detail": "Detail",
     "button.submit": "Submit",
     "button.setting": "Setting",
+    "button.view": "View",
 
 
 

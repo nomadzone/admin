@@ -12,26 +12,31 @@
             <div class="common-query-form-container">
 
                 <div class="form-item-group">
-                    <a-form :model="form" layout="inline" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }">
+                    <a-form :model="form" layout="inline" :label-col-props="{ span: 6 }"
+                        :wrapper-col-props="{ span: 18 }">
                         <a-grid :cols="queryFormItemLayout" style="width: 100%;">
                             <a-grid-item class="demo-item">
-                                <a-form-item field="userName" :label="$t('account.username')" label-col-flex="80px">
+                                <a-form-item field="userName" :label="$t('finance.revenueExpenditure.orderNum')"
+                                    label-col-flex="80px">
                                     <a-input v-model="form.orderNum" />
                                 </a-form-item>
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item field="roles" :label="$t('account.roles')" label-col-flex="80px">
-                                    <a-select v-model="form.financeType" />
+                                <a-form-item field="roles" :label="$t('finance.revenueExpenditure.settlementObject')"
+                                    label-col-flex="80px">
+                                    <a-input v-model="form.financeType" />
                                 </a-form-item>
 
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item field="status" :label="$t('account.status')" label-col-flex="80px">
+                                <a-form-item field="status" :label="$t('finance.revenueExpenditure.transactionType')"
+                                    label-col-flex="80px">
                                     <a-select v-model="form.dealType" />
                                 </a-form-item>
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item field="status" :label="$t('account.status')" label-col-flex="80px">
+                                <a-form-item field="status" :label="$t('finance.revenueExpenditure.receiptTime')"
+                                    label-col-flex="80px">
                                     <a-select v-model="form.dealType" />
                                 </a-form-item>
                             </a-grid-item>

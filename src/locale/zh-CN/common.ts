@@ -12,6 +12,8 @@ export default {
     "button.detail": "详情",
     "button.submit": "提交",
     "button.setting": "设置",
+    "button.view": "查看",
+
 
 
     "table.createTime": "创建时间",
