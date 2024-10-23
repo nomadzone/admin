@@ -23,15 +23,21 @@
 
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item label-col-flex="80px" field="category"
+                                <a-form-item label-col-flex="80px" field="categoryName"
                                     :label="$t('merchant.index.category')">
-                                    <a-select v-model="form.category" />
+                                    <a-select v-model="form.categoryName">
+                                        <a-option v-for="item in categoryNameOptions" :key="item.id"
+                                            :value="item.categoryName">
+                                            {{ item.categoryName }}
+                                        </a-option>
+                                    </a-select>
                                 </a-form-item>
                             </a-grid-item>
                             <a-grid-item class="demo-item">
                                 <a-form-item label-col-flex="80px" field="createTime"
                                     :label="$t('merchant.index.createTime')">
-                                    <a-select v-model="form.createTime" />
+                                    <a-range-picker format="YYYY-MM-DD " v-model="form.timeQuery" allow-clear />
+
                                 </a-form-item>
                             </a-grid-item>
                         </a-grid>
@@ -39,13 +45,13 @@
                 </div>
                 <a-divider class="query-form-divider" direction="vertical" />
                 <div class="query-actions">
-                    <a-button type="primary" @click="fetchData">
+                    <a-button type="primary" @click="fetchData(1)">
                         <template #icon>
                             <icon-search />
                         </template>
                         {{ $t("button.search") }}
                     </a-button>
-                    <a-button type="outline">
+                    <a-button type="outline" @click="handleReset()">
                         <template #icon>
                             <icon-refresh />
 
@@ -64,7 +70,7 @@
                     <div class="left">
                         <a-button class="left-btn" :disabled="!selectedKeys.length">{{
                             $t('merchant.index.batchApproval')
-                        }}</a-button>
+                            }}</a-button>
                         <a-button :disabled="!selectedKeys.length">{{ $t('merchant.index.batchNotPassed') }}</a-button>
                     </div>
                     <a-button> <template #icon>
@@ -116,7 +122,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
-import { shopList, shopStatusChange } from '@/api/merchant';
+import { shopList, shopStatusChange, merchantCategoryList } from '@/api/merchant';
 
 import { Modal, Button } from '@arco-design/web-vue';
 const router = useRouter();
@@ -127,8 +133,8 @@ const queryFormItemLayout = { xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }
 const form = ref({
     name: '',
     shopStatus: '',
-    categroy: '',
-    createTime: null
+    categoryName: '',
+    timeQuery: null
 
 })
 
@@ -171,8 +177,16 @@ const columns = ref([
 
 ])
 
-const data = ref([
-])
+// 查询商户分类选项数据
+const categoryNameOptions = ref([])
+
+const fetchCategoryOptions = async () => {
+    const res = await merchantCategoryList({ pageNum: 1, pageSize: 100000 })
+    categoryNameOptions.value = res.rows
+    console.log('categoryOptions:', categoryNameOptions)
+}
+
+const data = ref([])
 // 查询列表
 
 const pageSize = ref(10)
@@ -183,9 +197,14 @@ const tableLoading = ref(false)
 const fetchData = async (page, size) => {
     tableLoading.value = true
     let params = {
+        ...form.value,
+        beginCreateTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+        endCreateTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
         pageSize: size || pageSize.value,
         pageNum: page || pageNum.value,
     }
+
+    delete params.timeQuery
     const res = await shopList(params)
 
     data.value = res.rows
@@ -193,6 +212,17 @@ const fetchData = async (page, size) => {
 
 }
 
+// 点击重置
+const handleReset = () => {
+    form.value = {
+        name: '',
+        shopStatus: '',
+        categoryName: '',
+        timeQuery: null
+    }
+
+    fetchData(1)
+}
 
 
 
@@ -231,6 +261,7 @@ const handleChangeStatus = (row: any, status: number) => {
 }
 
 onMounted(() => {
+    fetchCategoryOptions()
     fetchData(1, pageSize.value)
 })
 

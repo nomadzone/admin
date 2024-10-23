@@ -18,6 +18,33 @@ export function merchantCategoryList(data: any) {
       })
 }
 
+// 新建商户品类
+export function merchantCategoryAdd(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/categoryName/add`,
+        data
+      })
+}
+
+// 修改商户品类
+export function merchantCategoryEdit(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/categoryName/edit`,
+        data
+      })
+}
+
+// 删除商户品类
+
+export function merchantCategoryDelete(data: any) {
+    return http({
+        method: 'DELETE',
+        url: `/admin/system/categoryName/delete/${data.id}`,
+      })
+}
+
 // 查询商户列表
 export function shopList(data: shopList & any) {
 
