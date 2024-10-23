@@ -64,9 +64,9 @@
         </template>
         <template #images="{ record }">
             <a-image
-                v-if="record.image"
+                v-if="record.mainImage"
                 width="32"
-                :src="record.image"
+                :src="record.mainImage"
             />
         </template>
         <template #orderNumber="{ record }">
@@ -114,7 +114,6 @@
     }, // 页码改变时的回调函数
   })
   const columns = [
-    { title: '广告ID', dataIndex: 'id' },
     { title: '广告标题', dataIndex: 'title', ellipsis: true },
     {
       title: '广告封面',
@@ -132,7 +131,7 @@
       slotName: 'status' // 0下架 1上架
     },
     { title: '发布时间', dataIndex: 'createTime' },
-    { title: '操作', slotName: 'optional', width: 160 },
+    { title: '操作', slotName: 'optional', width: 200 },
   ];
   const data = reactive({
     list: []
@@ -165,6 +164,14 @@
         res.rows.map(item=> {
           item.image = item.images.split(',')[0]
         })
+        res.rows.map(item=> {
+          if (item?.images) {
+            let mainImage = item?.images?.split(',')?.[0]
+            if (mainImage) {
+              item.mainImage = mainImage
+            }
+          }
+        })
         data.list = res.rows;
       }
     } catch (error) {
@@ -183,7 +190,7 @@
   localStorage.setItem('advInfo', JSON.stringify(_record))
     router.push({
       name: 'advCreate',
-      query: { id: item.id, type: 'look' }
+      query: { id: record.id, type: 'look' }
     })
   }
 
@@ -201,10 +208,17 @@
     })
   }
 
-  const doEdit = (item) => {
+  const doEdit = (record) => {
+  let _record = {...record}
+  for (let key in _record) {
+    if (_record[key]=== null || _record[key]===undefined) {
+      _record[key] = ''
+    }
+  }
+  localStorage.setItem('advInfo', JSON.stringify(_record))
     router.push({
       name: 'advCreate',
-      query: { id: item.id, type: 'edit' }
+      query: { id: record.id, type: 'edit' }
     })
   }
   
@@ -285,7 +299,6 @@
         } catch(error) {
           loading.value = false
           Message.error(JSON.stringify(error) || '接口异常')
-          debugger
         }
       },
       async onCancel() {

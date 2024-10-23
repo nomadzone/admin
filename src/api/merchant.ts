@@ -36,3 +36,42 @@ export function shopApprove(data: any) {
         data
       })
 }
+
+// 店铺套餐列表查询
+
+export function shopPackageList(data: any) {
+    return http({
+        method: 'get',
+        url: `/admin/system/combo/list`,
+        data
+      })
+}
+
+// 店铺套餐审批
+export function shopPackageApprove(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/combo/edit`,
+        data
+      })
+}
+
+// 店铺套餐上线下线
+
+export function shopPackageOnlineStatusChange(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/combo/changeStatus`,
+        data
+      })
+}
+
+
+// 店铺订单列表查询
+export function shopOrderList(data: any) {
+    return http({
+        method: 'get',
+        url: `/admin/system/order/list`,
+        data
+      })
+}

@@ -23,7 +23,7 @@
           </a-form-item>
 
         <a-form-item :label="'展示顺序'" required style="padding-top: 20px;">
-          <a-input v-model="formModel.orderNumber" placeholder="请输入" v-if="type !== 'look'"></a-input>
+          <a-input v-model="formModel.orderNumber" placeholder="请输入" v-if="type !== 'look'" max-length="2"></a-input>
           <div class="text" v-if="type === 'look'">{{formModel.orderNumber}}</div>
         </a-form-item>
 
@@ -34,14 +34,14 @@
                 <PicUpload 
                   v-if="type !== 'look'"
                   :limit="1" 
-                  :fileList="[item.image]" 
+                  :fileList="[item.image]"
                   :key="index" 
                   @updateFileList="(file) => { handleSetContactInformation(file, index) }"
                 />
                 <a-image
                    v-if="type === 'look'"
                   width="80"
-                  src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a8c8cdb109cb051163646151a4a5083b.png~tplv-uwbnlip3yd-webp.webp"
+                  :src="item.mainImage"
                 />
             </a-form-item>
 
@@ -86,6 +86,7 @@ const formModel = reactive({
   orderNumber: '',
   list: [
     {
+      mainImage: '',
       image: '',
       url: '',
     }
@@ -97,30 +98,37 @@ onMounted(()=> {
   const paramsType = router.currentRoute.value.query.type as string;
   const info = JSON.parse(localStorage.getItem('advInfo'))
   type.value = paramsType
-  if (paramsType !== 'add') {
+  if (paramsType === 'edit') {
     const paramsId = router.currentRoute.value.query.id as string;
     id.value = paramsId
-  }
+  } 
   if (info) {
     formModel.title = info.title
     formModel.status = !!(info.status == 1)
     formModel.type = info.type
     formModel.orderNumber = info.orderNumber
     let list = []
-    let images = info.images.split(',')
-    let urls = info.url.split(',')
-    images.map((item, index)=> {
-      list.push({
-        image: item,
-        url: urls[index],
+    let images = info?.images?.split(',') || ''
+    let urls = info?.url?.split(',') || ''
+    if (Array.isArray(images)) {
+      images.map((item, index)=> {
+        list.push({
+          image: item,
+          mainImage: item?.split(',')?.[0] ? item?.split(',')?.[0] : '',
+          url: urls[index],
+        })
       })
-    })
+    }
+    if (list?.length === 0) {
+      list = [{ image: '', url: '' }]
+    }
     formModel.list = list
   }
 })
 
 const doCreate = ()=> {
   formModel.list = [...formModel.list, {
+      mainImage: '',
       image: '',
       url: '',
   }]
@@ -146,6 +154,7 @@ const resetForm = ()=> {
     formModel.orderNumber = '1'
     formModel.list = [
     {
+      mainImage: '',
       image: '',
       url: '',
     }
@@ -171,12 +180,14 @@ const doSubmit = async()=> {
       }
     }
   }
+  if (isNaN(Number(formModel.orderNumber))) {
+    tip = '展示顺序填写数字'
+  }
   if (tip) {
     Message.error(tip)
     return;
   }
   try {
-    Message.loading('提交中...')
     let images = [];
     let urls = [];
     const params:any = {...formModel}
@@ -188,6 +199,7 @@ const doSubmit = async()=> {
     params.url = urls.join(',')
     delete params.list
     let res:any
+    Message.loading('提交中...')
     if (!id.value) {
       res = await noticeAdd({
         ...params,
@@ -197,9 +209,10 @@ const doSubmit = async()=> {
       res = await noticeEdit({
         ...params,
         status: params.status ? 1 : 0,
-        id: Number(id?.value)
+        id: id?.value
       })
     }
+    Message.clear()
     if (res.code == 0) {
       Message.success(!id.value ? '发布成功' : '编辑成功');
       setTimeout(()=> {
@@ -250,9 +263,9 @@ const doSubmit = async()=> {
   padding: 16px;
   border-radius: 6px;
   margin-bottom: 10px;
-  type: relative;
+  position: relative;
   .delete {
-    type: absolute;
+    position: absolute;
     top: 16px;
     right: 16px;
     color: #777;

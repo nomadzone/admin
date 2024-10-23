@@ -308,7 +308,7 @@ const doExamine = async () => {
     return;
   }
   data.list[index].status = examineStatus.value === '1' ? 301 : 303
-  Message.success('拒绝成功');
+  Message.success(examineStatus.value === '1' ? '审核通过' : '拒绝通过');
   search()
   return true;
 }

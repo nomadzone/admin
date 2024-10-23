@@ -5,10 +5,12 @@ const DASHBOARD: AppRouteRecordRaw = {
   path: '/order',
   name: 'order',
   component: DEFAULT_LAYOUT,
+  redirect: '/order/active',
   meta: {
-    locale: 'order.manage',
+    locale: '票夹管理',
     requiresAuth: true,
     icon: 'icon-bookmark',
+    hideChildrenInMenu: true,
     order: 6,
   },
   children: [
@@ -17,17 +19,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'orderActive',
       component: () => import('@/views/order/active.vue'),
       meta: {
-        locale: '活动订单',
-        requiresAuth: true,
-        roles: ['*']
-      },
-    },
-    {
-      path: 'meal',
-      name: 'orderMeal',
-      component: () => import('@/views/order/meal.vue'),
-      meta: {
-        locale: 'order.meal',
+        locale: '票夹管理',
         requiresAuth: true,
         roles: ['*']
       },
