@@ -53,8 +53,8 @@ import Info from '../../activity/info.vue'
 import ActionForm from '../../activity/form.vue'
 const tags = reactive({
     list: [
-        { id: 0, name: '已参与' },
         { id: 1, name: '已发起' },
+        { id: 0, name: '已参与' },
     ]
 })
 

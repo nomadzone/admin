@@ -4,7 +4,7 @@ export function getList(data) {
   const queryParams = new URLSearchParams(data).toString();
     return http({
       method: 'POST',
-      url: `/user/activity/list?${queryParams}`,  // 找搭子 type传3  新鲜事 传2
+      url: `/admin/user/activity/list?${queryParams}`,  // 找搭子 type传3  新鲜事 传2
     })
   }
   export function audit(data) {
@@ -32,7 +32,7 @@ export function getList(data) {
   export function userActivityList(data) {
     return http({
       method: 'POST',
-      url: '/user/userActivity/list',
+      url: '/admin/user/userActivity/list',
       data
     })
     }

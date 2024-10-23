@@ -36,23 +36,43 @@
             </a-col>
         </a-row>
         <a-table size="small" :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading"
-            :pagination='pagination' />
+            :pagination='pagination'>
+            <template #payType="{ record, rowIndex }">
+                <a-link v-if="record.payType == 1">收入</a-link>
+                <a-link v-else status="danger">支出</a-link>
+            </template>
+            <template #status="{ record, rowIndex }">
+                <a-tag color="blue">{{ statusText[record.status] }}</a-tag>
+            </template>
+        </a-table>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { orderUsedList } from '@/api/user'
+import { consumptionList } from '@/api/user'
 import { Message } from '@arco-design/web-vue'
-
+// 状态 0 处理成功 1 处理中 2 关闭  3 微信支付回调失败，4 退款中， 5 退款成功 6微信退款回调失败
+// payType 类型 1收入 2 支出
 const columns = [
-    { title: '用户ID', dataIndex: 'appUserId' },
-    { title: '用户昵称', dataIndex: 'appNikeName' },
-    { title: '手机号码', dataIndex: 'phone' },
-    { title: '消费次数', dataIndex: 'number' },
-    { title: '消费金额', dataIndex: 'orderAmount' },
-    { title: '最近消费时间', width: 170, dataIndex: 'payDate' },
+    { title: '用户昵称', dataIndex: 'nickname' },
+    { title: '手机号', dataIndex: 'phoneNumber' },
+    { title: '支出/收入', dataIndex: 'payType', slotName: 'payType' },
+    { title: '金额', dataIndex: 'amout' },
+    { title: '状态', dataIndex: 'status', slotName: 'status' },
+    { title: '描述', dataIndex: 'title' },
+    { title: '结算时间',  dataIndex: 'payTime' },
 ];
+
+const statusText = {
+    0: '处理成功',
+    1: '处理中',
+    2: '关闭',
+    3: '微信支付回调失败',
+    4: '退款中',
+    5: '退款成功',
+    6: '微信退款回调失败',
+}
 
 const formModel = reactive({
     pageNum: 1,
@@ -71,19 +91,23 @@ const pagination = ref({
     }, // 页码改变时的回调函数
 })
 const loading = ref(false)
-onMounted(() => { search() })
+let userId = ref('')
+onMounted(() => { 
+    const userListInfo = JSON.parse(localStorage.getItem('userListInfo'))
+    userId.value = userListInfo ? userListInfo?.id : ''
+    search()
+ })
 const search = async () => {
     loading.value = true
     const params = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
-        shopId: localStorage.getItem('shopId') || '',
-        isUsed: '0'
+        // userId: userId.value,
     }
     try {
-        let res: any = await orderUsedList(params)
+        let res: any = await consumptionList(params)
         loading.value = false
-        if (res?.code == 200) {
+        if (res?.code == 0) {
             pagination.value.total = res.total;
             formModel.list = res.rows
         } else {

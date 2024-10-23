@@ -11,7 +11,7 @@
                   <a-input v-model="formModel.storeName" placeholder="请输商家名称" />
                 </a-form-item>
                 <a-form-item field="number" label="套餐名称">
-                  <a-input v-model="formModel.mealName" placeholder="请输套餐名称" />
+                  <a-input v-model="formModel.comboName" placeholder="请输套餐名称" />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
@@ -24,10 +24,10 @@
                     <a-option value="3">不通过</a-option>
                   </a-select>
                 </a-form-item>
-                <a-form-item field="name" label="最近消费时间">
+                <a-form-item field="name" label="最近变更时间">
                   <a-range-picker style="width: 360px; margin: 0 24px 0 0;" show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }" format="YYYY-MM-DD HH:mm"
-                    @clear="onClear" @ok="onOkTime" />
+                    @clear="onClear" @ok="onOkTime" v-model="formModel.payDate" allow-clear/>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -52,10 +52,14 @@
         </a-col>
       </a-row>
     </a-card>
-    <a-radio-group type="button" v-model="buttonType" style="margin: 16px 0 16px 0;">
-      <a-radio value="0">审批通过</a-radio>
-      <a-radio value="1">审批不通过</a-radio>
-    </a-radio-group>
+
+    <div style="margin-bottom: 16px;display: flex;gap: 8px;">
+      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 0">审批通过</a-button>
+      <a-button  v-if="buttonType !== 0" @click="buttonType = 0">审批通过</a-button>
+      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 1">审批不通过</a-button>
+      <a-button @click="buttonType = 1"  v-if="buttonType !== 1">审批不通过</a-button>
+    </div>
+
     <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>
@@ -66,15 +70,15 @@
           <a-popconfirm content="是否上架?" v-if="record.comboStatus == '1'" @ok="doUp(record, rowIndex)">
             <a-button type="primary" size="mini">上架</a-button>
           </a-popconfirm>
-          <a-button v-if="record.comboStatus == '1'" @click="doEdit(record, rowIndex)" size="mini">编辑</a-button>
+          <!-- <a-button v-if="record.comboStatus == '1'" @click="doEdit(record, rowIndex)" size="mini">编辑</a-button>   -->
           <a-popconfirm content="是否删除?" v-if="record.comboStatus == '1'" @ok="doDelete(record, rowIndex)">
             <a-button status="danger"   size="mini">删除</a-button>
           </a-popconfirm>
         </a-space>
       </template>
       <template #comboStatus="{ record }">
-        <a-tag v-if="record.comboStatus == '0'" color="orange">已上线</a-tag>
-        <a-tag v-if="record.comboStatus == '1'" color="blue">已下线</a-tag>
+        <a-tag v-if="record.comboStatus == '0'" color="blue">已上线</a-tag>
+        <a-tag v-if="record.comboStatus == '1'" color="red">已下线</a-tag>
         <a-tag v-if="record.comboStatus == '2'" color="green">待审批</a-tag>
         <a-tag v-if="record.comboStatus == '3'" color="red">不通过</a-tag>
       </template>
@@ -102,8 +106,21 @@ import { useRouter } from 'vue-router';
 import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
 
 const router = useRouter()
-const buttonType = ref('0')
+const buttonType = ref('')
 const optionIndex = ref(-1)
+
+watch(buttonType, (newVal, oldVal) => {
+  if (newVal !== oldVal && newVal !== null) {
+  formModel.pageNum = 1;
+  formModel.pageSize = 10;
+  formModel.storeName = '';
+  formModel.comboName = '';
+  formModel.status = '';
+  formModel.payDate = [];
+  formModel.status = newVal;
+    search()
+  }
+})
 
 onMounted(() => {
   search()
@@ -112,9 +129,9 @@ const formModel = reactive({
   pageNum: 1,
   pageSize: 10,
   storeName: '',
-  mealName: '',
+  comboName: '',
   status: '',
-  payDate: '',
+  payDate: [],
 });
 const loading = ref(false)
 const pagination = ref({
@@ -130,7 +147,7 @@ const pagination = ref({
 })
 const columns = [
     { title: '套餐ID', dataIndex: 'id' },
-    { title: '套餐名称', dataIndex: 'comboName', width: 240, ellipsis: true },
+    { title: '套餐名称', dataIndex: 'comboName', ellipsis: true },
     { title: '销量', dataIndex: 'number' },
     { title: '门店价', dataIndex: 'shopPrice' },
     { title: '团购价', dataIndex: 'comboPrice' },
@@ -146,30 +163,43 @@ const columns = [
     },
     { title: '结束时间', dataIndex: 'validTimeEnd' },
     { title: '最近变更时间', dataIndex: 'updateTime' },
-    { title: '操作', slotName: 'optional', width: 240 },
+    { title: '操作', slotName: 'optional', width: 200 },
   ];
 const data = reactive({
   list: []
 });
 const reset = ()=> {
   formModel.pageNum = 1;
-  formModel.pageSize = 0;
+  formModel.pageSize = 10;
   formModel.storeName = '';
-  formModel.mealName = '';
+  formModel.comboName = '';
   formModel.status = '';
-  formModel.payDate = '';
+  formModel.payDate = [];
   search()
 }
 const search = async () => {
   loading.value = true
   try {
-    let res = await comboList({
+    const params = {
       pageNum: formModel.pageNum,
       pageSize: formModel.pageSize,
       storeName: formModel.storeName,
-      mealName: formModel.mealName,
-      status: formModel.status
-    })
+      comboName: formModel.comboName,
+    }
+    if (formModel.status || formModel.status === 0) {
+      params.comboStatus = formModel.status
+    }
+    if (formModel.comboName) {
+      params.comboName = formModel.comboName
+    }
+    if (formModel.storeName) {
+      params.storeName = formModel.storeName
+    }
+    if (formModel.payDate?.length === 2 && formModel.payDate[0] && formModel.payDate[1]) {
+      params.beginUpdateTime = formModel.payDate[0]
+      params.endUpdateTime = formModel.payDate[1]
+    }
+    let res = await comboList(params)
     loading.value = false
     if (res?.code !== 0) {
       Message.error(res?.msg)
@@ -189,9 +219,27 @@ const doLook = (record) => {
     if (_record[key]=== null || _record[key]===undefined) {
       _record[key] = ''
     }
+    if (key === 'comboClassifyList' && Array.isArray(_record[key])) {
+      _record[key].map(ele=> {
+        for (let eleKey in ele) {
+          if (ele[eleKey] === null || ele[eleKey] === undefined) {
+            ele[eleKey] = ''
+          }
+          if (eleKey === 'shopComboClassifyList') {
+            ele[eleKey].map(m=> {
+              for (let k in m) {
+                if (m[k] === null || m[k] === undefined) {
+                  m[k] = ''
+                }
+              }
+            })
+          }
+        }
+      })
+    }
   }
-    localStorage.setItem('mealEdit', JSON.stringify(_record))
-  router.push('/meal/create?id=' + record.id)
+    localStorage.setItem('mealInfo', JSON.stringify(_record))
+  router.push('/meal/create')
 }
 
 // 不通过
@@ -220,90 +268,47 @@ const doInject = async () => {
   return true;
 }
 
-
-// 通过
-const doAgree = async (item, index) => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '通过商家',
-    content: '是否确认通过，通过后商家可进行店铺管理',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('通过成功')
-          search()
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
+const doDown = async(item, index)=> {
+    loading.value = true
+    const res = await comboChangeStatus({
+      id: item.id,
+      comboStatus: '1'
+    })
+    loading.value = false
+    if (res?.code != 0){
+      Message.error(res?.msg);
+      return;
     }
-  });
-}
+    data.list[index].comboStatus = '1'
+    Message.success('下架成功');
+  }
 
-// 上线
-const doUp = async (item, index) => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '上线商家',
-    content: '是否确认上线，上线后小程序即可查看',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('上线成功')
-          search()
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
+  const doUp = async(item, index)=> {
+    loading.value = true
+    const res = await comboChangeStatus({
+      id: item.id,
+      comboStatus: '0'
+    })
+    loading.value = false
+    if (res?.code != 0){
+      Message.error(res?.msg);
+      return;
     }
-  });
-}
+    data.list[index].comboStatus = '0'
+    Message.success('上架成功');
+  }
 
-// 下线
-const doDown = async (item, index) => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '下线商家',
-    content: '是否确认下线，上线后小程序将无法查看',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('下线成功')
-          search()
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
+const doDelete = async(item, index)=> {
+    loading.value = true
+    const res = await comboDelete(item.id)
+    if (res?.code != 0){
+      Message.error(res?.msg);
+      return;
     }
-  });
-}
+    loading.value = false
+    search()
+    Message.success('删除成功');
+  }
 
 </script>
 

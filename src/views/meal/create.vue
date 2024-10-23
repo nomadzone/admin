@@ -8,35 +8,40 @@
         <a-col :span="8">
           <div class="line">
             <span>套餐id</span>
-            <span>344543 </span>
+            <span>{{ info.value.id }}</span>
           </div>
           <div class="line">
             <span>套餐名称</span>
-            <span>套餐名套餐名套餐名套餐名套餐名</span>
+            <span>{{ info.value.comboName }}</span>
           </div>
         </a-col>
         <a-col :span="8">
           <div class="line">
             <span>创建时间</span>
-            <span>2020-11-11 16:22:22</span>
+            <span>{{ info.value.createTime }}</span>
           </div>
           <div class="line">
             <span>状态</span>
             <span>
-              <a-tag color="green">已上线</a-tag>
-              <a-tag color="orangered">待审核</a-tag>
-              <a-tag color="gold">已下线</a-tag>
-              <a-tag color="red">不通过</a-tag>
-              <span>不通过原因</span>
+              <a-tag v-if="info.value.comboStatus == '0'" color="blue">已上线</a-tag>
+              <a-tag v-if="info.value.comboStatus == '1'" color="red">已下线</a-tag>
+              <a-tag v-if="info.value.comboStatus == '2'" color="green">待审批</a-tag>
+              <a-tag v-if="info.value.comboStatus == '3'" color="red">不通过</a-tag>
+              <span style="padding-left: 10px;">{{ info.value.remark }}</span>
             </span>
           </div>
         </a-col>
         <a-col :span="7" style="display: flex;flex-direction: row-reverse;padding-right: 50px;">
-          <div>
-            <a-button type="primary" @click="isInject = true">不通过商家</a-button>
-            <a-button type="primary" @click="doAgree" >通过商家</a-button>
-              <a-button type="primary" @click="doUp" >上线商家</a-button> 
-              <a-button type="primary" @click="doDown">下线商家</a-button>
+          <div style="display: flex; gap: 10px">
+            <a-popconfirm content="是否下架?" v-if="info.value.comboStatus != '1'" @ok="doDown">
+              <a-button status="warning"  >下架</a-button>
+            </a-popconfirm>
+            <a-popconfirm content="是否上架?" v-if="info.value.comboStatus == '1'" @ok="doUp">
+              <a-button type="primary">上架</a-button>
+            </a-popconfirm>
+            <a-popconfirm content="是否删除?" v-if="info.value.comboStatus == '1'" @ok="doDelete">
+              <a-button status="danger">删除</a-button>
+            </a-popconfirm>
           </div>
         </a-col>
       </a-row>
@@ -49,52 +54,74 @@
         <a-col :span="22">
           <div class="line">
             <span>适用人数</span>
-            <span>-</span>
+            <span>{{ info.value.personNumber }}</span>
           </div>
           <div class="line">
             <span>套餐内容</span>
             <div>
-              <div class="table" v-for="(items, index) in groupedPackageContent" :key="index" v-if="groupedPackageContent.length > 0">
+              <div class="table" v-for="(items, index) in info.value.comboClassifyList" :key="index" v-if="info.value.comboClassifyList.length > 0">
                 <div class="name">
                   <h4>{{ items.name }}</h4>
                 </div>
-                <a-table :pagination="false" :columns="columns" :data="items.shopComboClassifyList" style="width: 500px" :show-header="false">
+                <a-table :pagination="false" :columns="columns" :data="items.shopComboClassifyList" style="width: 500px" >
                 </a-table>
               </div>
             </div>
           </div>
           <div class="line">
             <span>门店价</span>
-            <span>22</span>
+            <span>{{ info.value.shopPrice }}</span>
           </div>
           <div class="line">
             <span>团购价</span>
-            <span>22</span>
+            <span>{{ info.value.comboPrice }}</span>
           </div>
           <div class="line">
             <span>有效期</span>
-            <span>2020.11.11 - 2024.01.01</span>
+            <span>{{ info.value.validTimeStart }} - {{ info.value.validTimeEnd }}</span>
           </div>
-          <div class="line">
+          <div class="line" v-if="info.value.allDayStatus === 'true'">
             <span>不可用日期</span>
-            <span>周日；法定节假日不可用</span>
+            <span>所有日期都可使用</span>
           </div>
-          <div class="line">
+          <div class="line" v-if="info.value.allDayStatus === 'false'">
+            <span>不可用日期</span>
+            <div>
+              <span>部分日期不可使用</span>
+              <div style="display: flex;gap: 8px; padding-top: 10px;">
+                <span v-if="info.value.monday === 'true'">周一</span>
+                <span v-if="info.value.tuesday === 'true'">周二</span>
+                <span v-if="info.value.wednesday === 'true'">周三</span>
+                <span v-if="info.value.thursday === 'true'">周四</span>
+                <span v-if="info.value.friday === 'true'">周五</span>
+                <span v-if="info.value.saturday === 'true'">周六</span>
+                <span v-if="info.value.sunday === 'true'">周日</span>
+              </div>
+              <div  style="padding-top: 10px;" v-if="info.value.legalHolidayStatus === 'true'">
+                法定节假日不可使用
+              </div>
+            </div>
+          </div>
+          <div class="line" v-if="info.value.allTimeStatus === 'true'">
             <span>使用时间</span>
-            <span>10:00:00-22:00:00</span>
+            <span>24小时可使用</span>
+          </div>
+          <div class="line" v-if="info.value.allTimeStatus === 'false'">
+            <span>使用时间</span>
+            <span>{{ info.value.usedTimeStart }} - {{ info.value.usedTimeEnd }}</span>
           </div>
           <div class="line">
             <span>宣传图</span>
             <span>
               <a-image
                 width="120"
-                src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a8c8cdb109cb051163646151a4a5083b.png~tplv-uwbnlip3yd-webp.webp"
+                :src="info.value.comboPhotoUrl"
               />
             </span>
           </div>
           <div class="line">
             <span>套餐详情</span>
-            <div>
+            <div v-html="info.value.comboRemark">
             </div>
           </div>
         </a-col>
@@ -114,13 +141,13 @@
 </template>
 
 <script setup lang="ts">
-import { comboChangeStatus } from '@/api/combo';
-import { orderCancel } from '@/api/order';
+import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
 import PageCard from '@/components/page-card/index.vue';
 import { Message, Modal } from '@arco-design/web-vue';
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 const loading = ref(false)
-const item = reactive({})
+const router = useRouter()
 
 const columns = [
   { title: '套餐名称', dataIndex: 'name', key: 'name' },
@@ -137,104 +164,81 @@ const groupedPackageContent = computed(() => {
 const isInject = ref(false)
 const injectText = ref('')
 const isInjectError = ref(false)
-const doInject = async () => {
-  if (!injectText.value) {
-    isInjectError.value = true;
-    return false
+const info = reactive({
+  value: {
+    id: '',
+    comboStatus: '',
+    comboName: '',
+    createTime: '',
+    remark: '',
+    personNumber: '',
+    shopPrice: '',
+    comboPrice: '',
+    validTimeEnd: '',
+    validTimeStart: '',
+    allDayStatus: '',
+    comboClassifyList: [],
+    comboRemark: '',
+    allTimeStatus: '',
+    usedTimeEnd: '',
+    usedTimeStart: '',
+    comboPhotoUrl: '',
+    legalHolidayStatus: '',
+    monday: '',
+    tuesday: '',
+    wednesday: '',
+    thursday: '',
+    friday: '',
+    saturday: '',
+    sunday: '',
   }
+})
+onMounted(()=> {
+  info.value = JSON.parse(localStorage.getItem('mealInfo'))
+  console.log(info.value, 'info.value')
+})
+// 下线
+const doDown = async()=> {
+    loading.value = true
+    const res = await comboChangeStatus({
+      id: info.value.id,
+      comboStatus: '1'
+    })
+    loading.value = false
+    if (res?.code != 0){
+      Message.error(res?.msg);
+      return;
+    }
+    info.value.comboStatus = '1'
+    Message.success('下架成功');
+  }
+
+const doUp = async()=> {
   loading.value = true
   const res = await comboChangeStatus({
-    id: item.id,
-    comboStatus: '1'
+    id: info.value.id,
+    comboStatus: '0'
   })
   loading.value = false
-  if (res?.code != 200) {
+  if (res?.code != 0){
     Message.error(res?.msg);
     return;
   }
-  Message.success('不通过成功');
-  return true;
+  info.value.comboStatus = '0'
+  Message.success('上架成功');
 }
 
-// 通过
-const doAgree = async () => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '通过商家',
-    content: '是否确认通过，通过后商家可进行店铺管理',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('通过成功')
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
+const doDelete = async()=> {
+    loading.value = true
+    const res = await comboDelete(info.value.id)
+    if (res?.code != 0){
+      Message.error(res?.msg);
+      return;
     }
-  });
-}
-// 上线
-const doUp = async () => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '上线商家',
-    content: '是否确认上线，上线后小程序即可查看',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('上线成功')
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
-    }
-  });
-}
-
-// 下线
-const doDown = async () => {
-  Modal.confirm({
-    titleAlign: 'start',
-    title: '下线商家',
-    content: '是否确认下线，上线后小程序将无法查看',
-    okText: '确定',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        let res = await orderCancel(item.id)
-        loading.value = false
-        if (res?.code == 200) {
-          Message.success('下线成功')
-        } else {
-          Message.error(res?.msg)
-        }
-      } catch(error) {
-        Message.error(JSON.stringify(error) || '接口异常')
-      }
-    },
-    async onCancel() {
-
-    }
-  });
-}
+    loading.value = false
+    router.back()
+    Message.success('删除成功');
+  }
 
 </script>
 
