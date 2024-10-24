@@ -102,7 +102,7 @@ const search = async () => {
     const params = {
         pageNum: formModel.pageNum,
         pageSize: formModel.pageSize,
-        // userId: userId.value,
+        userId: userId.value,
     }
     try {
         let res: any = await consumptionList(params)
@@ -123,11 +123,11 @@ const search = async () => {
 .row {
     display: flex;
     align-items: center;
-    color: #333;
+    color: var(--color-text-2);
     gap: 12px;
     .big {
         font-size: 22px;
-        color: #1b1b1b;
+        color: var(--color-text-1);
         font-weight: 600;
     }
     img {

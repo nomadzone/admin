@@ -6,12 +6,22 @@
             <a-form :model="formModel" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
               label-align="center">
               <a-row :gutter="16">
-                <a-col :span="12">
+                <a-col :span="8">
                   <a-form-item field="number" label="广告名称">
                     <a-input v-model="formModel.advName" placeholder="请输广告名称" allow-clear/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="12">
+                <a-col :span="8">
+                  <a-form-item field="status" label="位置">
+                    <a-select :style="{width:'340px'}" v-model="formModel.type" placeholder="全部" allow-clear>
+                      <a-option value="">全部</a-option>
+                      <a-option value="1">首页</a-option>
+                      <a-option value="2">用户默认头像</a-option>
+                      <a-option value="3">商家探索轮播图</a-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="8">
                   <a-form-item field="status" label="状态">
                     <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
                       <a-option value="">全部</a-option>
@@ -69,8 +79,11 @@
                 :src="record.mainImage"
             />
         </template>
+        <template #type="{ record }">
+          <span>{{ record.type === '1' ? '首页': (record.type === '2' ? '用户默认头像' : '商家探索轮播图') }}</span>
+        </template>
         <template #orderNumber="{ record }">
-          <span>{{ record.type === '1' ? '首页': (record.type === '2' ? '用户默认头像' : '商家') }}</span>/<span>{{ record.orderNumber }}</span>
+          <span>{{ record.orderNumber }}</span>
         </template>
         <template #status="{ record }">
           <a-tag v-if="record.status == 1" color="blue">已上架</a-tag>
@@ -100,6 +113,7 @@
     pageSize: 10,
     advName: '',
     status: '',
+    type: '',
   });
   const loading = ref(false)
   const pagination = ref({
@@ -121,7 +135,12 @@
       slotName: 'images' // 使用 slot 来渲染状态列
     },
     {
-      title: '位置/排列',
+      title: '位置',
+      dataIndex: 'type',
+      slotName: 'type' // 0下架 1上架
+    },
+    {
+      title: '排列',
       dataIndex: 'orderNumber',
       slotName: 'orderNumber' // 0下架 1上架
     },
@@ -154,6 +173,9 @@
       }
       if (formModel.status) {
         params.status = formModel.status
+      }
+      if (formModel.type) {
+        params.type = formModel.type.toString()
       }
       let res = await noticeList(params)
       loading.value = false

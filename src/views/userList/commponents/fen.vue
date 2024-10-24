@@ -1,10 +1,10 @@
 <template>
-    <div style="padding-top: 48px;">
+    <div style="padding-top: 32px;">
         <div class="type">
-            <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">关注</a-button>
-            <a-button shape="round" type="primary"  v-if="type == '0'">关注</a-button>
             <a-button shape="round" v-if="type != '1'" @click="type = '1'; search()">粉丝</a-button>
             <a-button shape="round" type="primary" v-if="type == '1'">粉丝</a-button>
+            <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">关注</a-button>
+            <a-button shape="round" type="primary"  v-if="type == '0'">关注</a-button>
         </div>
         <a-table size="small" :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading"
             :pagination='pagination'>
@@ -20,7 +20,73 @@
               </a-space>
             </template>
         </a-table>
-
+        <a-modal v-model:visible="visible">
+            <template #title>
+                活动详情
+            </template>
+            <div>
+                <div class="line">
+                    <span>昵称</span>
+                    <span>{{ info.value.nickname }}</span>
+                </div>
+                <div class="line">
+                    <span>状态</span>
+                    <span>
+                        <a-tag  color="red" v-if="info.value.status === '0'" :default-checked="true">未认证</a-tag>
+                        <a-tag  color="green" v-if="info.value.status === '1'" :default-checked="true">已认证</a-tag>
+                    </span>
+                </div>
+                <div class="line">
+                    <span>openId</span>
+                    <span>{{ info.value.openId }}</span>
+                </div>
+                <div class="line">
+                    <span>手机号码</span>
+                    <span>{{ info.value.phoneNumber }}</span>
+                </div>
+                <div class="line">
+                    <span>头像</span>
+                    <span>
+                        <a-avatar :size="64">
+                            <img
+                                alt="avatar"
+                                :src="info.value.avatarUrl"
+                            />
+                        </a-avatar>
+                    </span>
+                </div>
+                <div class="line">
+                    <span>生日</span>
+                    <span>{{ info.value.birthdayTime }}</span>
+                </div>
+                <div class="line">
+                    <span>性别</span>
+                    <span>{{ info.value.gender == '0' ? '男' : (info.value.gender == '1' ? '女' : '未知' ) }}</span>
+                </div>
+                <div class="line">
+                    <span>国家</span>
+                    <span>{{ info.value.country }}</span>
+                </div>
+                <div class="line">
+                    <span>省份</span>
+                    <span>{{ info.value.province }}</span>
+                </div>
+                <div class="line">
+                    <span>城市</span>
+                    <span>{{ info.value.city }}</span>
+                </div>
+                <div class="line">
+                    <span>备注</span>
+                    <span>{{ info.value.remark }}</span>
+                </div>
+                <div class="line">
+                    <span>标签</span>
+                    <div>
+                        <a-tag color="blue" style="margin: 0 4px;" v-for="(item, index) in info.value.userPreferenceList"> {{ item.name }} </a-tag>
+                    </div>
+                </div>
+            </div>
+        </a-modal>
     </div>
 </template>
 
@@ -46,6 +112,24 @@ const columns = [
   ];
 
 const type = ref('1')
+const visible = ref(false)
+const info = reactive({ 
+    value: {
+        avatarUrl: '',
+        userPreferenceList: [],
+        birthdayTime: '',
+        city: '',
+        contactphoto: '',
+        country: '',
+        gender: '',
+        nickname: '',
+        openId: '',
+        phoneNumber: '',
+        province: '',
+        remark: '',
+        status: '',
+    }
+ })
 const formModel = reactive({
     pageNum: 1,
     pageSize: 10,
@@ -96,7 +180,8 @@ const search = async () => {
     }
 }
 const doLook = (record, index)=> {
-
+    info.value = record
+    visible.value = true
 }
 </script>
 
@@ -106,4 +191,23 @@ const doLook = (record, index)=> {
     gap: 8px;
     padding-bottom: 16px;
 }
+.line {
+  padding: 8px 0;
+  display: flex;
+  gap: 10px;
+
+  >* {
+    display: flex;
+  }
+
+  >span:first-child {
+    color: var(--color-text-3);
+    width: 100px;
+    text-align: right;
+    flex: 0 0 100px;
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}
+
 </style>

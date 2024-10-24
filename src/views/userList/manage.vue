@@ -75,7 +75,8 @@ import { Message } from '@arco-design/web-vue'
     dataIndex: 'userType',
     slotName: 'userType' // userType是否发起过活动 1 发起过 其他没有
   },
-    { title: '消费金额', dataIndex: 'consumption' },
+    { title: '套餐消费金额', dataIndex: 'consumption' },
+    { title: '活动消费金额', dataIndex: 'consumption' },
     { title: '活动参与数', dataIndex: 'activityInNumber' },
     { title: '活动发起数', dataIndex: 'activityNumberEd' }, 
     { title: '注册时间', dataIndex: 'createTime' },

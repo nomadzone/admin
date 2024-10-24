@@ -264,7 +264,7 @@ const doDelete = async()=> {
   gap: 10px;
 
   >span:first-child {
-    color: #777;
+    color: var(--color-text-3);
     width: 80px;
     text-align: right;
   }
@@ -295,11 +295,11 @@ const doDelete = async()=> {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #dcdee3;
+    background-color: var(--color-text-8);
     padding-right: 26px;
 
     &:hover {
-      background-color: #d8d8d8;
+      background-color: var(--color-text-8);
     }
   }
 }
