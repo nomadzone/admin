@@ -8,18 +8,18 @@
             <a-row :gutter="16">
               <a-col :span="12">
                 <a-form-item field="number" label="商家名称">
-                  <a-input v-model="formModel.storeName" placeholder="请输商家名称" />
+                  <a-input v-model="formModel.shopName" placeholder="请输商家名称" allow-clear />
                 </a-form-item>
                 <a-form-item field="number" label="套餐名称">
-                  <a-input v-model="formModel.comboName" placeholder="请输套餐名称" />
+                  <a-input v-model="formModel.comboName" placeholder="请输套餐名称"  allow-clear/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item field="name" label="状态">
-                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部">
+                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear >
                     <a-option value="">全部</a-option>
-                    <a-option value="0">已上线</a-option>
-                    <a-option value="1">已下线</a-option>
+                    <a-option value="0">已上架</a-option>
+                    <a-option value="1">已下架</a-option>
                     <a-option value="2">待审批</a-option>
                     <a-option value="3">不通过</a-option>
                   </a-select>
@@ -64,23 +64,23 @@
       <template #optional="{ record, rowIndex }">
         <a-space>
           <a-link @click="doLook(record, rowIndex)" size="mini">查看</a-link>
-          <a-popconfirm content="是否下架?" v-if="record.comboStatus != '1'" @ok="doDown(record, rowIndex)">
-            <a-button status="warning"  size="mini">下架</a-button>
+          <a-popconfirm content="是否下架?" v-if="record.comboStatus == '0'" @ok="doDown(record, rowIndex)">
+            <a-button status="warning" type="primary"  size="mini">下架</a-button>
           </a-popconfirm>
           <a-popconfirm content="是否上架?" v-if="record.comboStatus == '1'" @ok="doUp(record, rowIndex)">
             <a-button type="primary" size="mini">上架</a-button>
           </a-popconfirm>
-          <!-- <a-button v-if="record.comboStatus == '1'" @click="doEdit(record, rowIndex)" size="mini">编辑</a-button>   -->
-          <a-popconfirm content="是否删除?" v-if="record.comboStatus == '1'" @ok="doDelete(record, rowIndex)">
-            <a-button status="danger"   size="mini">删除</a-button>
+          <a-button type="primary" status="success" size="mini" @click="doVerity(record,rowIndex)" v-if="record.comboStatus == '2'">审核</a-button>
+          <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)">
+            <a-button type="primary" status="danger" size="mini">删除</a-button>
           </a-popconfirm>
         </a-space>
       </template>
       <template #comboStatus="{ record }">
-        <a-tag v-if="record.comboStatus == '0'" color="blue">已上线</a-tag>
-        <a-tag v-if="record.comboStatus == '1'" color="red">已下线</a-tag>
-        <a-tag v-if="record.comboStatus == '2'" color="green">待审批</a-tag>
-        <a-tag v-if="record.comboStatus == '3'" color="red">不通过</a-tag>
+            <a-tag v-if="record.comboStatus == '0'" color="#168cff">已上架</a-tag>
+            <a-tag v-if="record.comboStatus == '1'" color="#ffb400">已下架</a-tag>
+            <a-tag v-if="record.comboStatus == '2'" color="green">待审批</a-tag>
+            <a-tag v-if="record.comboStatus == '3'" color="#f53f3f">不通过</a-tag>
       </template>
       <template #rejectReason="{ record }">
         <span> {{ record.comboStatus == 3 ? record.rejectReason : '--' }} </span>
@@ -89,8 +89,14 @@
 
     <!-- 不通过 -->
     <a-modal v-model:visible="isInject" :on-before-ok="doInject" @cancel="isInject = false" unmountOnClose>
-      <template #title>审核不通过</template>
-      <div class="ineject">
+      <template #title>审核</template>
+      <div>
+        <a-radio-group v-model="verifyStatus">
+          <a-radio value="1">通过</a-radio>
+          <a-radio value="3">不通过</a-radio>
+        </a-radio-group>
+      </div>
+      <div class="ineject" v-if="verifyStatus == '3'">
         <div :class="[!injectText && isInjectError?'error':'']"><span class="required">*</span>请输入不通过原因</div>
         <a-input :style="{width:'320px'}" placeholder="请输入不通过原因" type="text" v-model="injectText" required allow-clear />
       </div>
@@ -107,13 +113,12 @@ import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
 
 const router = useRouter()
 const buttonType = ref('')
-const optionIndex = ref(-1)
 
 watch(buttonType, (newVal, oldVal) => {
   if (newVal !== oldVal && newVal !== null) {
   formModel.pageNum = 1;
   formModel.pageSize = 10;
-  formModel.storeName = '';
+  formModel.shopName = '';
   formModel.comboName = '';
   formModel.status = '';
   formModel.payDate = [];
@@ -128,7 +133,7 @@ onMounted(() => {
 const formModel = reactive({
   pageNum: 1,
   pageSize: 10,
-  storeName: '',
+  shopName: '',
   comboName: '',
   status: '',
   payDate: [],
@@ -171,7 +176,7 @@ const data = reactive({
 const reset = ()=> {
   formModel.pageNum = 1;
   formModel.pageSize = 10;
-  formModel.storeName = '';
+  formModel.shopName = '';
   formModel.comboName = '';
   formModel.status = '';
   formModel.payDate = [];
@@ -183,7 +188,7 @@ const search = async () => {
     const params = {
       pageNum: formModel.pageNum,
       pageSize: formModel.pageSize,
-      storeName: formModel.storeName,
+      shopName: formModel.shopName,
       comboName: formModel.comboName,
     }
     if (formModel.status || formModel.status === 0) {
@@ -192,8 +197,8 @@ const search = async () => {
     if (formModel.comboName) {
       params.comboName = formModel.comboName
     }
-    if (formModel.storeName) {
-      params.storeName = formModel.storeName
+    if (formModel.shopName) {
+      params.shopName = formModel.shopName
     }
     if (formModel.payDate?.length === 2 && formModel.payDate[0] && formModel.payDate[1]) {
       params.beginUpdateTime = formModel.payDate[0]
@@ -241,30 +246,45 @@ const doLook = (record) => {
     localStorage.setItem('mealInfo', JSON.stringify(_record))
   router.push('/meal/create')
 }
-
-// 不通过
+// 审批
 const isInject = ref(false)
 const injectText = ref('')
+const optionIndex = ref(-1)
 const isInjectError = ref(false)
+const verifyStatus = ref('1')
+
+const doVerity = (record, index)=> {
+  optionIndex.value = index;
+  isInject.value = true;
+}
 const doInject = async () => {
-  if (!injectText.value) {
+  if (verifyStatus.value == '3' && !injectText.value) {
     isInjectError.value = true;
     return false
   }
   const index = optionIndex.value
   const item = data.list[optionIndex.value]
   loading.value = true
-  const res = await comboChangeStatus({
+  const params = {
     id: item.id,
-    comboStatus: '1'
-  })
-  loading.value = false
-  if (res?.code != 200) {
-    Message.error(res?.msg);
-    return;
+    comboStatus: verifyStatus.value.toString()
   }
-  data.list[index].comboStatus = '1'
-  Message.success('不通过成功');
+  if (verifyStatus.value == '3') {
+    params.rejectReason = injectText.value
+  }
+  try {
+    const res = await comboChangeStatus(params)
+    loading.value = false
+    if (res?.code != 0) {
+      Message.error(res?.msg);
+      return false;
+    }
+    data.list[index].comboStatus = verifyStatus.value
+    Message.success(verifyStatus.value == '1' ? '审批通过' : '审批不通过');
+  } catch(error){
+    loading.value = false
+    return false;
+  }
   return true;
 }
 
@@ -332,6 +352,7 @@ const doDelete = async(item, index)=> {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding-top: 16px;
   .required {
     color: red;
   }

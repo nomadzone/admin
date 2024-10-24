@@ -23,8 +23,8 @@
           <div class="line">
             <span>状态</span>
             <span>
-              <a-tag v-if="info.value.comboStatus == '0'" color="blue">已上线</a-tag>
-              <a-tag v-if="info.value.comboStatus == '1'" color="red">已下线</a-tag>
+              <a-tag v-if="info.value.comboStatus == '0'" color="blue">已上架</a-tag>
+              <a-tag v-if="info.value.comboStatus == '1'" color="red">已下架</a-tag>
               <a-tag v-if="info.value.comboStatus == '2'" color="green">待审批</a-tag>
               <a-tag v-if="info.value.comboStatus == '3'" color="red">不通过</a-tag>
               <span style="padding-left: 10px;">{{ info.value.remark }}</span>
@@ -33,14 +33,15 @@
         </a-col>
         <a-col :span="7" style="display: flex;flex-direction: row-reverse;padding-right: 50px;">
           <div style="display: flex; gap: 10px">
-            <a-popconfirm content="是否下架?" v-if="info.value.comboStatus != '1'" @ok="doDown">
-              <a-button status="warning"  >下架</a-button>
+            <a-popconfirm content="是否下架?" v-if="info.value.comboStatus == '0'" @ok="doDown">
+              <a-button type="primary" status="warning"  >下架</a-button>
             </a-popconfirm>
             <a-popconfirm content="是否上架?" v-if="info.value.comboStatus == '1'" @ok="doUp">
               <a-button type="primary">上架</a-button>
             </a-popconfirm>
-            <a-popconfirm content="是否删除?" v-if="info.value.comboStatus == '1'" @ok="doDelete">
-              <a-button status="danger">删除</a-button>
+            <a-button type="primary" status="success" @click="doVerity" v-if="info.value.comboStatus == '2'">审核</a-button>
+            <a-popconfirm content="是否删除?" @ok="doDelete">
+              <a-button type="primary" status="danger">删除</a-button>
             </a-popconfirm>
           </div>
         </a-col>
@@ -130,11 +131,16 @@
 
     <!-- 不通过 -->
     <a-modal v-model:visible="isInject" :on-before-ok="doInject" @cancel="isInject = false" unmountOnClose>
-      <template #title>审核不通过</template>
-      <div class="ineject">
-        <div :class="[!injectText && isInjectError ? 'error' : '']"><span class="required">*</span>请输入不通过原因</div>
-        <a-input :style="{ width: '320px' }" placeholder="请输入不通过原因" type="text" v-model="injectText" required
-          allow-clear />
+      <template #title>审核</template>
+      <div>
+        <a-radio-group v-model="verifyStatus">
+          <a-radio value="1">通过</a-radio>
+          <a-radio value="3">不通过</a-radio>
+        </a-radio-group>
+      </div>
+      <div class="ineject" v-if="verifyStatus == '3'">
+        <div :class="[!injectText && isInjectError?'error':'']"><span class="required">*</span>请输入不通过原因</div>
+        <a-input :style="{width:'320px'}" placeholder="请输入不通过原因" type="text" v-model="injectText" required allow-clear />
       </div>
     </a-modal>
   </PageCard>
@@ -161,9 +167,6 @@ const groupedPackageContent = computed(() => {
 });
 
 // 不通过
-const isInject = ref(false)
-const injectText = ref('')
-const isInjectError = ref(false)
 const info = reactive({
   value: {
     id: '',
@@ -195,9 +198,45 @@ const info = reactive({
 })
 onMounted(()=> {
   info.value = JSON.parse(localStorage.getItem('mealInfo'))
-  console.log(info.value, 'info.value')
 })
-// 下线
+
+const isInject = ref(false)
+const injectText = ref('')
+const isInjectError = ref(false)
+const verifyStatus = ref('1')
+const doVerity = ()=> {
+  isInject.value = true;
+}
+const doInject = async () => {
+  if (verifyStatus.value == '3' && !injectText.value) {
+    isInjectError.value = true;
+    return false
+  }
+  const item = info.value
+  loading.value = true
+  const params:any = {
+    id: item.id,
+    comboStatus: verifyStatus.value.toString()
+  }
+  if (verifyStatus.value == '3') {
+    params.rejectReason = injectText.value
+  }
+  try {
+    const res = await comboChangeStatus(params)
+    loading.value = false
+    if (res?.code != 0) {
+      Message.error(res?.msg);
+      return false;
+    }
+    info.value.comboStatus = verifyStatus.value
+    Message.success(verifyStatus.value == '1' ? '审批通过' : '审批不通过');
+  } catch(error){
+    loading.value = false
+    return false;
+  }
+  return true;
+}
+// 下架
 const doDown = async()=> {
     loading.value = true
     const res = await comboChangeStatus({
@@ -274,6 +313,7 @@ const doDelete = async()=> {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding-top: 16px;
 
   .required {
     color: red;
