@@ -68,13 +68,13 @@
                     </template>
 
                     <template #action="{ record }">
-                        <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.detail") }}</a-button>
+                        <a-button type="text" v-if="record.settlementStatus == 0"
+                            @click="handleSet(record)">结算</a-button>
                     </template>
                 </a-table>
                 <div class="pagination-row">
                     <a-pagination :total="totalValue" :current="currentPage" :pageSize="pageSize"
                         @change="handleChangePage" @page-size-change="handleChangeSize" />
-
                 </div>
 
             </div>
@@ -85,8 +85,9 @@
 <script lang="ts" setup>
 import { ref, watch, defineProps } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { shopSettlementList } from '@/api/merchant';
+import { shopSettlementList, shopSettlementDeal } from '@/api/merchant';
 import Summary from './summary.vue';
+import { Modal, Message } from '@arco-design/web-vue'
 const { t } = useI18n()
 const queryFormItemLayout = { xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }
 
@@ -108,7 +109,7 @@ const columns = ref([
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlementStatusName', key: 'settlementStatusName', width: 120, ellipsis: true },
     { title: t('finance.settlement.settlementMethod') + '/' + t('finance.settlement.settlementNumber'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 200, ellipsis: true, slotName: 'paymentMethod' },
     { title: t('finance.settlement.settlementTime'), dataIndex: 'settlementDate', key: 'settlementDate', width: 180, ellipsis: true },
-    // { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
+    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
 
 ])
 
@@ -121,11 +122,12 @@ const handleShowDetail = (row: any) => {
 const totalValue = ref(0)
 const currentPage = ref(1)
 const currentSize = ref(20)
+const data = ref([])
 const getSettleListData = async (page, size) => {
     let params = {
         shopId: props.shopId,
-        page: page || currentPage.value,
-        size: size || currentSize.value,
+        pageNum: page || currentPage.value,
+        pageSize: size || currentSize.value,
         orderNo: form.value.orderNo,
         settlementType: form.value.settlementType,
         timeQuery: form.value.timeQuery,
@@ -136,7 +138,7 @@ const getSettleListData = async (page, size) => {
 
     delete params.timeQuery
     const res = await shopSettlementList(params)
-    if (res && res.code === 200) {
+    if (res && res.code === 0) {
         data.value = res.rows
         totalValue.value = res.total
 
@@ -152,6 +154,25 @@ const handleChangePage = (page) => {
 const handleChangeSize = (size) => {
     currentSize.value = size
     getSettleListData(1, size)
+}
+
+// 点击结算
+const handleSet = (record) => {
+    console.log('record:', record)
+    Modal.confirm({
+        title: '结算',
+        content: '确定结算吗？',
+        onOk: () => {
+            shopSettlementDeal([record.id]).then(res => {
+                if (res.code == 0) {
+                    Message.success('操作成功');
+                    getSettleListData(currentPage.value)
+                }
+            }).catch(err => {
+                console.log('shopSettlementDeal error:', err);
+            })
+        }
+    })
 }
 
 watch(() => props.shopId, (newVal) => {
@@ -170,6 +191,7 @@ watch(() => props.shopId, (newVal) => {
     align-items: flex-start;
     color: rgb(var(--gray-10));
     padding: 0px 12px;
+    margin-top: 20px;
 
     .query-actions {
         width: 80px;
@@ -194,7 +216,6 @@ watch(() => props.shopId, (newVal) => {
 
     .form-item-group {
         width: calc(100% - 100px);
-        margin-top: 20px;
     }
 }
 
@@ -202,5 +223,13 @@ watch(() => props.shopId, (newVal) => {
     .table-header {
         margin-bottom: 10px;
     }
+}
+
+.pagination-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
 }
 </style>

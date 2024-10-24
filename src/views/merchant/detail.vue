@@ -18,7 +18,7 @@
                             </a-descriptions-item>
                             <a-descriptions-item label="商家类型">
                                 <!-- <a-tag></a-tag> -->
-                                {{ authTypeMap[basicInfo.authType] }}
+                                {{ authTypeMap[identifyInfoData.authType] }}
                             </a-descriptions-item>
                         </a-descriptions>
 

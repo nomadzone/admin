@@ -16,7 +16,7 @@
                         :wrapper-col-props="{ span: 18 }">
                         <a-grid :cols="queryFormItemLayout" style="width: 100%;">
                             <a-grid-item class="demo-item">
-                                <a-form-item field="userName" :label="$t('finance.revenueExpenditure.orderNum')"
+                                <a-form-item field="orderNum" :label="$t('finance.revenueExpenditure.orderNum')"
                                     label-col-flex="80px">
                                     <a-input v-model="form.orderNum" />
                                 </a-form-item>
@@ -37,7 +37,7 @@
                             <a-grid-item class="demo-item">
                                 <a-form-item field="status" :label="$t('finance.revenueExpenditure.receiptTime')"
                                     label-col-flex="80px">
-                                    <a-select v-model="form.dealType" />
+                                    <a-range-picker format="YYYY-MM-DD " v-model="form.timeQuery" allow-clear />
                                 </a-form-item>
                             </a-grid-item>
                         </a-grid>
@@ -109,7 +109,7 @@ const form = ref({
     orderNum: '',
     financeType: '',
     dealType: '',
-    postingdate: null
+    timeQuery: null
 
 })
 
