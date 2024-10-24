@@ -138,3 +138,11 @@ export function shopSettlementTotal(data: any) {
         data
       })
 }
+// 结算操作
+export function shopSettlementDeal(data: any) {
+    return http({
+        method: 'post',
+        url: `/admin/system/record/settlement`,
+        data
+      })
+}
