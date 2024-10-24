@@ -27,7 +27,7 @@
               <a-tag v-if="info.value.comboStatus == '1'" color="red">已下架</a-tag>
               <a-tag v-if="info.value.comboStatus == '2'" color="green">待审批</a-tag>
               <a-tag v-if="info.value.comboStatus == '3'" color="red">不通过</a-tag>
-              <span style="padding-left: 10px;">{{ info.value.remark }}</span>
+              <span style="padding-left: 10px;">{{ info.value.rejectReason }}</span>
             </span>
           </div>
         </a-col>
@@ -40,7 +40,7 @@
               <a-button type="primary">上架</a-button>
             </a-popconfirm>
             <a-button type="primary" status="success" @click="doVerity" v-if="info.value.comboStatus == '2'">审核</a-button>
-            <a-popconfirm content="是否删除?" @ok="doDelete">
+            <a-popconfirm content="是否删除?" v-if="info.value.comboStatus != '0'" @ok="doDelete">
               <a-button type="primary" status="danger">删除</a-button>
             </a-popconfirm>
           </div>
@@ -147,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
+import { comboList, comboChangeStatus, comboDelete, comboEditVerify } from '@/api/combo';
 import PageCard from '@/components/page-card/index.vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -194,6 +194,7 @@ const info = reactive({
     friday: '',
     saturday: '',
     sunday: '',
+    rejectReason: '',
   }
 })
 onMounted(()=> {
@@ -222,13 +223,16 @@ const doInject = async () => {
     params.rejectReason = injectText.value
   }
   try {
-    const res = await comboChangeStatus(params)
+    const res = await comboEditVerify(params)
     loading.value = false
     if (res?.code != 0) {
       Message.error(res?.msg);
       return false;
     }
     info.value.comboStatus = verifyStatus.value
+    if (verifyStatus.value == '3') {
+      info.value.rejectReason = verifyStatus.value
+    }
     Message.success(verifyStatus.value == '1' ? '审批通过' : '审批不通过');
   } catch(error){
     loading.value = false

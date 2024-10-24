@@ -73,10 +73,9 @@
 <script setup lang="ts">
 import { Message, Modal } from '@arco-design/web-vue';
 import PageCard from '@/components/page-card/index.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import PicUpload from '@/components/picUpload/index.vue'
-import { comboAdd, comboEdit } from '@/api/combo';
 import { noticeAdd, noticeEdit } from '@/api/adv';
 const router = useRouter()
 const formModel = reactive({

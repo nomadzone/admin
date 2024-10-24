@@ -78,7 +78,7 @@ export function comboAdd(data: any) {
     })
 }
 
-export function comboEdit(data: any) {
+export function comboEditVerify(data: any) {
     return http({
       method: 'POST',
       url: '/admin/system/combo/edit',

@@ -71,7 +71,7 @@
             <a-button type="primary" size="mini">上架</a-button>
           </a-popconfirm>
           <a-button type="primary" status="success" size="mini" @click="doVerity(record,rowIndex)" v-if="record.comboStatus == '2'">审核</a-button>
-          <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)">
+          <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)" v-if="record.comboStatus != '0'">
             <a-button type="primary" status="danger" size="mini">删除</a-button>
           </a-popconfirm>
         </a-space>
@@ -109,7 +109,7 @@ import PageCard from '@/components/page-card/index.vue';
 import { ref, reactive, watch, onMounted, inject } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useRouter } from 'vue-router';
-import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
+import { comboList, comboChangeStatus, comboDelete, comboEditVerify } from '@/api/combo';
 
 const router = useRouter()
 const buttonType = ref('')
@@ -273,13 +273,16 @@ const doInject = async () => {
     params.rejectReason = injectText.value
   }
   try {
-    const res = await comboChangeStatus(params)
+    const res = await comboEditVerify(params)
     loading.value = false
     if (res?.code != 0) {
       Message.error(res?.msg);
       return false;
     }
     data.list[index].comboStatus = verifyStatus.value
+    if (verifyStatus.value == '3') {
+      data.list[index].rejectReason = injectText.value
+    }
     Message.success(verifyStatus.value == '1' ? '审批通过' : '审批不通过');
   } catch(error){
     loading.value = false
