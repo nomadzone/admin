@@ -24,12 +24,7 @@
                 <a-input placeholder="请输入" v-model="form.nickname"></a-input>
               </a-form-item>
             </a-col>
-            
-            <a-col :xl="6" :lg="8" :md="12" :xs="24">
-              <a-form-item label="活动名称:" field="address">
-                <a-input placeholder="请输入" v-model="form.title"></a-input>
-              </a-form-item>
-            </a-col>
+
             <a-col :xl="6" :lg="8" :md="12" :xs="24">
               <a-form-item label="状态:" field="status">
                 <a-select v-model="form.status" placeholder="请选择" :options="options" :field-names="fieldNames" >
@@ -125,6 +120,11 @@ const columns = ref([
   {
     title: '活动名称',
     dataIndex: 'title',
+    width: 100
+  },
+  {
+    title: '活动标签',
+    dataIndex: 'label',
     width: 100
   },
   {
