@@ -16,3 +16,11 @@ export function orderCancel(id: string | number) {
     data: { id }
   })
 }
+
+export function userMealList(data: any) {
+  return http({
+    method: 'get',
+    url: '/admin/system/order/list',
+    data
+  })
+}

@@ -87,7 +87,7 @@ const columns = [
         dataIndex: 'signUpNumber',
     },
     {
-        title: '人均收费',
+        title: '报名费',
         dataIndex: 'price',
     },
     {

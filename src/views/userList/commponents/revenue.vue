@@ -1,5 +1,11 @@
 <template>
-    <div style="padding-top: 48px;">
+    <div style="padding-top: 32px;">
+        <div class="type">
+            <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">活动套餐明细</a-button>
+            <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button>
+            <a-button shape="round" v-if="type != '1'" @click="type = '1'; searchMeal()">套餐收支明细</a-button>
+            <a-button shape="round" type="primary"  v-if="type == '1'">套餐收支明细</a-button>
+        </div>
         <a-row style="padding-left: 20px; padding-bottom:32px;">
             <a-col :span="10">
                 <div class="row">
@@ -117,6 +123,13 @@ const search = async () => {
         Message.error('接口异常')
     }
 }
+
+
+const type = ref('0')
+
+const searchMeal = ()=> {
+    
+}
 </script>
 
 <style lang="scss" scoped>
@@ -134,5 +147,11 @@ const search = async () => {
         position: relative;
         top: 8px;
     }
+}
+
+.type {
+    display: flex;
+    gap: 8px;
+    padding-bottom: 16px;
 }
 </style>

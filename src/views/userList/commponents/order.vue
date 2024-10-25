@@ -45,16 +45,7 @@
     <a-table v-if="type == '1'" :columns="columnsMeal" :data="formModelMeal.list" style="width: 100%" :loading="loadingMeal" :pagination='paginationMeal'>
       <template #optional="{ record, rowIndex }">
         <a-space>
-          <a-link @click="doLookMeal(record, rowIndex)" size="mini">查看</a-link>
-          <a-popconfirm content="是否下架?" v-if="record.comboStatus != '1'" @ok="doDown(record, rowIndex)">
-            <a-button status="warning"  size="mini">下架</a-button>
-          </a-popconfirm>
-          <a-popconfirm content="是否上架?" v-if="record.comboStatus == '1'" @ok="doUp(record, rowIndex)">
-            <a-button type="primary" size="mini">上架</a-button>
-          </a-popconfirm>
-          <a-popconfirm content="是否删除?" v-if="record.comboStatus == '1'" @ok="doDelete(record, rowIndex)">
-            <a-button status="danger" size="mini">删除</a-button>
-          </a-popconfirm>
+          <a-link @click="doLookMeal(record, rowIndex)" size="mini">查看详情</a-link>
         </a-space>
       </template>
       <template #comboStatus="{ record }">
@@ -67,15 +58,32 @@
         <span> {{ record.comboStatus == 3 ? record.rejectReason : '--' }} </span>
       </template>
     </a-table>
+    <a-modal v-model:visible="visibleMeal" width="840px">
+      <template #title>
+        套餐详情
+      </template>
+      <div class="meal-row">
+        <div class="line" v-for="field in fieldsMeal" :key="field.key">
+          <span>{{ field.label }}</span>
+            <a-image
+                v-if="field.key === 'comboPhotoUrl'"
+                width="48"
+                :src="infoMeal[field.key]"
+            />
+          <span v-else>{{ infoMeal[field.key] || '--' }}</span>
+        </div>
+      </div>
+    </a-modal>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { userActivityList } from '@/api/order'
+import { userActivityList, userMealList } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
 import { comboList, comboChangeStatus, comboDelete } from '@/api/combo';
 import { useRouter } from 'vue-router';
+import { find } from 'lodash';
 const router = useRouter()
 
 // 活动订单
@@ -176,28 +184,17 @@ const doLook = (item)=> {
   visible.value = true
 }
 
-
-
 // 套餐订单
 const columnsMeal = [
-    { title: '套餐ID', dataIndex: 'id' },
-    { title: '套餐名称', dataIndex: 'comboName', ellipsis: true },
+    { title: '套餐ID', dataIndex: 'orderNo' },
+    { title: '套餐名称', dataIndex: 'shopComboName', ellipsis: true },
     { title: '销量', dataIndex: 'number' },
-    { title: '门店价', dataIndex: 'shopPrice' },
-    { title: '团购价', dataIndex: 'comboPrice' },
-    { 
-      title: '状态', 
-      dataIndex: 'comboStatus',
-      slotName: 'comboStatus' // 使用 slot 来渲染状态列
-    },
-    { 
-      title: '拒绝理由', 
-      dataIndex: 'rejectReason',
-      slotName: 'rejectReason' // 使用 slot 来渲染状态列
-    },
-    { title: '结束时间', dataIndex: 'validTimeEnd' },
-    { title: '最近变更时间', dataIndex: 'updateTime' },
-    { title: '操作', slotName: 'optional', width: 200 },
+    { title: '商家昵称', dataIndex: 'shopName' },
+    { title: '订单金额', dataIndex: 'orderAmount' },
+    { title: '服务费', dataIndex: 'serviceCost' },
+    { title: '状态', dataIndex: 'orderStatusName'},
+    { title: '下单时间', dataIndex: 'createTime' },
+    { title: '操作', slotName: 'optional', width: 100 },
 ];
 const formModelMeal = reactive({
     pageNum: 1,
@@ -224,7 +221,7 @@ const searchMeal = async () => {
         appUserld: userId.value
     }
     try {
-        let res: any = await comboList(params)
+        let res: any = await userMealList(params)
         loadingMeal.value = false
         if (res?.code == 0) {
             pagination.value.total = res.total;
@@ -237,76 +234,113 @@ const searchMeal = async () => {
     }
 }
 
-const doLookMeal = (record, index)=> {
-  let _record = {...record}
-  for (let key in _record) {
-    if (_record[key]=== null || _record[key]===undefined) {
-      _record[key] = ''
-    }
-    if (key === 'comboClassifyList' && Array.isArray(_record[key])) {
-      _record[key].map(ele=> {
-        for (let eleKey in ele) {
-          if (ele[eleKey] === null || ele[eleKey] === undefined) {
-            ele[eleKey] = ''
-          }
-          if (eleKey === 'shopComboClassifyList') {
-            ele[eleKey].map(m=> {
-              for (let k in m) {
-                if (m[k] === null || m[k] === undefined) {
-                  m[k] = ''
-                }
-              }
-            })
-          }
-        }
-      })
-    }
+const visibleMeal = ref(false)
+const fieldsMeal = [
+  { label: 'ID', key: 'id' },
+  { label: '订单编号', key: 'orderNo' },
+  { label: '店铺套餐名称', key: 'shopComboName' },
+  { label: '数量', key: 'number' },
+  { label: '订单金额', key: 'orderAmount' },
+  { label: '服务费', key: 'serviceCost' },
+  { label: '订单状态', key: 'orderStatusName' },
+  { label: '电话', key: 'phone' },
+  { label: '订单日期', key: 'orderDate' },
+  { label: '支付日期', key: 'payDate' },
+  { label: '支付类型', key: 'payTypeName' },
+  { label: '验证时间', key: 'verifyTime' },
+  { label: '验证状态', key: 'verifyStatusName' },
+  { label: '验证昵称', key: 'verifyNikeName' },
+  { label: '退货标志', key: 'returnFlag' },
+  { label: '退货原因', key: 'rejectReturnReason' },
+  { label: '退货状态', key: 'returnStatusName' },
+  { label: '退货编号', key: 'returnNo' },
+  { label: '退货日期', key: 'returnDate' },
+  { label: '退货方式', key: 'returnWay' },
+  { label: '买家姓名', key: 'buyerName' },
+  { label: '折扣', key: 'discount' },
+  { label: '维权理由', key: 'defendRightsReason' },
+  { label: '套餐照片URL', key: 'comboPhotoUrl' },
+  { label: '订单备注', key: 'orderRemark' },
+  { label: '支付编号', key: 'payNo' },
+  { label: '店铺套餐', key: 'shopCombo' },
+  { label: '用户昵称', key: 'userNikeName' },
+  { label: '开始订单日期', key: 'beginOrderDate' },
+  { label: '结束订单日期', key: 'endOrderDate' },
+  { label: '开始验证时间', key: 'beginVerifyTime' },
+  { label: '结束验证时间', key: 'endVerifyTime' },
+  { label: '开始支付日期', key: 'beginPayDate' },
+  { label: '结束支付日期', key: 'endPayDate' },
+  { label: '店铺名称', key: 'shopName' },
+  { label: '备注', key: 'remark' },
+];
+
+const infoMeal = ref({
+  createTime: '',
+  updateBy: '',
+  updateTime: '',
+  remark: '',
+  dimensionId: '',
+  adminNew: '',
+  pageNum: '',
+  pageSize: '',
+  id: '',
+  userId: '',
+  shopId: '',
+  orderId: '',
+  orderNo: '',
+  shopComboId: '',
+  shopComboName: '',
+  number: '',
+  orderAmount: '',
+  serviceCost: '',
+  orderStatus: '',
+  orderStatusName: '',
+  appUserId: '',
+  appNikeName: '',
+  ticketCode: '',
+  phone: '',
+  orderDate: '',
+  payDate: '',
+  payType: '',
+  payTypeName: '',
+  verifyTime: '',
+  verifyStatus: '',
+  verifyStatusName: '',
+  verifyUserId: '',
+  verifyNikeName: '',
+  returnFlag: '',
+  returnFlagName: '',
+  rejectReturnReason: '',
+  returnStatus: '',
+  returnStatusName: '',
+  returnNo: '',
+  returnDate: '',
+  returnWay: '',
+  buyerName: '',
+  discount: '',
+  defendRightsReason: '',
+  delFlag: '',
+  comboPhotoUrl: '',
+  orderRemark: '',
+  payNo: '',
+  shopCombo: '',
+  userNikeName: '',
+  beginOrderDate: '',
+  endOrderDate: '',
+  beginVerifyTime: '',
+  endVerifyTime: '',
+  beginPayDate: '',
+  endPayDate: '',
+  shopName: '',
+})
+
+const doLookMeal = (item)=> {
+  for (let key in item) {
+    infoMeal.value[key] = item[key] || ''
   }
-    localStorage.setItem('mealInfo', JSON.stringify(_record))
-  router.push('/meal/create')
+  visibleMeal.value = true
 }
 
-const doDown = async(item, index)=> {
-    loading.value = true
-    const res = await comboChangeStatus({
-      id: item.id,
-      comboStatus: '1'
-    })
-    loading.value = false
-    if (res?.code != 0){
-      Message.error(res?.msg);
-      return;
-    }
-    formModel.list[index].comboStatus = '1'
-    Message.success('下架成功');
-  }
-
-  const doUp = async(item, index)=> {
-    loading.value = true
-    const res = await comboChangeStatus({
-      id: item.id,
-      comboStatus: '0'
-    })
-    loading.value = false
-    if (res?.code != 0){
-      Message.error(res?.msg);
-      return;
-    }
-    data.list[index].comboStatus = '0'
-    Message.success('上架成功');
-  }
-
-const doDelete = async(item, index)=> {
-    loading.value = true
-    const res = await comboDelete(item.id)
-    if (res?.code != 0){
-      Message.error(res?.msg);
-      return;
-    }
-    loading.value = false
-    search()
-    Message.success('删除成功');
-  }
 </script>
 
 <style lang="scss" scoped>
@@ -334,7 +368,7 @@ const doDelete = async(item, index)=> {
     box-sizing: border-box;
 }
 .line {
-  padding: 8px 0;
+  padding: 4px 0;
   display: flex;
   gap: 10px;
 
@@ -360,5 +394,13 @@ const doDelete = async(item, index)=> {
     display: flex;
     gap: 8px;
     padding-bottom: 16px;
+}
+.meal-row {
+  display: flex;
+  flex-wrap: wrap;
+  > div {
+    width: 50%;
+    box-sizing: border-box;
+  }
 }
 </style>

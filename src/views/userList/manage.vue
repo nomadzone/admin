@@ -45,7 +45,7 @@
           <a-table :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading" :pagination='pagination' >
             <template #userType="{ record, rowIndex }">
               <a-space> 
-                <span>{{ record.userType == 1 ? '发起人' : '普通人' }}</span>
+                <span>{{ record.status == '0' ? '普通人' : '发起人' }}</span>
               </a-space>
             </template>
             <template #optional="{ record, rowIndex }">
@@ -76,6 +76,7 @@ import { Message } from '@arco-design/web-vue'
     slotName: 'userType' // userType是否发起过活动 1 发起过 其他没有
   },
     { title: '套餐消费金额', dataIndex: 'consumption' },
+    { title: '套餐金额汇总', dataIndex: 'comboAmountSum' },
     { title: '活动消费金额', dataIndex: 'consumption' },
     { title: '活动参与数', dataIndex: 'activityInNumber' },
     { title: '活动发起数', dataIndex: 'activityNumberEd' }, 
