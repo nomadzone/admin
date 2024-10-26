@@ -8,15 +8,15 @@
             <a-row :gutter="16">
               <a-col :span="12"> 
                 <a-form-item field="number" label="用户昵称 ">
-                  <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " />
+                  <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " allow-clear/>
                 </a-form-item>
                 <a-form-item field="number" label="手机号码">
-                  <a-input v-model="formModel.phone" placeholder="请输入手机号码" />
+                  <a-input v-model="formModel.phone" placeholder="请输入手机号码" allow-clear/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item field="name" label="状态">
-                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部">
+                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
                     <a-option value="">全部</a-option>
                     <a-option value="0">已上线</a-option>
                     <a-option value="1">已下线</a-option>
@@ -27,7 +27,7 @@
                 <a-form-item field="name" label="报名时间">
                   <a-range-picker style="width: 360px; margin: 0 24px 24px 0;" show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }" format="YYYY-MM-DD HH:mm"
-                     @select="onSelectTime" @ok="onOkTime" @clear="onClear" />
+                     @select="onSelectTime" @ok="onOkTime" @clear="onClear" allow-clear/>
                 </a-form-item>
               </a-col>
             </a-row>

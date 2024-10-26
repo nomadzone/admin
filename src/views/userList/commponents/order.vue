@@ -48,14 +48,15 @@
           <a-link @click="doLookMeal(record, rowIndex)" size="mini">查看详情</a-link>
         </a-space>
       </template>
-      <template #comboStatus="{ record }">
-        <a-tag v-if="record.comboStatus == '0'" color="blue">已上线</a-tag>
-        <a-tag v-if="record.comboStatus == '1'" color="red">已下线</a-tag>
-        <a-tag v-if="record.comboStatus == '2'" color="green">待审批</a-tag>
-        <a-tag v-if="record.comboStatus == '3'" color="red">不通过</a-tag>
-      </template>
-      <template #rejectReason="{ record }">
-        <span> {{ record.comboStatus == 3 ? record.rejectReason : '--' }} </span>
+      <template #orderStatusName="{ record }">
+        <a-tag v-if="record.orderStatus == '0'" color="green">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '1'" color="gray">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '2'" color="blue">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '3'" color="arcoblue">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '4'" color="gold">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '5'" color="orange">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '6'" color="orangered">{{ record.orderStatusName }}</a-tag>
+        <a-tag v-if="record.orderStatus == '7'" color="red">{{ record.orderStatusName }}</a-tag>
       </template>
     </a-table>
     <a-modal v-model:visible="visibleMeal" width="840px">
@@ -192,7 +193,7 @@ const columnsMeal = [
     { title: '商家昵称', dataIndex: 'shopName' },
     { title: '订单金额', dataIndex: 'orderAmount' },
     { title: '服务费', dataIndex: 'serviceCost' },
-    { title: '状态', dataIndex: 'orderStatusName'},
+    { title: '状态', dataIndex: 'orderStatusName', slotName: 'orderStatusName'},
     { title: '下单时间', dataIndex: 'createTime' },
     { title: '操作', slotName: 'optional', width: 100 },
 ];
