@@ -78,8 +78,8 @@ import { Message } from '@arco-design/web-vue'
     { title: '套餐消费金额', dataIndex: 'consumption' },
     { title: '套餐金额汇总', dataIndex: 'comboAmountSum' },
     { title: '活动消费金额', dataIndex: 'consumption' },
-    // { title: '活动参与数', dataIndex: 'activityInNumber' },
-    // { title: '活动发起数', dataIndex: 'activityNumberEd' }, 
+    { title: '活动参与数', dataIndex: 'activityInNumber' },
+    { title: '活动发起数', dataIndex: 'activityNumberEd' }, 
     { title: '注册时间', dataIndex: 'createTime' },
     { title: '操作', slotName: 'optional', width: 120 },
   ];

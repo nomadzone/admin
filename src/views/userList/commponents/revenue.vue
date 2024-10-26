@@ -58,6 +58,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { consumptionList } from '@/api/user'
 import { Message } from '@arco-design/web-vue'
+import { shopSettlementTotal, shopSettlementList } from '@/api/merchant'
 // 状态 0 处理成功 1 处理中 2 关闭  3 微信支付回调失败，4 退款中， 5 退款成功 6微信退款回调失败
 // payType 类型 1收入 2 支出
 const columns = [

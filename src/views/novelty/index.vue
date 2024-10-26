@@ -20,7 +20,6 @@
                     <a-option value="">全部</a-option>
                     <a-option value="200">审核中</a-option>
                     <a-option value="201">已上架</a-option>
-                    <!-- <a-option value="202">已删除</a-option> -->
                     <a-option value="203">已下架</a-option>
                   </a-select>
                 </a-form-item>
@@ -54,12 +53,11 @@
     </a-card>
     <a-divider />
     <div style="margin-bottom: 16px;display: flex;gap: 8px;">
-      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 201">审批通过</a-button>
-      <a-button  v-if="buttonType !== 201" @click="buttonType = 201">审批通过</a-button>
-      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 203">审批不通过</a-button>
-      <a-button @click="buttonType = 203"  v-if="buttonType !== 203">审批不通过</a-button>
+      <a-button @click="doVerify('1')">审批通过</a-button>
+      <a-button @click="doVerify('2')">审批不通过</a-button>
     </div>
-    <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
+    <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination' 
+    v-model:selectedKeys="selectedKeys"  row-key="id" :row-selection="rowSelection">
       <template #optional="{ record, rowIndex }">
         <a-space>
           <a-button @click="doLook(record)" size="mini">
@@ -67,14 +65,14 @@
               <icon-find-replace />
             </template>
             查看</a-button>
-          <a-button type="primary" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+          <a-button type="primary" size="mini" @click="verifyType = 'single';optionIndex = rowIndex; isExamine = true"
             v-if="record.status == 200">
             <template #icon>
               <icon-check-square />
             </template>
             审核
           </a-button>
-          <a-button type="outline" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+          <a-button type="outline" size="mini" @click="verifyType = 'single';optionIndex = rowIndex; isExamine = true"
             v-if="record.status == 203">
             <template #icon>
               <icon-check-square />
@@ -87,9 +85,6 @@
               <icon-eye-invisible />
             </template>
             下架</a-button>
-          <!-- <a-link status="danger" @click="optionIndex = rowIndex; isExamine = true" size="mini" v-if="record.status == 200">不通过</a-link>
-            <a-link status="success" @click="doAgree(record, rowIndex)" size="mini" v-if="record.status == 200 || record.status == 203">通过</a-link>
-            <a-link type="primary" @click="doUp(record, rowIndex)" size="mini" v-if="record.status == 200 || record.status == 203">上架</a-link> -->
 
         </a-space>
       </template>
@@ -97,7 +92,6 @@
         <a-tag v-if="record.status == 200" color="orange">审核中</a-tag>
         <a-tag v-if="record.status == 201" color="green">已上架</a-tag>
         <a-tag v-if="record.status == 202" color="green">已删除</a-tag>
-        <!-- <a-tag v-if="record.status == 203" color="red">未通过</a-tag> -->
         <a-tag v-if="record.status == 203" color="red">已下架</a-tag>
       </template>
     </a-table>
@@ -164,13 +158,13 @@ const pagination = ref({
 })
 const columns = [
   { title: '标题', dataIndex: 'title' },
+  { title: '定位', dataIndex: 'address' },
+  { title: '用户昵称', dataIndex: 'nickname' },
   {
     title: '状态',
     dataIndex: 'status',
     slotName: 'status' // 使用 slot 来渲染状态列
   },
-  { title: '定位', dataIndex: 'address' },
-  { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
   { title: '操作', slotName: 'optional', width: 200 },
 ];
@@ -239,6 +233,11 @@ const search = async () => {
       Message.error(res?.msg)
     } else {
       pagination.value.total = res.total;
+      res.rows.map(item=> {
+        if (item.status == 201 || item.status == 202) {
+          item.disabled = true;
+        }
+      })
       data.list = res.rows;
     }
   } catch (error) {
@@ -251,28 +250,64 @@ const isExamine = ref(false)
 const examineText = ref('')
 const isExamineError = ref(false)
 const examineStatus = ref('1')
+
+const verifyType = ref('single')
+const selectedKeys = ref([]);
+const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+  });
+const doVerify = (type) => {
+  if (selectedKeys.value.length === 0) {
+    Message.error('请勾选')
+    return;
+  }
+  isExamine.value = true
+  examineStatus.value = type
+  verifyType.value = 'multi'
+}
+
 const doExamine = async () => {
   if (examineStatus.value === '2' && !examineText.value) {
     isExamineError.value = true;
     return false
   }
-  const index = optionIndex.value
-  const record = data.list[optionIndex.value]
+  let params = {}
+  let index = -1
+  if (verifyType.value === 'single') {
+    const record = data.list[optionIndex.value]
+    index = optionIndex.value
+    params = {
+      id: record.id,
+      status: examineStatus.value,
+      remark: examineStatus.value === '1' ? "" : examineText.value
+    }
+  } else {
+    params = {
+      id: selectedKeys.value,
+      status: examineStatus.value,
+      remark: examineStatus.value === '1' ? "" : examineText.value
+    }
+  }
   loading.value = true
-
   Message.loading('加载中...')
-  const res = await audit({
-    id: record.id,
-    status: examineStatus.value,
-    remark: examineStatus.value === '1' ? "" : examineText.value
-  })
+  const res = await audit(params)
   Message.clear()
   loading.value = false
   if (res?.code != 0) {
     Message.error(res?.msg);
     return;
   }
-  data.list[index].status = examineStatus.value === '1' ? 201 : 203;
+  if (verifyType.value === 'single') {
+    data.list[index].status = examineStatus.value === '1' ? 201 : 203
+  } else {
+    data.list.map(item=> {
+      if (selectedKeys.value.includes(item.id)) {
+        item.status = examineStatus.value === '1' ? 201 : 203
+      }
+    })
+  }
   Message.success(examineStatus.value === '1' ? "审核通过" : '拒绝通过');
   search()
   return true;
