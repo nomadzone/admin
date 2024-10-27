@@ -1,42 +1,53 @@
 <template>
     <div style="padding-top: 32px;">
         <div class="type">
-            <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">活动套餐明细</a-button>
+            <!-- <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">活动套餐明细</a-button> -->
             <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button>
-            <a-button shape="round" v-if="type != '1'" @click="type = '1'; searchMeal()">套餐收支明细</a-button>
-            <a-button shape="round" type="primary"  v-if="type == '1'">套餐收支明细</a-button>
+            <!-- <a-button shape="round" v-if="type != '1'" @click="type = '1'; searchMeal()">套餐收支明细</a-button>
+            <a-button shape="round" type="primary"  v-if="type == '1'">套餐收支明细</a-button> -->
         </div>
         <a-row style="padding-left: 20px; padding-bottom:32px;">
-            <a-col :span="10">
+            <a-col :span="6">
                 <div class="row">
                     <div>
                         <img src="../../../assets/images/revenue-1.svg" alt="" srcset="">
                     </div>
                     <div>
                         <p>累计收入</p>
-                        <div class="big">50000（其中服务费 300）</div>
+                        <div class="big">{{ activeBobdy.incomeAmount }}</div>
                     </div>
                 </div>
             </a-col>
-            <a-col :span="7">
+            <a-col :span="6">
                 <div class="row">
                     <div>
                         <img src="../../../assets/images/revenue-2.svg" alt="" srcset="">
                     </div>
                     <div>
                         <p>待结算</p>
-                        <div class="big">20000</div>
+                        <div class="big">{{ activeBobdy.settlementEdAmount }}</div>
                     </div>
                 </div>
             </a-col>
-            <a-col :span="7">
+            <a-col :span="6">
                 <div class="row">
                     <div>
                         <img src="../../../assets/images/revenue-3.svg" alt="" srcset="">
                     </div>
                     <div>
                         <p>已结算</p>
-                        <div class="big">29700</div>
+                        <div class="big">{{ activeBobdy.settlementAmount }}</div>
+                    </div>
+                </div>
+            </a-col>
+            <a-col :span="6">
+                <div class="row">
+                    <div>
+                        <img src="../../../assets/images/revenue-3.svg" alt="" srcset="">
+                    </div>
+                    <div>
+                        <p>退款</p>
+                        <div class="big">{{ activeBobdy.settlementAmount }}</div>
                     </div>
                 </div>
             </a-col>
@@ -44,11 +55,12 @@
         <a-table size="small" :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading"
             :pagination='pagination'>
             <template #payType="{ record, rowIndex }">
-                <a-link v-if="record.payType == 1">收入</a-link>
-                <a-link v-else status="danger">支出</a-link>
+                <a-tag color='blue' v-if="record.payType == 1">收入</a-tag>
+                <a-tag v-else color='red'>支出</a-tag>
             </template>
             <template #status="{ record, rowIndex }">
-                <a-tag color="blue">{{ statusText[record.status] }}</a-tag>
+                <a-tag color='blue' v-if="record.status == 1">处理成功</a-tag>
+                <a-tag v-else color="red">处理中</a-tag>
             </template>
         </a-table>
     </div>
@@ -56,14 +68,14 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { consumptionList } from '@/api/user'
+import { consumptionList, getAmountByUserId } from '@/api/user'
 import { Message } from '@arco-design/web-vue'
 import { shopSettlementTotal, shopSettlementList } from '@/api/merchant'
 // 状态 0 处理成功 1 处理中 2 关闭  3 微信支付回调失败，4 退款中， 5 退款成功 6微信退款回调失败
 // payType 类型 1收入 2 支出
 const columns = [
     { title: '用户昵称', dataIndex: 'nickname' },
-    { title: '手机号', dataIndex: 'phoneNumber' },
+    { title: '手机号', dataIndex: 'phone' },
     { title: '支出/收入', dataIndex: 'payType', slotName: 'payType' },
     { title: '金额', dataIndex: 'amout' },
     { title: '状态', dataIndex: 'status', slotName: 'status' },
@@ -99,6 +111,12 @@ const pagination = ref({
 })
 const loading = ref(false)
 let userId = ref('')
+const activeBobdy = ref({
+    incomeAmount: 0, // 累计收入
+    refundAmount: 0, // 退款金额
+    settlementEdAmount: 0, // 待结算
+    settlementAmount: 0, // 已结算
+})
 onMounted(() => { 
     const userListInfo = JSON.parse(localStorage.getItem('userListInfo'))
     userId.value = userListInfo ? userListInfo?.id : ''
@@ -112,6 +130,14 @@ const search = async () => {
         userId: userId.value,
     }
     try {
+        getAmountByUserId({ userId: userId.value }).then((res:any)=> {
+            if (res?.code == 0) {
+                activeBobdy.value.incomeAmount = res?.body?.incomeAmount
+                activeBobdy.value.refundAmount = res?.body?.refundAmount
+                activeBobdy.value.settlementEdAmount = res?.body?.settlementEdAmount
+                activeBobdy.value.settlementAmount = res?.body?.settlementAmount
+            }
+        })
         let res: any = await consumptionList(params)
         loading.value = false
         if (res?.code == 0) {

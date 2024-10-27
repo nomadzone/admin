@@ -53,8 +53,8 @@
     </a-card>
     <a-divider />
     <div style="margin-bottom: 16px;display: flex;gap: 8px;">
-      <a-button @click="doVerify('1')">审批通过</a-button>
-      <a-button @click="doVerify('2')">审批不通过</a-button>
+      <a-button @click="doVerify('1')" :disabled='selectedKeys.length == 0'>审批通过</a-button>
+      <a-button @click="doVerify('2')" :disabled='selectedKeys.length == 0'>审批不通过</a-button>
     </div>
     <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination' 
     v-model:selectedKeys="selectedKeys"  row-key="id" :row-selection="rowSelection">
@@ -172,6 +172,7 @@ const data = reactive({
   list: []
 });
 const doLook = (record)=> {
+  try {
   let _record = {...record}
   for (let key in _record) {
     if (_record[key]=== null || _record[key]===undefined) {
@@ -180,6 +181,9 @@ const doLook = (record)=> {
   }
   localStorage.setItem('noveltyInfo', JSON.stringify(_record))
   router.push('/novelty/info?id=' + record.id)
+  } catch(error) {
+    Message.error(JSON.stringify(error))
+  }
 }
 
 const onOkTime = (value) => { formModel.verifyTime = value }
@@ -279,13 +283,13 @@ const doExamine = async () => {
     const record = data.list[optionIndex.value]
     index = optionIndex.value
     params = {
-      id: record.id,
+      ids: [record.id],
       status: examineStatus.value,
       remark: examineStatus.value === '1' ? "" : examineText.value
     }
   } else {
     params = {
-      id: selectedKeys.value,
+      ids: selectedKeys.value,
       status: examineStatus.value,
       remark: examineStatus.value === '1' ? "" : examineText.value
     }
@@ -301,10 +305,13 @@ const doExamine = async () => {
   }
   if (verifyType.value === 'single') {
     data.list[index].status = examineStatus.value === '1' ? 201 : 203
+      data.list[index].disabled = examineStatus.value === '1'
   } else {
     data.list.map(item=> {
       if (selectedKeys.value.includes(item.id)) {
         item.status = examineStatus.value === '1' ? 201 : 203
+        item.disabled = examineStatus.value === '1'
+        selectedKeys.value = []
       }
     })
   }
@@ -326,6 +333,7 @@ const doDown = async (record, index) => {
         onlineDown({ id: record.id }).then(res => {
           if (res.code === 0) {
             data.list[index].status = 203
+            data.list[index].disabled = false
             Message.success('下架成功')
             search()
           } else {

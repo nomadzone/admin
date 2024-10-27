@@ -4,6 +4,7 @@ import { AppRouteRecordRaw } from '../types';
 const MERCHANT: AppRouteRecordRaw = {
   path: '/merchant',
   name: 'merchant',
+  redirect: '/merchant/index',
   component: DEFAULT_LAYOUT,
   meta: {
     locale: 'menu.merchant',

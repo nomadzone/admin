@@ -35,6 +35,17 @@
         <a-layout class="layout-content" :style="paddingStyle">
           <TabBar v-if="appStore.tabBar" />
           <a-layout-content>
+            <div class='breadcrumb'>
+              <a-breadcrumb>
+                <template #separator>
+                  <icon-right />
+                </template>
+                <a-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index">
+                  <a-link href="javascript:;" @click="doLink(item)">{{ item.isChinese ? item.label : $t(item.label) }}</a-link>
+                  <!-- {{ item.isChinese ? item.label : $t(item.label) }} -->
+                </a-breadcrumb-item>
+              </a-breadcrumb>
+            </div>
             <PageLayout />
           </a-layout-content>
         </a-layout>
@@ -53,6 +64,7 @@
   import usePermission from '@/hooks/permission';
   import useResponsive from '@/hooks/responsive';
   import PageLayout from './page-layout.vue';
+  import { useBreadcrumbs } from '@/hooks/index';
 
   const isInit = ref(false);
   const appStore = useAppStore();
@@ -60,6 +72,7 @@
   const router = useRouter();
   const route = useRoute();
   const permission = usePermission();
+  const {breadcrumbs} = useBreadcrumbs()
   useResponsive(true);
   const navbarHeight = `60px`;
   const navbar = computed(() => appStore.navbar);
@@ -100,6 +113,11 @@
   onMounted(() => {
     isInit.value = true;
   });
+  const doLink = (item)=> {
+    router.push({
+      name: item.name,
+    });
+  }
 </script>
 
 <style scoped lang="less">

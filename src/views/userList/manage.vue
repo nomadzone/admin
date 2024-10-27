@@ -69,7 +69,7 @@ import { Message } from '@arco-design/web-vue'
   
   const columns = [
     { title: '用户昵称', dataIndex: 'nickname' },
-    { title: '手机号码', dataIndex: 'phoneNumber' },
+    { title: '手机号码', dataIndex: 'phone' },
   {
     title: '用户类型',
     dataIndex: 'userType',

@@ -52,14 +52,6 @@
         </a-col>
       </a-row>
     </a-card>
-
-    <div style="margin-bottom: 16px;display: flex;gap: 8px;">
-      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 0">审批通过</a-button>
-      <a-button  v-if="buttonType !== 0" @click="buttonType = 0">审批通过</a-button>
-      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 1">审批不通过</a-button>
-      <a-button @click="buttonType = 1"  v-if="buttonType !== 1">审批不通过</a-button>
-    </div>
-
     <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>

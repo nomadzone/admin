@@ -8,6 +8,7 @@ const SYSTEMSETTING: AppRouteRecordRaw = {
     path: '/systemSetting',
     name: 'systemSetting',
     component: DEFAULT_LAYOUT,
+    redirect: '/systemSetting/dictInfo',
     meta: {
         locale: 'menu.systemSetting',
         requiresAuth: true,

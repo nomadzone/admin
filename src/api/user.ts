@@ -102,3 +102,11 @@ export function consumptionList(data:any) {
     url: `/admin/user/consumption/list?${queryParams}`,
   })
 }
+
+export function getAmountByUserId(data:any) {
+  return http({
+    method: 'GET',
+    url: `/user/consumption/getAmountByUserId`,
+    data
+  })
+}

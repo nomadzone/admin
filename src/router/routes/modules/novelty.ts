@@ -19,7 +19,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'noveltyIndex',
       component: () => import('@/views/novelty/index.vue'),
       meta: {
-        locale: '新鲜事',
+        locale: '新鲜事管理',
         requiresAuth: true,
         roles: ['*'],
       },

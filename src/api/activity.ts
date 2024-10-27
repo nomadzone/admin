@@ -7,9 +7,23 @@ export function getList(data) {
       url: `/admin/user/activity/list?${queryParams}`,  // 找搭子 type传3  新鲜事 传2
     })
   }
+  export function commentList(data) {
+      return http({
+        method: 'GET',
+        url: `/admin/user/comment/list`,  // 找搭子 type传3  新鲜事 传2
+        data
+      })
+    }
+    export function commentRemove(data) {
+        return http({
+          method: 'GET',
+          url: `/admin/user/comment/remove`,  // 找搭子 type传3  新鲜事 传2
+          data
+        })
+      }
   export function audit(data) {
     return http({
-      method: 'GET',
+      method: 'POST',
       url: '/admin/user/activity/audit',
       data
     })

@@ -19,7 +19,7 @@ const DASHBOARD: AppRouteRecordRaw = {
             name: 'activityIndex',
             component: () => import('@/views/activity/index.vue'),
             meta: {
-                locale: 'activity.meal',
+                locale: '一起野管理',
                 requiresAuth: true,
                 roles: ['*']
             },

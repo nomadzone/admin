@@ -7,7 +7,7 @@ const DASHBOARD: AppRouteRecordRaw = {
   component: DEFAULT_LAYOUT,
  redirect: '/meal/manage',
   meta: {
-    locale: 'menu.meal',
+    locale: '套餐管理',
     requiresAuth: true,
     icon: 'icon-select-all', 
     order: 2,
@@ -19,7 +19,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'mealManage',
       component: () => import('@/views/meal/manage.vue'),
       meta: {
-        locale: 'menu.meal',
+        locale: '套餐管理',
         requiresAuth: true,
         roles: ['*'],
       },

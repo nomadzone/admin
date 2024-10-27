@@ -58,7 +58,7 @@
           </div>
         </div>
       </div>
-      <div class="title" style="padding-top: 20px;">基础信息</div>
+      <!-- <div class="title" style="padding-top: 20px;">基础信息</div>
       <div>
         <a-row class="grid-demo" :gutter="24">
           <a-col :span="8">
@@ -80,21 +80,26 @@
             </div>
           </a-col>
         </a-row>
-      </div>
+      </div> -->
     </div>
     <div class="card">
-      <div class="title">评论列表</div>
+      <div class="title">
+        <span>评论列表</span>
+        <icon-refresh class='refresh' @click="search()"/>
+      </div>
       <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
       <template #optional="{ record, rowIndex }">
         <a-space>
-          <a-button @click="doLookPin(record, rowIndex)" size="mini">
-            查看</a-button>
-          <a-button type="primary" size="mini" @click="doUpPin(record, rowIndex)">
+          <!-- <a-button @click="doLookPin(record, rowIndex)" size="mini">查看</a-button> -->
+          <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)">
+            <a-button type="primary" status="danger" size="mini">删除</a-button>
+          </a-popconfirm>
+          <!-- <a-button type="primary" size="mini" @click="doUpPin(record, rowIndex)">
             上线
           </a-button>
           <a-button type="primary" status="danger" size="mini"
             @click="doDownPin(record, rowIndex)">
-            下线</a-button>
+            下线</a-button> -->
         </a-space>
       </template>
     </a-table>
@@ -125,7 +130,7 @@
 import PageCard from '@/components/page-card/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
-import { getList, onlineUp, onlineDown, audit } from '@/api/activity';
+import { getList,commentList, onlineUp, onlineDown, audit, commentRemove } from '@/api/activity';
 
 const info = ref({
   id: '',
@@ -203,11 +208,11 @@ const doDown = async () => {
 const loading = ref(false)
 const columns = [
   { title: 'ID', dataIndex: 'id' },
-  { title: '评论内容', dataIndex: 'title' },
-  { title: '点赞数', dataIndex: 'address' },
+  { title: '评论内容', dataIndex: 'content' },
+  { title: '点赞数', dataIndex: 'numberUp' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
-  { title: '操作', slotName: 'optional', width: 160 },
+  { title: '操作', slotName: 'optional', width: 100 },
 ];
 onMounted(() => {
   search()
@@ -235,10 +240,10 @@ const search = async () => {
   const params = {
     pageNum: formModel.pageNum,
     pageSize: formModel.pageSize,
-    "type": 2
+    activityId: info.value.id
   }
   try {
-    let res = await getList(params)
+    let res:any = await commentList(params)
     loading.value = false
     if (res?.code !== 0) {
       Message.error(res?.msg)
@@ -254,11 +259,17 @@ const search = async () => {
 const doLookPin = (record, index) => {
 
 }
-const doUpPin = (record, index) => {
-
-}
-const doDownPin = (record, index) => {
-
+const doDelete = (record, index)=> {
+  commentRemove({ id: record.id }).then(res => {
+      Message.clear()
+      if (res.code === 0) {
+        info.value.status = 203
+        Message.success('删除成功')
+        search()
+      } else {
+        Message.error('删除失败')
+      }
+    })
 }
 </script>
 
@@ -301,6 +312,14 @@ const doDownPin = (record, index) => {
   font-size: 20px;
   font-weight: 500;
   padding-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  .refresh {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+    color: #999;
+  }
 }
 
 .basic {

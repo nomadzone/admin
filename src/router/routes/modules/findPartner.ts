@@ -19,7 +19,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'findPartnerIndex',
       component: () => import('@/views/findPartner/index.vue'),
       meta: {
-        locale: '找搭子',
+        locale: '找搭子管理',
         requiresAuth: true,
         roles: ['*'],
       },
