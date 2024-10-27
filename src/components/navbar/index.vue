@@ -6,7 +6,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          旷野-商家版
+          旷野-运营版
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"

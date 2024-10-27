@@ -30,6 +30,7 @@ const MERCHANT: AppRouteRecordRaw = {
         locale: 'menu.merchant.detail',
         requiresAuth: true,
         roles: ['*'],
+        hideInMenu: true
       },
     },
     {

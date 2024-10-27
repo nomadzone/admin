@@ -4,6 +4,9 @@
         <a-form-item label="活动名称:">
             {{ detail?.title }}
         </a-form-item>
+        <a-form-item label="活动标签:">
+          {{ detail?.label }}
+        </a-form-item>
         <a-form-item label="活动时间:">
             {{ detail?.startdate }} - {{ detail?.enddate }}
         </a-form-item>
@@ -68,7 +71,7 @@
   });
   const detail = ref({})
   const rules = {}
-  
+
   const openDialog = (row) => {
     visible.value = true;
     detail.value = row;
@@ -132,4 +135,3 @@
     border-top: 1px solid var(--color-neutral-3);
   }
   </style>
-  

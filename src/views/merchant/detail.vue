@@ -18,7 +18,7 @@
                             </a-descriptions-item>
                             <a-descriptions-item label="商家类型">
                                 <!-- <a-tag></a-tag> -->
-                                {{ authTypeMap[basicInfo.authType] }}
+                                {{ authTypeMap[identifyInfoData.authType] }}
                             </a-descriptions-item>
                         </a-descriptions>
 
@@ -46,6 +46,7 @@
                         <OrderList :shopId="basicInfo.id" />
                     </a-tab-pane>
                     <a-tab-pane key="5" title="收支明细">
+                        <Settlement :shopId="basicInfo.id" />
                     </a-tab-pane>
                 </a-tabs>
             </div>
@@ -62,6 +63,7 @@ import { useI18n } from 'vue-i18n';
 import BasicInfo from './components/basicInfo.vue';
 import SetMenu from './components/setMenu.vue';
 import OrderList from './components/orderList.vue';
+import Settlement from './components/settlement.vue';
 import { merchantIdentifyList, shopList } from '@/api/merchant';
 const { t } = useI18n()
 

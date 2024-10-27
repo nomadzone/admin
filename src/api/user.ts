@@ -94,3 +94,11 @@ export function fansList(data:any) {
     url: `/admin/user/fans/list?${queryParams}`,
   })
 }
+
+export function consumptionList(data:any) {
+  const queryParams = new URLSearchParams(data).toString();
+  return http({
+    method: 'POST',
+    url: `/admin/user/consumption/list?${queryParams}`,
+  })
+}

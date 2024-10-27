@@ -1,8 +1,8 @@
 import http from './axios'
 
-interface ShopComboClassify {
+interface adminComboClassify {
     id?: string;
-    shopComboId?: number;
+    adminComboId?: number;
     pid?: string;
     level?: string;
     name?: string;
@@ -19,8 +19,8 @@ interface ShopComboClassify {
     updateTime?: string;
     level?: string;
     pid?: string | null;
-    shopComboClassifyList?: ShopComboClassify[];
-    shopComboId?: number;
+    adminComboClassifyList?: adminComboClassify[];
+    adminComboId?: number;
     createTime?: string | null;
     price?: number | null;
   }
@@ -32,13 +32,13 @@ interface ShopComboClassify {
     updateTime?: string | null;
     dimensionId?: number;
     id?: number | string;
-    shopId?: number;
+    adminId?: number;
     number?: number;
     comboName?: string;
     comboPrice?: number;
     comboStatus?: string | null;
     personNumber?: string | null;
-    shopPrice?: string | null;
+    adminPrice?: string | null;
     monday?: string | null;
     tuesday?: string | null;
     wednesday?: string | null;
@@ -73,15 +73,15 @@ export function comboList(data: any) {
 export function comboAdd(data: any) {
     return http({
       method: 'POST',
-      url: '/shop/system/combo/add',
+      url: '/admin/system/combo/add',
       data
     })
 }
 
-export function comboEdit(data: any) {
+export function comboEditVerify(data: any) {
     return http({
       method: 'POST',
-      url: '/shop/system/combo/edit',
+      url: '/admin/system/combo/edit',
       data
     })
 }
@@ -89,7 +89,7 @@ export function comboEdit(data: any) {
 export function comboDelete(id: string | number) {
     return http({
       method: 'DELETE',
-      url: `/shop/system/combo/${id}`
+      url: `/admin/system/combo/${id}`
     })
 }
 
@@ -101,7 +101,7 @@ export interface ChangeStatus {
 export function comboChangeStatus(data: ChangeStatus) {
     return http({
       method: 'POST',
-      url: `/shop/system/combo/changeStatus`,
+      url: `/admin/system/combo/changeStatus`,
       data
     })
 }

@@ -6,55 +6,59 @@ const FINANCE: AppRouteRecordRaw = {
     path: '/finance',
     name: 'finance',
     component: DEFAULT_LAYOUT,
+    redirect: '/finance/revenueExpenditure',
+
     meta: {
-        locale: 'menu.finance',
+        locale:  'menu.finance.revenueExpenditure',
         requiresAuth: true,
-        icon: 'icon-check-circle',
+        icon: 'icon-desktop',
         order: 9,
+        hideChildrenInMenu: true,
+
     },
     children: [
+        {
+            path: 'revenueExpenditure',
+            name: 'revenueExpenditure',
+            component: () => import('@/views/finance/revenueExpenditure/index.vue'),
+            meta: {
+                locale: 'menu.finance.revenueExpenditure',
+                requiresAuth: true,
+                roles: ['*'],
+            },
+        },
         // {
-        //     path: 'revenueExpenditure',
-        //     name: 'revenueExpenditure',
-        //     component: () => import('@/views/finance/revenueExpenditure/index.vue'),
+        //     path: 'withdrawalApply',
+        //     name: 'withdrawalApply',
+        //     component: () => import('@/views/finance/revenueExpenditure/withdrawalApply.vue'),
         //     meta: {
-        //         locale: 'menu.finance.revenueExpenditure',
+        //         locale: 'menu.finance.withdrawalApply',
+        //         requiresAuth: true,
+        //         roles: ['*'],
+        //         hideInMenu: true,
+        //     },
+        // },
+
+        // {
+        //     path: 'settlementMange',
+        //     name: 'settlementMange',
+        //     component: () => import('@/views/finance/settlement/index.vue'),
+        //     meta: {
+        //         locale: 'menu.finance.settlement',
         //         requiresAuth: true,
         //         roles: ['*'],
         //     },
         // },
-        {
-            path: 'withdrawalApply',
-            name: 'withdrawalApply',
-            component: () => import('@/views/finance/revenueExpenditure/withdrawalApply.vue'),
-            meta: {
-                locale: 'menu.finance.withdrawalApply',
-                requiresAuth: true,
-                roles: ['*'],
-                hideInMenu: true,
-            },
-        },
-
-        {
-            path: 'settlementMange',
-            name: 'settlementMange',
-            component: () => import('@/views/finance/settlement/index.vue'),
-            meta: {
-                locale: 'menu.finance.settlement',
-                requiresAuth: true,
-                roles: ['*'],
-            },
-        },
-        {
-            path: 'withdrawal',
-            name: 'withdrawal',
-            component: () => import('@/views/finance/withdrawal/index.vue'),
-            meta: {
-                locale: 'menu.finance.withdrawal',
-                requiresAuth: true,
-                roles: ['*'],
-            },
-        },
+        // {
+        //     path: 'withdrawal',
+        //     name: 'withdrawal',
+        //     component: () => import('@/views/finance/withdrawal/index.vue'),
+        //     meta: {
+        //         locale: 'menu.finance.withdrawal',
+        //         requiresAuth: true,
+        //         roles: ['*'],
+        //     },
+        // },
         
        
        

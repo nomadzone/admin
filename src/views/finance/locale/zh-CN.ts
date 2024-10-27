@@ -14,6 +14,8 @@ export default {
     "finance.revenueExpenditure.paymentMethod": "交易方式",
     "finance.revenueExpenditure.paymentNumber": "支付号",
     "finance.revenueExpenditure.receiptTime": "入账时间",
+    "finance.revenueExpenditure.settlementObject": "结算对象",
+
 
     "finance.withdrawal.apply": "申请提现",
     "finance.withdrawal.tips": "最少提现金额100元，只支持提现到的借记卡，不支持信用卡和存折，提现审核周期为3个工作日；",

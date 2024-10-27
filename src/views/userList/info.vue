@@ -165,7 +165,7 @@
         > div {
             padding: 8px 0;
             > span:first-child {
-                color: #777;
+                color: var(--color-text-2);
                 padding-right: 8px
             }
         }
@@ -180,13 +180,15 @@
   .tag {
     display: flex;
     gap: 8px;
-    color: #444;
+    color: var(--color-text-2);
     span {
         padding: 6px 16px;
         border-radius: 20px;
         cursor: pointer;
+        color: var(--color-text-1);
         &:hover {
             background-color: #F2F3F5;
+            color: #165DFF;
         }
     }
     .active {

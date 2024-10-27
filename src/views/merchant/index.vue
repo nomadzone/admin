@@ -12,21 +12,32 @@
                                 </a-form-item>
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item label-col-flex="80px" field="status" :label="$t('merchant.index.status')">
-                                    <a-select v-model="form.status" />
+                                <a-form-item label-col-flex="80px" field="shopStatus"
+                                    :label="$t('merchant.index.status')">
+                                    <a-select v-model="form.shopStatus">
+                                        <a-option v-for="item in statusOptions" :key="item.value" :value="item.value">
+                                            {{ item.label }}
+                                        </a-option>
+                                    </a-select>
                                 </a-form-item>
 
                             </a-grid-item>
                             <a-grid-item class="demo-item">
-                                <a-form-item label-col-flex="80px" field="category"
+                                <a-form-item label-col-flex="80px" field="categoryName"
                                     :label="$t('merchant.index.category')">
-                                    <a-select v-model="form.category" />
+                                    <a-select v-model="form.categoryName">
+                                        <a-option v-for="item in categoryNameOptions" :key="item.id"
+                                            :value="item.categoryName">
+                                            {{ item.categoryName }}
+                                        </a-option>
+                                    </a-select>
                                 </a-form-item>
                             </a-grid-item>
                             <a-grid-item class="demo-item">
                                 <a-form-item label-col-flex="80px" field="createTime"
                                     :label="$t('merchant.index.createTime')">
-                                    <a-select v-model="form.createTime" />
+                                    <a-range-picker format="YYYY-MM-DD " v-model="form.timeQuery" allow-clear />
+
                                 </a-form-item>
                             </a-grid-item>
                         </a-grid>
@@ -34,13 +45,13 @@
                 </div>
                 <a-divider class="query-form-divider" direction="vertical" />
                 <div class="query-actions">
-                    <a-button type="primary">
+                    <a-button type="primary" @click="fetchData(1)">
                         <template #icon>
                             <icon-search />
                         </template>
                         {{ $t("button.search") }}
                     </a-button>
-                    <a-button type="outline">
+                    <a-button type="outline" @click="handleReset()">
                         <template #icon>
                             <icon-refresh />
 
@@ -50,7 +61,6 @@
                     </a-button>
                 </div>
             </div>
-
             <a-divider />
 
 
@@ -58,8 +68,10 @@
             <div class="data-box">
                 <div class="table-header-row">
                     <div class="left">
-                        <a-button class="left-btn">{{ $t('merchant.index.batchApproval') }}</a-button>
-                        <a-button>{{ $t('merchant.index.batchNotPassed') }}</a-button>
+                        <a-button class="left-btn" :disabled="!selectedKeys.length">{{
+                            $t('merchant.index.batchApproval')
+                            }}</a-button>
+                        <a-button :disabled="!selectedKeys.length">{{ $t('merchant.index.batchNotPassed') }}</a-button>
                     </div>
                     <a-button> <template #icon>
                             <icon-download />
@@ -68,7 +80,8 @@
 
                 <div class="common-table-container">
 
-                    <a-table size="small" :columns="columns" :data="data">
+                    <a-table size="small" :columns="columns" :data="data" :row-selection="rowSelection" row-key="id"
+                        v-model:selectedKeys="selectedKeys" @selection-change="handleSelectRow">
                         <template #paymentMethod="{ record }">
                             <div>
                                 <span>{{ record?.paymentMethod }}</span>/
@@ -84,6 +97,18 @@
                         </template>
                         <template #action="{ record }">
                             <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.detail") }}</a-button>
+                            <a-button type="text" v-if="record.isAuth == 2">{{ $t("merchant.index.pass") }}</a-button>
+                            <a-button type="text" v-if="record.isAuth == 2">{{ $t("merchant.index.reject") }}</a-button>
+                            <a-button type="text"
+                                v-if="record.isAuth == 0 && (record.shopStatus == 2 || record.shopStatus == 1)"
+                                @click="handleChangeStatus(record, 0)">{{
+                                    $t("merchant.setMenu.goOnline")
+                                }}</a-button>
+                            <a-button type="text" v-if="record.isAuth == 0 && record.shopStatus == 0"
+                                @click="handleChangeStatus(record, 2)">{{
+                                    $t("merchant.setMenu.goOffline")
+                                }}</a-button>
+
                         </template>
                     </a-table>
                 </div>
@@ -94,10 +119,12 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
-import { shopList } from '@/api/merchant';
+import { shopList, shopStatusChange, merchantCategoryList } from '@/api/merchant';
+
+import { Modal, Button } from '@arco-design/web-vue';
 const router = useRouter();
 
 const { t } = useI18n()
@@ -105,12 +132,18 @@ const queryFormItemLayout = { xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }
 
 const form = ref({
     name: '',
-    status: '',
-    categroy: '',
-    createTime: null
+    shopStatus: '',
+    categoryName: '',
+    timeQuery: null
 
 })
 
+const selectedKeys = ref([]);
+const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+});
 const approveStatusMap = {
     '0': t('merchant.index.identifyed'),
     '1': t('merchant.index.authenticationFailed'),
@@ -124,6 +157,12 @@ const statusMap = {
     '2': t('merchant.index.offlineAlready')
 }
 
+const statusOptions = [
+    { label: t('merchant.index.inBusiness'), value: '0' },
+    { label: t('merchant.index.restedAlready'), value: '1' },
+    { label: t('merchant.index.offlineAlready'), value: '2' }
+]
+
 
 const columns = ref([
     { title: t('merchant.index.id'), dataIndex: 'id', key: 'id', width: 100, ellipsis: true },
@@ -134,27 +173,56 @@ const columns = ref([
     { title: t('merchant.index.packageNum'), dataIndex: 'packageNum', key: 'packageNum', width: 120, ellipsis: true },
     { title: t('merchant.index.accumulatedRevenue'), dataIndex: 'accumulatedRevenue', key: 'accumulatedRevenue', width: 200, ellipsis: true, slotName: 'paymentMethod' },
     { title: t('merchant.index.accumulatedExpenses'), dataIndex: 'accumulatedExpenses', key: 'accumulatedExpenses', width: 180, ellipsis: true },
-    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
+    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 160, slotName: 'action', fixed: 'right' },
 
 ])
 
-const data = ref([
-])
+// 查询商户分类选项数据
+const categoryNameOptions = ref([])
+
+const fetchCategoryOptions = async () => {
+    const res = await merchantCategoryList({ pageNum: 1, pageSize: 100000 })
+    categoryNameOptions.value = res.rows
+    console.log('categoryOptions:', categoryNameOptions)
+}
+
+const data = ref([])
 // 查询列表
 
 const pageSize = ref(10)
 const pageNum = ref(1)
 const total = ref(0)
+const tableLoading = ref(false)
 
 const fetchData = async (page, size) => {
+    tableLoading.value = true
     let params = {
+        ...form.value,
+        beginCreateTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+        endCreateTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
         pageSize: size || pageSize.value,
         pageNum: page || pageNum.value,
     }
+
+    delete params.timeQuery
     const res = await shopList(params)
+
     data.value = res.rows
+    tableLoading.value = false
+
 }
 
+// 点击重置
+const handleReset = () => {
+    form.value = {
+        name: '',
+        shopStatus: '',
+        categoryName: '',
+        timeQuery: null
+    }
+
+    fetchData(1)
+}
 
 
 
@@ -168,8 +236,33 @@ const handleShowDetail = (row: any) => {
     });
 }
 
+const handleSelectRow = (val) => {
+    console.log(val)
+    selectedKeys.value = val
+}
+
+// 修改状态
+const handleChangeStatus = (row: any, status: number) => {
+    let statusText = status === 0 ? t('merchant.index.onlineMerchants') : t('merchant.index.offlineMerchants')
+    let tipText = status === 0 ? t('merchant.index.onlineMerchantsTip') : t('merchant.index.offlineMerchantsTip')
+    Modal.confirm({
+        alignCenter: false,
+        title: statusText,
+        content: tipText,
+        onOk() {
+            shopStatusChange({ id: row.id, shopStatus: status }).then(res => {
+                if (res?.code === 0) {
+                    fetchData(pageNum.value, pageSize.value)
+                }
+            })
+        },
+    });
+
+}
+
 onMounted(() => {
-    fetchData()
+    fetchCategoryOptions()
+    fetchData(1, pageSize.value)
 })
 
 </script>

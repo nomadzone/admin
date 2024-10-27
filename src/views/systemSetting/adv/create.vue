@@ -19,7 +19,7 @@
                   <a-radio :value="'2'">用户默认头像</a-radio>
                   <a-radio :value="'3'">商家</a-radio>
               </a-radio-group>
-              <div class="text" v-if="type === 'look'">{{formModel.type === '1' ? '首页': (formModel.type === '2' ? '用户默认头像' : '商家') }}</div>
+              <div class="text" v-if="type === 'look'">{{formModel.type === '1' ? '首页': (formModel.type === '2' ? '用户默认头像' : '商家探索轮播图') }}</div>
           </a-form-item>
 
         <a-form-item :label="'展示顺序'" required style="padding-top: 20px;">
@@ -73,10 +73,9 @@
 <script setup lang="ts">
 import { Message, Modal } from '@arco-design/web-vue';
 import PageCard from '@/components/page-card/index.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import PicUpload from '@/components/picUpload/index.vue'
-import { comboAdd, comboEdit } from '@/api/combo';
 import { noticeAdd, noticeEdit } from '@/api/adv';
 const router = useRouter()
 const formModel = reactive({

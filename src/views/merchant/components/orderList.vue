@@ -5,7 +5,7 @@
         <a-table size="small" :columns="columns" :data="data" :pagination="false">
 
             <template #action="{ record }">
-                <a-button type="text">{{ $t("button.cancel") }}</a-button>
+                <a-button type="text" v-if="record.orderStatus == 3">{{ $t("button.cancel") }}</a-button>
             </template>
         </a-table>
         <div class="pagination-box">
@@ -26,22 +26,32 @@ const props = defineProps({
     shopId: String
 })
 
+const orderStatusMap = ref({
+    '0': '已完成',
+    '1': '已取消',
+    '2': '待使用',
+    '3': '待付款',
+    '4': '退款中',
+    '5': '退款完成',
+    '6': '微信支付回调失败',
+    '7': '微信退款回调失败',
+})
 const data = ref([])
 const columns = ref([
 
     { title: t('merchant.order.orderNumber'), dataIndex: 'id', key: 'id', width: 100, ellipsis: true },
-    { title: t('merchant.setMenu.name'), dataIndex: 'comboName', key: 'comboName', width: 100, ellipsis: true },
+    { title: t('merchant.setMenu.name'), dataIndex: 'shopComboName', key: 'shopComboName', width: 100, ellipsis: true },
     { title: t('merchant.order.num'), dataIndex: 'number', key: 'number', width: 100, ellipsis: true },
-    { title: t('merchant.order.merchantNickname'), dataIndex: 'comboPrice', key: 'comboPrice', width: 100, ellipsis: true },
-    { title: t('merchant.order.orderAmount'), dataIndex: 'comboStatus', key: 'comboStatus', width: 100, ellipsis: true },
-    { title: t('merchant.order.serviceCharge'), dataIndex: 'usedTimeEnd', key: 'usedTimeEnd', width: 100, ellipsis: true },
-    { title: t('merchant.order.status'), dataIndex: 'updateTime', key: 'updateTime', width: 160, ellipsis: true },
-    { title: t('merchant.order.customerNickname'), dataIndex: 'updateTime', key: 'updateTime', width: 160, ellipsis: true },
-    { title: t('merchant.order.orderTime'), dataIndex: 'updateTime', key: 'updateTime', width: 160, ellipsis: true },
+    { title: t('merchant.order.merchantNickname'), dataIndex: 'shopName', key: 'shopName', width: 100, ellipsis: true },
+    { title: t('merchant.order.orderAmount'), dataIndex: 'orderAmount', key: 'orderAmount', width: 100, ellipsis: true },
+    { title: t('merchant.order.serviceCharge'), dataIndex: 'serviceCost', key: 'serviceCost', width: 100, ellipsis: true },
+    { title: t('merchant.order.status'), dataIndex: 'orderStatusName', key: 'orderStatusName', width: 160, ellipsis: true },
+    { title: t('merchant.order.customerNickname'), dataIndex: 'buyerName', key: 'buyerName', width: 160, ellipsis: true },
+    { title: t('merchant.order.orderTime'), dataIndex: 'orderDate', key: 'orderDate', width: 160, ellipsis: true },
     { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 80, ellipsis: true, slotName: 'action', fixed: 'right' },
 ])
 
-const pageSize = ref(10)
+const pageSize = ref(20)
 const pageNum = ref(1)
 const total = ref(0)
 

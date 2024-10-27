@@ -54,12 +54,11 @@
     </a-card>
     <a-divider />
     <div style="margin-bottom: 16px;display: flex;gap: 8px;">
-      <a-button type="primary" @click="buttonType = ''"  v-if="buttonType === 301">审批通过</a-button>
-      <a-button  v-if="buttonType !== 301" @click="buttonType = 301">审批通过</a-button>
-      <a-button type="primary" @click="buttonType = ''" v-if="buttonType === 303">审批不通过</a-button>
-      <a-button @click="buttonType = 303"  v-if="buttonType !== 303">审批不通过</a-button>
+      <a-button @click="doVerify('1')">审批通过</a-button>
+      <a-button @click="doVerify('2')">审批不通过</a-button>
     </div>
-    <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
+    <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination' 
+    v-model:selectedKeys="selectedKeys"  row-key="id" :row-selection="rowSelection">
       <template #optional="{ record, rowIndex }">
         <a-space>
           <a-button @click="optionIndex = rowIndex; isLook = true" size="mini">
@@ -67,14 +66,14 @@
               <icon-find-replace />
             </template>
             查看</a-button>
-          <a-button type="primary" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+          <a-button type="primary" size="mini" @click="verifyType = 'single';optionIndex = rowIndex; isExamine = true"
             v-if="record.status == 300">
             <template #icon>
               <icon-check-square />
             </template>
             审核
           </a-button>
-          <a-button type="outline" size="mini" @click="optionIndex = rowIndex; isExamine = true"
+          <a-button type="outline" size="mini" @click="verifyType = 'single';optionIndex = rowIndex; isExamine = true"
             v-if="record.status == 303">
             <template #icon>
               <icon-check-square />
@@ -173,7 +172,6 @@ import { getList, onlineUp, onlineDown, audit } from '@/api/activity';
 // 302 己删除
 // 303 未通过
 
-const buttonType = ref('')
 const optionIndex = ref(-1)
 const info = computed(() => data.list[optionIndex.value] || {
   describe: '',
@@ -238,18 +236,6 @@ const reset = () => {
   formModel.verifyTime = [];
   search()
 }
-
-watch(buttonType, (newVal, oldVal) => {
-  if (newVal !== oldVal && newVal !== null) {
-    formModel.pageNum = 1;
-    formModel.pageSize = 10;
-    formModel.describe = '';
-    formModel.nickname = '';
-    formModel.status = Number(newVal);
-    formModel.verifyTime = [];
-    search()
-  }
-})
 const search = async () => {
   loading.value = true
   const params = {
@@ -277,6 +263,11 @@ const search = async () => {
       Message.error(res?.msg)
     } else {
       pagination.value.total = res.total;
+      res.rows.map(item=> {
+        if (item.status == 301 || item.status == 302) {
+          item.disabled = true;
+        }
+      })
       data.list = res.rows;
     }
   } catch (error) {
@@ -289,25 +280,63 @@ const isExamine = ref(false)
 const examineText = ref('')
 const isExamineError = ref(false)
 const examineStatus = ref('1')
+
+const verifyType = ref('single')
+const selectedKeys = ref([]);
+const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+  });
+const doVerify = (type) => {
+  if (selectedKeys.value.length === 0) {
+    Message.error('请勾选')
+    return;
+  }
+  isExamine.value = true
+  examineStatus.value = type
+  verifyType.value = 'multi'
+}
+
 const doExamine = async () => {
   if (examineStatus.value === '2' && !examineText.value) {
     isExamineError.value = true;
     return false
   }
-  const index = optionIndex.value
-  const record = data.list[optionIndex.value]
+  let params = {}
+  let index = -1
+  if (verifyType.value === 'single') {
+    const record = data.list[optionIndex.value]
+    index = optionIndex.value
+    params = {
+      id: record.id,
+      status: examineStatus.value,
+      remark: examineStatus.value === '1' ? "" : examineText.value
+    }
+  } else {
+    params = {
+      id: selectedKeys.value,
+      status: examineStatus.value,
+      remark: examineStatus.value === '1' ? "" : examineText.value
+    }
+  }
   loading.value = true
-  const res = await audit({
-    id: record.id,
-    status: examineStatus.value,
-    remark: examineStatus.value === '1' ? "" : examineText.value
-  })
+  const res = await audit(params)
   loading.value = false
   if (res?.code != 0) {
     Message.error(res?.msg);
     return;
   }
-  data.list[index].status = examineStatus.value === '1' ? 301 : 303
+  if (verifyType.value === 'single') {
+    data.list[index].status = examineStatus.value === '1' ? 301 : 303
+  } else {
+    data.list.map(item=> {
+      if (selectedKeys.value.includes(item.id)) {
+        item.status = examineStatus.value === '1' ? 301 : 303
+      }
+    })
+  }
+
   Message.success(examineStatus.value === '1' ? '审核通过' : '拒绝通过');
   search()
   return true;
