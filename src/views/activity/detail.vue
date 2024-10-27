@@ -86,7 +86,7 @@
         return
     }
     let data = {
-        id: detail.value.id,
+        ids: [detail.value.id],
         status: 2,
         remark: form.value.remark
     }
@@ -107,7 +107,7 @@
   }
   const handleBeforeOk = () => {
     let data = {
-        id: detail.value.id,
+        ids: [detail.value.id],
         status: 1,
         remark: form.value.remark
     }
