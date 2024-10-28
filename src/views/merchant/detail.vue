@@ -53,6 +53,15 @@
 
         </div>
 
+        <a-modal title-align="start" v-model:visible="visible" @ok="handleConfirmReject" @cancel="handleCancelReject"
+            :title="t('merchant.index.rejectModalTitle')">
+            <a-form>
+                <a-form-item :label-col-props="{ span: 8 }" :wrapper-col-props="{ span: 16 }"
+                    :label="t('merchant.index.rejectLabel')" label-width="180px">
+                    <a-input v-model="rejectReason" :placeholder="t('merchant.index.rejectLabel')" />
+                </a-form-item>
+            </a-form>
+        </a-modal>
     </div>
 </template>
 <script setup>
@@ -77,7 +86,7 @@ const approveStatusMap = {
 
 const authTypeMap = {
     '0': t('merchant.index.person'),
-    '1': t('merchant.index.enterprise')
+    '1': t('merchant.index.company')
 }
 
 const info = ref({

@@ -68,10 +68,12 @@
             <div class="data-box">
                 <div class="table-header-row">
                     <div class="left">
-                        <a-button class="left-btn" :disabled="!selectedKeys.length">{{
+                        <a-button class="left-btn" :disabled="!selectedKeys.length" @click="passByGroup()">{{
                             $t('merchant.index.batchApproval')
                             }}</a-button>
-                        <a-button :disabled="!selectedKeys.length">{{ $t('merchant.index.batchNotPassed') }}</a-button>
+                        <a-button :disabled="!selectedKeys.length" @click="RejectByGroup()">{{
+                            $t('merchant.index.batchNotPassed')
+                            }}</a-button>
                     </div>
                     <a-button> <template #icon>
                             <icon-download />
@@ -81,7 +83,7 @@
                 <div class="common-table-container">
 
                     <a-table size="small" :columns="columns" :data="data" :row-selection="rowSelection" row-key="id"
-                        v-model:selectedKeys="selectedKeys" @selection-change="handleSelectRow">
+                        v-model:selectedKeys="selectedKeys" @selection-change="handleSelectRow" :loading="tableLoading">
                         <template #paymentMethod="{ record }">
                             <div>
                                 <span>{{ record?.paymentMethod }}</span>/
@@ -97,8 +99,14 @@
                         </template>
                         <template #action="{ record }">
                             <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.detail") }}</a-button>
-                            <a-button type="text" v-if="record.isAuth == 2">{{ $t("merchant.index.pass") }}</a-button>
-                            <a-button type="text" v-if="record.isAuth == 2">{{ $t("merchant.index.reject") }}</a-button>
+                            <a-popconfirm v-if="record.isAuth == 2" :content="$t('merchant.index.passConfirm')"
+                                @ok="handlePass(record)">
+                                <a-button type="text" v-if="record.isAuth == 2">{{ $t("merchant.index.pass")
+                                    }}</a-button>
+
+                            </a-popconfirm>
+                            <a-button type="text" v-if="record.isAuth == 2" @click="handleReject(record)">{{
+                                $t("merchant.index.reject") }}</a-button>
                             <a-button type="text"
                                 v-if="record.isAuth == 0 && (record.shopStatus == 2 || record.shopStatus == 1)"
                                 @click="handleChangeStatus(record, 0)">{{
@@ -113,7 +121,15 @@
                     </a-table>
                 </div>
             </div>
-
+            <a-modal title-align="start" v-model:visible="visible" @ok="handleConfirmReject"
+                @cancel="handleCancelReject" :title="t('merchant.index.rejectModalTitle')">
+                <a-form>
+                    <a-form-item :label-col-props="{ span: 8 }" :wrapper-col-props="{ span: 16 }"
+                        :label="t('merchant.index.rejectLabel')" label-width="180px">
+                        <a-input v-model="rejectReason" :placeholder="t('merchant.index.rejectLabel')" />
+                    </a-form-item>
+                </a-form>
+            </a-modal>
         </div>
 
     </div>
@@ -122,9 +138,9 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
-import { shopList, shopStatusChange, merchantCategoryList } from '@/api/merchant';
+import { shopList, shopStatusChange, merchantCategoryList, shopApprove } from '@/api/merchant';
 
-import { Modal, Button } from '@arco-design/web-vue';
+import { Modal, Message } from '@arco-design/web-vue';
 const router = useRouter();
 
 const { t } = useI18n()
@@ -167,12 +183,13 @@ const statusOptions = [
 const columns = ref([
     { title: t('merchant.index.id'), dataIndex: 'id', key: 'id', width: 100, ellipsis: true },
     { title: t('merchant.index.name'), dataIndex: 'name', key: 'name', width: 160, ellipsis: true },
-    { title: t('merchant.index.category'), dataIndex: 'category', key: 'category', width: 100, ellipsis: true },
+    { title: t('merchant.index.category'), dataIndex: 'categoryName', key: 'categoryName', width: 100, ellipsis: true },
     { title: t('merchant.index.identifyStatus'), dataIndex: 'isAuth', key: 'isAuth', slotName: 'isAuth', width: 120, ellipsis: true },
     { title: t('merchant.index.status'), dataIndex: 'shopStatus', key: 'shopStatus', slotName: 'shopStatus', width: 120, ellipsis: true },
     { title: t('merchant.index.packageNum'), dataIndex: 'packageNum', key: 'packageNum', width: 120, ellipsis: true },
     { title: t('merchant.index.accumulatedRevenue'), dataIndex: 'accumulatedRevenue', key: 'accumulatedRevenue', width: 200, ellipsis: true, slotName: 'paymentMethod' },
     { title: t('merchant.index.accumulatedExpenses'), dataIndex: 'accumulatedExpenses', key: 'accumulatedExpenses', width: 180, ellipsis: true },
+    { title: t('merchant.index.createTime'), dataIndex: 'createTime', key: 'createTime', width: 180, ellipsis: true },
     { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 160, slotName: 'action', fixed: 'right' },
 
 ])
@@ -237,7 +254,6 @@ const handleShowDetail = (row: any) => {
 }
 
 const handleSelectRow = (val) => {
-    console.log(val)
     selectedKeys.value = val
 }
 
@@ -260,6 +276,84 @@ const handleChangeStatus = (row: any, status: number) => {
 
 }
 
+const visible = ref(false);
+// 点击不通过
+const rejectReason = ref('');
+const choosenRow = ref(null);
+const handleReject = (row) => {
+    choosenRow.value = row;
+    visible.value = true;
+};
+
+// 点击确认不通过
+const handleConfirmReject = () => {
+    console.log('rejectReason:', rejectReason.value);
+    let params = {
+        shopIds: choosenRow ? [choosenRow.id] : selectedKeys.value,
+        isAuth: 1,
+        rejectReason: rejectReason.value
+    }
+    shopApprove(params).then(res => {
+        if (res.code == 0) {
+            Message.success('操作成功');
+        }
+    }).catch(err => {
+        console.log('reject error:', err);
+    }).finally(() => {
+        visible.value = false;
+    });
+};
+
+// 点击取消
+const handleCancelReject = () => {
+    visible.value = false;
+
+
+};
+// 点击通过
+const handlePass = (row) => {
+    visible.value = true;
+    let params = {
+        shopIds: row ? [row.id] : selectedKeys.value,
+        isAuth: 0,
+        rejectReason: ''
+    }
+    shopApprove(params).then(res => {
+        if (res.code == 0) {
+            Message.success('操作成功');
+        }
+    }).catch(err => {
+        console.log('reject error:', err);
+    }).finally(() => {
+        visible.value = false;
+    });
+};
+
+
+const RejectByGroup = () => {
+    choosenRow.value = null;
+    let pendingApproval = selectedKeys.value.filter(item => item.isAuth == 2)
+
+    if (pendingApproval.length === 0) {
+        Message.error('请选择待审核的商家')
+        return
+    } else {
+        handleReject()
+    }
+
+}
+
+const passByGroup = () => {
+    let pendingApproval = selectedKeys.value.filter(item => item.isAuth == 2)
+
+    if (pendingApproval.length === 0) {
+        Message.error('请选择待审核的商家')
+        return
+    } else {
+        handlePass()
+    }
+
+}
 onMounted(() => {
     fetchCategoryOptions()
     fetchData(1, pageSize.value)

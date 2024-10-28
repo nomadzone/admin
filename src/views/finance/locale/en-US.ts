@@ -14,6 +14,10 @@ export default {
     "finance.revenueExpenditure.paymentMethod":"Payment Method",
     "finance.revenueExpenditure.paymentNumber":"Payment Number",
     "finance.revenueExpenditure.receiptTime":"Receipt Time",
+    "finance.revenueExpenditure.activityOrder": "Activity Order",
+    "finance.revenueExpenditure.packageOrder": "Package Order",
+
+
 
     "finance.withdrawal.apply":"Apply for withdrawal",
     "finance.withdrawal.tips":"The minimum withdrawal amount is 100 yuan. Withdrawals are only supported to debit cards, not credit cards or passbooks. The withdrawal review period is 3 working days",

@@ -15,6 +15,10 @@ export default {
     "finance.revenueExpenditure.paymentNumber": "支付号",
     "finance.revenueExpenditure.receiptTime": "入账时间",
     "finance.revenueExpenditure.settlementObject": "结算对象",
+    "finance.revenueExpenditure.activityOrder": "活动订单",
+    "finance.revenueExpenditure.packageOrder": "套餐订单",
+
+
 
 
     "finance.withdrawal.apply": "申请提现",

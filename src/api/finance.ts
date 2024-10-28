@@ -14,3 +14,8 @@ export const getSettleList = (params: any) => {
 export const getWithdrawList = (params: any) => {
     return axios.get<SettlementRecord>('/shop/system/record/withdrawList', params);
 }
+
+//查询活动订单收支明细
+export const getActivityOrderList = (params: any) => {
+    return axios.get<SettlementRecord>('/admin/user/userActivity/list', {params});
+}
