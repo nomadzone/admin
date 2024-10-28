@@ -6,12 +6,12 @@
             <a-form :model="formModel" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
               label-align="center">
               <a-row :gutter="16">
-                <a-col :span="8">
+                <a-col :span="12">
                   <a-form-item field="number" label="广告名称">
                     <a-input v-model="formModel.advName" placeholder="请输广告名称" allow-clear/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="8">
+                <a-col :span="12">
                   <a-form-item field="status" label="位置">
                     <a-select :style="{width:'340px'}" v-model="formModel.type" placeholder="全部" allow-clear>
                       <a-option value="">全部</a-option>
@@ -21,7 +21,20 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :span="8">
+                <a-col :span="12">
+                  <a-form-item field="status" label="广告类型">
+                    <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
+                      <a-option value="">全部</a-option>
+                      <a-option value="1">套餐</a-option>
+                      <a-option value="2">商家</a-option>
+                      <a-option value="3">一起野</a-option>
+                      <a-option value="4">新鲜事</a-option>
+                      <a-option value="5">找搭子</a-option>
+                      <a-option value="6">小程序</a-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="12">
                   <a-form-item field="status" label="状态">
                     <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
                       <a-option value="">全部</a-option>
@@ -58,25 +71,24 @@
             <template #icon>
                 <icon-plus />
             </template>
-            <!-- Use the default slot to avoid extra spaces -->
             <template #default>新建</template>
         </a-button>
       </div>
       <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
         <template #optional="{ record, rowIndex }">
           <a-space>
-            <a-link @click="doLook(record, rowIndex)" size="mini">查看</a-link>
-            <a-link @click="doEdit(record, rowIndex)" v-if="record.status == 0" size="mini">编辑</a-link>
-            <a-link status="success" @click="doUp(record, rowIndex)" v-if="record.status == 0" size="mini">上架</a-link>
-            <a-link status="warning" @click="doDown(record, rowIndex)" v-if="record.status == 1" size="mini">下架</a-link>
-            <a-link status="danger" @click="doDelete(record, rowIndex)" v-if="record.status == 0" size="mini">删除</a-link>
+            <a-button  @click="doLook(record, rowIndex)" size="mini">查看</a-button>
+            <a-button type="primary" @click="doEdit(record, rowIndex)" v-if="record.status == 0" size="mini">编辑</a-button>
+            <a-button type="primary" status="success" @click="doUp(record, rowIndex)" v-if="record.status == 0" size="mini">上架</a-button>
+            <a-button type="primary" status="warning" @click="doDown(record, rowIndex)" v-if="record.status == 1" size="mini">下架</a-button>
+            <a-button type="primary" status="danger" @click="doDelete(record, rowIndex)" v-if="record.status == 0" size="mini">删除</a-button>
           </a-space>
         </template>
         <template #images="{ record }">
             <a-image
-                v-if="record.mainImage"
+                v-if="record.images"
                 width="32"
-                :src="record.mainImage"
+                :src="record.images"
             />
         </template>
         <template #type="{ record }">
@@ -100,6 +112,7 @@
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import { noticeList, noticeRemove, noticeAdd, noticeEdit, noticeUp, noticeDown } from '@/api/adv';
+  import store2 from 'store2'
   
   const router = useRouter()
   const buttonType = ref('0')
@@ -132,25 +145,31 @@
     {
       title: '广告封面',
       dataIndex: 'images',
-      slotName: 'images' // 使用 slot 来渲染状态列
+      slotName: 'images'
     },
     {
       title: '位置',
       dataIndex: 'type',
-      slotName: 'type' // 0下架 1上架
+      slotName: 'type'
     },
     {
-      title: '排列',
-      dataIndex: 'orderNumber',
-      slotName: 'orderNumber' // 0下架 1上架
+      title: '展示顺序',
+      dataIndex: 'orderNumber'
+    },
+    {
+      title: '广告类型',
+      dataIndex: 'urlType'
+    },
+    {
+      title: '广告id',
+      dataIndex: 'url'
     },
     {
       title: '状态',
       dataIndex: 'status',
       slotName: 'status' // 0下架 1上架
     },
-    { title: '发布时间', dataIndex: 'createTime' },
-    { title: '操作', slotName: 'optional', width: 200 },
+    { title: '操作', slotName: 'optional', width: 250 },
   ];
   const data = reactive({
     list: []
@@ -183,17 +202,6 @@
         Message.error(res?.msg)
       } else {
         pagination.value.total = res.total;
-        res.rows.map(item=> {
-          item.image = item.images.split(',')[0]
-        })
-        res.rows.map(item=> {
-          if (item?.images) {
-            let mainImage = item?.images?.split(',')?.[0]
-            if (mainImage) {
-              item.mainImage = mainImage
-            }
-          }
-        })
         data.list = res.rows;
       }
     } catch (error) {
@@ -203,27 +211,15 @@
   }
   
   const doLook = (record) => {
-  let _record = {...record}
-  for (let key in _record) {
-    if (_record[key]=== null || _record[key]===undefined) {
-      _record[key] = ''
-    }
-  }
-  localStorage.setItem('advInfo', JSON.stringify(_record))
+    store2.set('advInfo', record)
     router.push({
       name: 'advCreate',
       query: { id: record.id, type: 'look' }
     })
   }
 
-  const doCreate = (record) => {
-  let _record = {...record}
-  for (let key in _record) {
-    if (_record[key]=== null || _record[key]===undefined) {
-      _record[key] = ''
-    }
-  }
-  localStorage.setItem('advInfo', JSON.stringify(_record))
+  const doCreate = () => {
+    store2.remove('advInfo')
     router.push({
       name: 'advCreate',
       query: { type: 'add' }

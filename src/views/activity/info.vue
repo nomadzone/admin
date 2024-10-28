@@ -107,7 +107,7 @@ const columns = ref([
   },
   {
     title: '服务费',
-    dataIndex: '',
+    dataIndex: 'serviceAmount',
     width: 100
   },
   {
