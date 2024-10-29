@@ -47,7 +47,7 @@
 
 </template>
 <script lang="ts" setup>
-import { ref, onMounted, defineProps, watch } from 'vue';
+import { ref, onMounted, defineProps, watch, defineExpose } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { shopSettlementTotal } from '@/api/merchant';
@@ -64,10 +64,10 @@ watch(() => props.shopId, (newVal) => {
 }, { immediate: true });
 // 查询结算汇总
 const summaryData = ref({})
-const fetchSettleSummary = async () => {
-    const res = await shopSettlementTotal({ shopId: props.shopId })
-    console.log(res)
-    summaryData.value = res
+const fetchSettleSummary = async (params) => {
+    let queryInfo = Object.assign({}, params, { shopId: props.shopId })
+    const res = await shopSettlementTotal(queryInfo)
+    summaryData.value = res.data
 }
 /**
  * 提现申请
@@ -80,7 +80,9 @@ const handleWithdrawalApply = () => {
     });
 }
 
-
+defineExpose({
+    fetchSettleSummary
+})
 </script>
 
 <style lang="scss" scoped>

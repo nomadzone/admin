@@ -17,6 +17,8 @@ export default {
     "finance.revenueExpenditure.settlementObject": "结算对象",
     "finance.revenueExpenditure.activityOrder": "活动订单",
     "finance.revenueExpenditure.packageOrder": "套餐订单",
+    "finance.revenueExpenditure.settlement": "结算",
+
 
 
 
@@ -55,6 +57,7 @@ export default {
     
 
     "finance.settlement.pendingSettlement": "待结算",
+    "finance.settlement.settlemented": "已结算",
     "finance.settlement.settlementInProgress": "结算中",
     "finance.settlement.unsettled": "未结算",
     "finance.settlement.settlementSuccessful": "成功",

@@ -1,7 +1,7 @@
 <template>
     <div class="shop-settlement-comp">
 
-        <Summary :shopId="props.shopId"></Summary>
+        <Summary :shopId="props.shopId" ref="summaryRef"></Summary>
         <div class="common-query-form-container">
             <div class="form-item-group">
                 <a-form :model="form" layout="inline">
@@ -11,17 +11,6 @@
                                 :label="$t('finance.revenueExpenditure.orderNum')">
                                 <a-input v-model="form.orderNo" allow-clear />
                             </a-form-item>
-                        </a-grid-item>
-                        <a-grid-item class="demo-item">
-                            <a-form-item label-col-flex="80px" field="settlementType"
-                                :label="$t('finance.settlement.settlementType')">
-                                <a-select v-model="form.settlementType" allow-clear>
-                                    <a-option v-for="(item, index) in settlementTypeOptions" :key="index" :value="item">
-                                        {{ item }}
-                                    </a-option>
-                                </a-select>
-                            </a-form-item>
-
                         </a-grid-item>
                         <a-grid-item class="demo-item">
                             <a-form-item label-col-flex="80px" field="timeQuery"
@@ -97,7 +86,7 @@ const props = defineProps({
 const form = ref({
     orderNo: '',
     timeQuery: '',
-    settlementType: '',
+    name: '',
 })
 const settlementTypeOptions = ref(['交易结算', '服务费结算', '提现结算'])
 
@@ -108,7 +97,7 @@ const columns = ref([
     { title: t('finance.settlement.settlementAmount'), dataIndex: 'settlementAmount', key: 'settlementAmount', width: 120, ellipsis: true },
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlementStatusName', key: 'settlementStatusName', width: 120, ellipsis: true },
     { title: t('finance.settlement.settlementMethod') + '/' + t('finance.settlement.settlementNumber'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 200, ellipsis: true, slotName: 'paymentMethod' },
-    { title: t('finance.settlement.settlementTime'), dataIndex: 'settlementDate', key: 'settlementDate', width: 180, ellipsis: true },
+    { title: t('finance.settlement.settlementTime'), dataIndex: 'extends3', key: 'extends3', width: 180, ellipsis: true },
     { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
 
 ])
@@ -117,7 +106,7 @@ const handleShowDetail = (row: any) => {
     console.log('show detail')
 
 }
-
+const summaryRef = ref(null)
 // 获取结算列表
 const totalValue = ref(0)
 const currentPage = ref(1)
@@ -129,8 +118,7 @@ const getSettleListData = async (page, size) => {
         pageNum: page || currentPage.value,
         pageSize: size || currentSize.value,
         orderNo: form.value.orderNo,
-        settlementType: form.value.settlementType,
-        timeQuery: form.value.timeQuery,
+        shopName: form.value.name,
         beginSettlementDate: form.value.timeQuery ? form.value.timeQuery[0] : '',
         endSettlementDate: form.value.timeQuery ? form.value.timeQuery[1] : '',
     }
@@ -144,7 +132,34 @@ const getSettleListData = async (page, size) => {
 
     }
 
+    if (summaryRef.value) {
+        let summaryParams = {
+            orderNo: form.value.orderNo,
+            name: form.value.name,
+            beginSettlementDate: form.value.timeQuery ? form.value.timeQuery[0] : '',
+            endSettlementDate: form.value.timeQuery ? form.value.timeQuery[1] : '',
+        }
+        summaryRef.value.fetchSettleSummary(summaryParams)
+    }
+
 }
+
+
+const handleSearchResult = () => {
+    form.value = {
+        name: '',
+        orderNo: '',
+
+    }
+    getSettleListData(1, currentSize.value)
+    if (summaryRef.value) {
+        let summaryParams = {
+        }
+        summaryRef.value.fetchSettleSummary(summaryParams)
+    }
+
+}
+
 
 const handleChangePage = (page) => {
     currentPage.value = page

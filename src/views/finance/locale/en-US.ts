@@ -16,6 +16,7 @@ export default {
     "finance.revenueExpenditure.receiptTime":"Receipt Time",
     "finance.revenueExpenditure.activityOrder": "Activity Order",
     "finance.revenueExpenditure.packageOrder": "Package Order",
+    "finance.revenueExpenditure.settlement": "Settlement",
 
 
 
@@ -52,6 +53,7 @@ export default {
 
 
     "finance.settlement.pendingSettlement": "Pending settlement",
+    "finance.settlement.settlemented": "Settlemented",
     "finance.settlement.settlementInProgress": "Settlement in progress",
     "finance.settlement.unsettled": "Unsettled",
     "finance.settlement.settlementSuccessful": "Settlement successful",
