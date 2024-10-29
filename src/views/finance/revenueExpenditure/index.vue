@@ -7,8 +7,7 @@
                 <div class="header-actions">
                 </div>
             </div>
-
-            <Summary></Summary>
+            <Summary :activeTab="activeTab" :queryInfo="form" ref="summaryRef"></Summary>
             <div class="common-query-form-container">
 
                 <div class="form-item-group">
@@ -24,16 +23,16 @@
                             <a-grid-item class="demo-item">
                                 <a-form-item field="roles" :label="$t('finance.revenueExpenditure.settlementObject')"
                                     label-col-flex="80px">
-                                    <a-input v-model="form.financeType" />
+                                    <a-input v-model="form.name" />
                                 </a-form-item>
 
                             </a-grid-item>
-                            <a-grid-item class="demo-item">
+                            <!-- <a-grid-item class="demo-item">
                                 <a-form-item field="status" :label="$t('finance.revenueExpenditure.transactionType')"
                                     label-col-flex="80px">
                                     <a-select v-model="form.dealType" />
                                 </a-form-item>
-                            </a-grid-item>
+                            </a-grid-item> -->
                             <a-grid-item class="demo-item">
                                 <a-form-item field="status" :label="$t('finance.revenueExpenditure.receiptTime')"
                                     label-col-flex="80px">
@@ -45,13 +44,13 @@
                 </div>
                 <a-divider class="query-form-divider" direction="vertical" />
                 <div class="query-actions">
-                    <a-button type="primary">
+                    <a-button type="primary" @click="handleClickSearch()">
                         <template #icon>
                             <icon-search />
                         </template>
                         {{ $t("button.search") }}
                     </a-button>
-                    <a-button type="outline">
+                    <a-button type="outline" @click="handleClickReset()">
                         <template #icon>
                             <icon-refresh />
 
@@ -76,19 +75,47 @@
 
                 <div class="common-table-container">
 
-                    <a-table size="small" :columns="columns" :data="data" :loading="tableLoad" :pagination="false">
+                    <a-table size="small" :columns="columns" :data="data" :loading="tableLoad" :pagination="false"
+                        v-if="activeTab == 1">
+                        <template #settlementType="{ record }">
+                            <div>
+                                线下
+                            </div>
+                        </template>
+                        <template #financeType="{ record }">
+                            <div>
+                                线下
+                            </div>
+                        </template>
+                        <template #settlement="{ record }">
+                            <div>
+                                <span v-if="record.settlement == 1"> 已结算</span>
+                                <span v-else-if="record.settlement == 0"> 待结算</span>
+
+                            </div>
+                        </template>
+                        <template #action="{ record }">
+                            <a-button type="text" v-if="record.settlement == 0" @click="handleActivitySet(record)">{{
+                                $t("finance.revenueExpenditure.settlement") }}</a-button>
+                        </template>
+                    </a-table>
+
+                    <a-table size="small" :columns="orderColumns" :data="orderData" :loading="tableLoad"
+                        :pagination="false" v-else-if="activeTab == 2">
                         <template #paymentMethod="{ record }">
                             <div>
                                 <span>{{ record?.settlementWay }}</span>/
                                 <span>{{ record?.settlementNo }}</span>
-
                             </div>
                         </template>
 
                         <template #action="{ record }">
-                            <a-button type="text" @click="handleShowDetail(record)">{{ $t("button.detail") }}</a-button>
+                            <a-button type="text" v-if="record.settlementStatus == 0"
+                                @click="handlePackageOrderSet(record)">{{
+                                    $t("finance.revenueExpenditure.settlement") }}</a-button>
                         </template>
                     </a-table>
+
 
                     <div class="pagination-row">
                         <a-pagination :total="totalValue" :current="currentPage" :pageSize="currentSize"
@@ -106,8 +133,9 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Summary from './components/summary.vue';
 import { getActivityOrderList } from '@/api/finance'
-import { shopSettlementList } from '@/api/merchant';
-import { active } from 'sortablejs';
+import { shopSettlementList, shopSettlementDeal } from '@/api/merchant';
+import { shopActivitySettlementDeal } from '@/api/finance';
+import { Message, Modal } from '@arco-design/web-vue'
 
 const { t } = useI18n()
 
@@ -115,22 +143,36 @@ const queryFormItemLayout = { xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }
 
 const form = ref({
     orderNum: '',
-    financeType: '',
+    name: '',
     dealType: '',
     timeQuery: null
 
 })
 
 const columns = ref([
+    { title: t('finance.revenueExpenditure.transactionType'), dataIndex: 'settlementType', key: 'settlementType', width: 100, ellipsis: true, slotName: 'settlementType' },
+    { title: t('finance.revenueExpenditure.orderNum'), dataIndex: 'orderNo', key: 'orderNo', width: 260, ellipsis: true },
+    { title: t('finance.revenueExpenditure.financeType'), dataIndex: 'financeType', key: 'financeType', width: 100, ellipsis: true, slotName: 'financeType' },
+    { title: t('finance.revenueExpenditure.amount'), dataIndex: 'total', key: 'total', width: 120, ellipsis: true },
+    { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlement', key: 'settlement', width: 120, ellipsis: true, slotName: 'settlement' },
+    { title: t('finance.revenueExpenditure.receiptTime'), dataIndex: 'createTime', key: 'createTime', width: 180, ellipsis: true },
+    { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
+
+])
+
+
+const orderColumns = ref([
     { title: t('finance.revenueExpenditure.transactionType'), dataIndex: 'settlementType', key: 'settlementType', width: 100, ellipsis: true },
-    { title: t('finance.revenueExpenditure.orderNum'), dataIndex: 'orderNo', key: 'orderNo', width: 160, ellipsis: true },
+    { title: t('finance.revenueExpenditure.orderNum'), dataIndex: 'orderNo', key: 'orderNo', width: 260, ellipsis: true },
     { title: t('finance.revenueExpenditure.financeType'), dataIndex: 'settlementType', key: 'settlementType', width: 100, ellipsis: true },
     { title: t('finance.revenueExpenditure.amount'), dataIndex: 'settlementAmount', key: 'settlementAmount', width: 120, ellipsis: true },
-    // { title: t('finance.revenueExpenditure.balance'), dataIndex: 'balance', key: 'balance', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.settlementObject'), dataIndex: 'userNikeName', key: 'userNikeName', width: 120, ellipsis: true },
+
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlementStatusName', key: 'settlementStatusName', width: 120, ellipsis: true },
     { title: t('finance.revenueExpenditure.paymentMethod'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 200, ellipsis: true, slotName: 'paymentMethod' },
-    { title: t('finance.revenueExpenditure.receiptTime'), dataIndex: 'settlementDate', key: 'settlementDate', width: 180, ellipsis: true },
+    { title: t('finance.revenueExpenditure.receiptTime'), dataIndex: 'extends3', key: 'extends3', width: 180, ellipsis: true },
     { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
+
 
 ])
 const data = ref([
@@ -148,12 +190,18 @@ const tableLoad = ref(false)
 const searchActivityOrderListData = async (page, size) => {
     tableLoad.value = true
     let params = {
+        orderNum: form.value.orderNum,
+        name: form.value.name,
+        startcreateTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+        endcreateTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
         pageNum: page || currentPage.value,
         pageSize: size || currentSize.value
     }
+
+    delete params.timeQuery
     const res = await getActivityOrderList(params)
-    if (res.code === 200) {
-        data.value = res.rows
+    if (res.code === 0) {
+        data.value = [...res.rows]
         totalValue.value = res.total
         tableLoad.value = false
     } else {
@@ -163,14 +211,21 @@ const searchActivityOrderListData = async (page, size) => {
 
 
 // 查询套餐订单列表
+const orderData = ref([])
 const searchPackageOrderListData = async (page, size) => {
     let params = {
+        orderNo: form.value.orderNum,
+        shopName: form.value.name,
+        beginSettlementDate: form.value.timeQuery ? form.value.timeQuery[0] : '',
+        endSettlementDate: form.value.timeQuery ? form.value.timeQuery[1] : '',
         pageNum: page || currentPage.value,
         pageSize: size || currentSize.value
     }
+
+    delete params.timeQuery
     const res = await shopSettlementList(params)
     if (res.code === 0) {
-        data.value = res.rows
+        orderData.value = [...res.rows]
         totalValue.value = res.total
         tableLoad.value = false
     } else {
@@ -183,32 +238,158 @@ const handleChangeTab = (key) => {
     currentPage.value = 1
     activeTab.value = key
     if (key === '1') {
-        searchActivityOrderListData(1)
+        searchActivityOrderListData(1, currentSize.value)
+        if (summaryRef.value) {
+            let params = {
+                orderNum: form.value.orderNum,
+                name: form.value.name,
+                startcreateTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+                endcreateTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchSettleSummary(params)
+        }
     } else {
-        searchPackageOrderListData(1)
+        searchPackageOrderListData(1, currentSize.value)
+        if (summaryRef.value) {
+            let params = {
+                orderNo: form.value.orderNum,
+                shopName: form.value.name,
+                beginSettlementDate: form.value.timeQuery ? form.value.timeQuery[0] : '',
+                endSettlementDate: form.value.timeQuery ? form.value.timeQuery[1] : '',
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchOrderSummary(params)
+        }
     }
 }
 
 const handleChangePage = (page) => {
     currentPage.value = page
-    if (activeTab.value == 1) {
-        searchActivityOrderListData(page)
+    if (activeTab.value == '1') {
+        searchActivityOrderListData(page, currentSize.value)
+
     } else {
-        searchPackageOrderListData(page)
+        searchPackageOrderListData(page, currentSize.value)
     }
 }
 
 const handleChangeSize = (size) => {
     currentSize.value = size
-    if (activeTab.value == 1) {
+    if (activeTab.value == '1') {
         searchActivityOrderListData(1, size)
     } else {
         searchPackageOrderListData(1, size)
     }
 }
 
+const summaryRef = ref(null)
+const handleClickSearch = () => {
+    if (activeTab.value == '1') {
+        searchActivityOrderListData(1, currentSize.value)
+        if (summaryRef.value) {
+            let params = {
+                orderNum: form.value.orderNum,
+                name: form.value.name,
+                beginVerifyTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+                endVerifyTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchSettleSummary(params)
+        }
+
+    } else {
+
+        if (summaryRef.value) {
+            let params = {
+                orderNo: form.value.orderNum,
+                shopName: form.value.name,
+
+                startcreateTime: form.value.timeQuery ? form.value.timeQuery[0] : '',
+                endcreateTime: form.value.timeQuery ? form.value.timeQuery[1] : '',
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchOrderSummary(params)
+        }
+        searchPackageOrderListData(1, currentSize.value)
+    }
+}
+const handleClickReset = () => {
+    form.value.orderNum = ''
+    form.value.name = ''
+    form.value.dealType = ''
+    form.value.timeQuery = null
+
+
+    if (activeTab.value == '1') {
+        searchActivityOrderListData(1, currentSize.value)
+        if (summaryRef.value) {
+            let params = {
+
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchSettleSummary(params)
+        }
+
+    } else {
+
+        if (summaryRef.value) {
+            let params = {
+
+                pageNum: 1,
+                pageSize: currentSize.value
+            }
+            summaryRef.value.fetchOrderSummary(params)
+        }
+        searchPackageOrderListData(1, currentSize.value)
+    }
+}
+
+// 点击结算
+const handleActivitySet = (record) => {
+    console.log('record:', record)
+    Modal.confirm({
+        title: '结算',
+        content: '确定结算吗？',
+        onOk: () => {
+            shopActivitySettlementDeal([record.id]).then(res => {
+                if (res.code == 0) {
+                    Message.success('操作成功');
+                    searchActivityOrderListData(1, currentPage.value)
+                }
+            }).catch(err => {
+                console.log('shopSettlementDeal error:', err);
+            })
+        }
+    })
+}
+
+// 点击结算
+const handlePackageOrderSet = (record) => {
+    console.log('record:', record)
+    Modal.confirm({
+        title: '结算',
+        content: '确定结算吗？',
+        onOk: () => {
+            shopSettlementDeal([record.id]).then(res => {
+                if (res.code == 0) {
+                    Message.success('操作成功');
+                    searchPackageOrderListData(currentPage.value)
+                }
+            }).catch(err => {
+                console.log('shopSettlementDeal error:', err);
+            })
+        }
+    })
+}
+
 onMounted(() => {
-    searchActivityOrderListData(1)
+    searchActivityOrderListData(1, currentSize.value)
 })
 
 </script>

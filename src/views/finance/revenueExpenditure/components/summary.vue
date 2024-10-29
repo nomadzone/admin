@@ -8,9 +8,10 @@
                     </div>
                     <div class="item-info">
                         <div class="title-text">{{ t("finance.revenueExpenditure.accumulatedIncome") }}</div>
-                        <div class="data-value">{{ summaryData && summaryData?.waitSettlementAmount || 0 }}元<span
-                                class="server-money">(其中服务费{{
-                                    summaryData && summaryData?.costAmount || 0 }}元)</span></div>
+                        <div class="data-value">{{ activeTab == 1 ? summaryData && summaryData?.cumulativeAmount || 0 :
+                            summaryData && summaryData?.sumAmount || 0 }}元<span class="server-money">(其中服务费{{
+                                activeTab == 1 ? summaryData && summaryData?.serviceAmount || 0 : summaryData &&
+                                    summaryData?.costAmount || 0 }}元)</span></div>
                     </div>
                 </div>
             </a-col>
@@ -22,7 +23,8 @@
                     </div>
                     <div class="item-info">
                         <div class="title-text">{{ t("finance.settlement.pendingSettlement") }}</div>
-                        <div class="data-value">{{ summaryData && summaryData?.waitSettlementAmount || 0 }}元
+                        <div class="data-value">{{ activeTab == 1 ? summaryData && summaryData?.settlementAmount || 0 :
+                            summaryData && summaryData?.waitSettlementAmount || 0 }}元
                         </div>
                     </div>
                 </div>
@@ -34,8 +36,9 @@
 
                     </div>
                     <div class="item-info">
-                        <div class="title-text">{{ t("finance.revenueExpenditure.accountBalance") }}</div>
-                        <div class="data-value">{{ summaryData && summaryData?.settlementAmount || 0 }}元</div>
+                        <div class="title-text">{{ t("finance.settlement.settlemented") }}</div>
+                        <div class="data-value">{{ activeTab == 1 ? summaryData && summaryData?.balanceAmount || 0 :
+                            summaryData && summaryData?.settlementAmount || 0 }}元</div>
                     </div>
                 </div>
             </a-col>
@@ -46,24 +49,43 @@
 
 </template>
 <script setup>
-import { ref, onMounted, defineProps, watch } from 'vue';
+import { ref, onMounted, defineProps, defineExpose } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { shopSettlementTotal } from '@/api/merchant';
-
+import { shopSettlementActiveTotal } from '@/api/finance';
 const { t } = useI18n();
 const router = useRouter();
+const props = defineProps({
+    activeTab: {
+        type: String,
+        default: '1'
+    }
+})
+
+
 
 // 查询结算汇总
 const summaryData = ref({})
-const fetchSettleSummary = async () => {
-    const res = await shopSettlementTotal()
+const fetchSettleSummary = async (params) => {
+    const res = await shopSettlementActiveTotal(params)
     console.log(res)
-    summaryData.value = res
+    summaryData.value = res.data
+}
+
+const fetchOrderSummary = async (params) => {
+    const res = await shopSettlementTotal(params)
+    console.log(res)
+    summaryData.value = res.data
 }
 
 onMounted(() => {
     fetchSettleSummary()
+});
+
+defineExpose({
+    fetchSettleSummary,
+    fetchOrderSummary
 });
 /**
  * 提现申请

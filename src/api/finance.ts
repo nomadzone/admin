@@ -17,5 +17,15 @@ export const getWithdrawList = (params: any) => {
 
 //查询活动订单收支明细
 export const getActivityOrderList = (params: any) => {
-    return axios.get<SettlementRecord>('/admin/user/userActivity/list', {params});
+    return axios.post<SettlementRecord>('/admin/user/userActivity/orderList', params);
+}
+
+//查询活动订单收支汇总
+export const shopSettlementActiveTotal = (params: any) => {
+    return axios.post<SettlementRecord>('/admin/user/userActivity/statistics', params);
+}
+
+//活动订单结算
+export const shopActivitySettlementDeal = (params: any) => {
+    return axios.post<SettlementRecord>('/admin//user/userActivity/settlement', params);
 }
