@@ -2,7 +2,7 @@
     <div style="padding-top: 32px;">
         <div class="type">
             <!-- <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">活动套餐明细</a-button> -->
-            <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button>
+            <!-- <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button> -->
             <!-- <a-button shape="round" v-if="type != '1'" @click="type = '1'; searchMeal()">套餐收支明细</a-button>
             <a-button shape="round" type="primary"  v-if="type == '1'">套餐收支明细</a-button> -->
         </div>
