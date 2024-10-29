@@ -105,8 +105,17 @@ export function consumptionList(data:any) {
 
 export function getAmountByUserId(data:any) {
   return http({
-    method: 'GET',
-    url: `/user/consumption/getAmountByUserId`,
+    method: 'POST',
+    url: `/admin/user/consumption/getAmountByUserId`,
+    data
+  })
+}
+
+export function orderList  (data:any) {
+  // const queryParams = new URLSearchParams(data).toString();
+  return http({
+    method: 'post',
+    url: `/admin/user/userActivity/orderList`,
     data
   })
 }

@@ -88,18 +88,21 @@
         <icon-refresh class='refresh' @click="search()"/>
       </div>
       <a-table :columns="columns" :data="data.list" style="width: 100%" :loading="loading" :pagination='pagination'>
+      <template #status="{ record }">
+        <a-tag v-if="record.status == 1" color="red">已下架</a-tag>
+        <a-tag v-if="record.status == 0" color="blue">已上架</a-tag>
+      </template>
       <template #optional="{ record, rowIndex }">
         <a-space>
-          <!-- <a-button @click="doLookPin(record, rowIndex)" size="mini">查看</a-button> -->
-          <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)">
+          <!-- <a-popconfirm content="是否删除?" @ok="doDelete(record, rowIndex)">
             <a-button type="primary" status="danger" size="mini">删除</a-button>
+          </a-popconfirm> -->
+          <a-popconfirm content="是否删除?" v-if="record.status == 1" @ok="doPinUp(record, rowIndex)">
+            <a-button type="primary" status="normal" size="mini">上架</a-button>
           </a-popconfirm>
-          <!-- <a-button type="primary" size="mini" @click="doUpPin(record, rowIndex)">
-            上线
-          </a-button>
-          <a-button type="primary" status="danger" size="mini"
-            @click="doDownPin(record, rowIndex)">
-            下线</a-button> -->
+          <a-popconfirm content="是否删除?" v-if="record.status == 0" @ok="doPinDown(record, rowIndex)">
+            <a-button type="primary" status="danger" size="mini">下架</a-button>
+          </a-popconfirm>
         </a-space>
       </template>
     </a-table>
@@ -130,7 +133,9 @@
 import PageCard from '@/components/page-card/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
-import { getList,commentList, onlineUp, onlineDown, audit, commentRemove } from '@/api/activity';
+import store2 from 'store2'
+import { getList,commentList, onlineUp, onlineDown, audit, commentRemove, commentDown, commentUp } from '@/api/activity';
+import { status } from 'nprogress';
 
 const info = ref({
   id: '',
@@ -144,7 +149,7 @@ const info = ref({
 })
 const optionIndex = ref(-1)
 onMounted(() => {
-  info.value = localStorage.getItem('noveltyInfo') ? JSON.parse(localStorage.getItem('noveltyInfo')) : {}
+  info.value = store2.get('noveltyInfo')
   console.log(info.value, 12)
 })
 // 审批
@@ -212,6 +217,7 @@ const columns = [
   { title: '点赞数', dataIndex: 'numberUp' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
+  { title: '状态', dataIndex: 'status', slotName: 'status' },
   { title: '操作', slotName: 'optional', width: 100 },
 ];
 onMounted(() => {
@@ -270,6 +276,34 @@ const doDelete = (record, index)=> {
         Message.error('删除失败')
       }
     })
+}
+const doPinUp = (record, index)=> {
+  commentUp({ 
+    id: record.id,
+    status: 0
+  }).then((res:any)=> {
+    if (res.code === 0) {
+        data.list[index].status = 0
+        Message.success('上架成功')
+        search()
+      } else {
+        Message.error('上架失败')
+      }
+   })
+}
+const doPinDown = (record, index)=> {
+  commentDown({ 
+    id: record.id,
+    status: 1
+   }).then((res:any)=> {
+    if (res.code === 0) {
+        data.list[index].status = 1
+        Message.success('下架成功')
+        search()
+      } else {
+        Message.error('下架失败')
+      }
+   })
 }
 </script>
 

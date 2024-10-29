@@ -2,7 +2,7 @@
     <div style="padding-top: 32px;">
         <div class="type">
             <!-- <a-button shape="round" v-if="type != '0'" @click="type = '0'; search()">活动套餐明细</a-button> -->
-            <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button>
+            <!-- <a-button shape="round" type="primary" v-if="type == '0'">活动套餐明细</a-button> -->
             <!-- <a-button shape="round" v-if="type != '1'" @click="type = '1'; searchMeal()">套餐收支明细</a-button>
             <a-button shape="round" type="primary"  v-if="type == '1'">套餐收支明细</a-button> -->
         </div>
@@ -54,13 +54,9 @@
         </a-row>
         <a-table size="small" :columns="columns" :data="formModel.list" style="width: 100%" :loading="loading"
             :pagination='pagination'>
-            <template #payType="{ record, rowIndex }">
-                <a-tag color='blue' v-if="record.payType == 1">收入</a-tag>
-                <a-tag v-else color='red'>支出</a-tag>
-            </template>
-            <template #status="{ record, rowIndex }">
-                <a-tag color='blue' v-if="record.status == 1">处理成功</a-tag>
-                <a-tag v-else color="red">处理中</a-tag>
+            <template #settlement="{ record, rowIndex }">
+                <a-tag color='blue' v-if="record.settlement == 1">已结算</a-tag>
+                <a-tag v-else color='red'>未结算</a-tag>
             </template>
         </a-table>
     </div>
@@ -68,19 +64,19 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import { consumptionList, getAmountByUserId } from '@/api/user'
+import { consumptionList, getAmountByUserId, orderList } from '@/api/user'
 import { Message } from '@arco-design/web-vue'
 import { shopSettlementTotal, shopSettlementList } from '@/api/merchant'
 // 状态 0 处理成功 1 处理中 2 关闭  3 微信支付回调失败，4 退款中， 5 退款成功 6微信退款回调失败
 // payType 类型 1收入 2 支出
 const columns = [
-    { title: '用户昵称', dataIndex: 'nickname' },
-    { title: '手机号', dataIndex: 'phone' },
-    { title: '支出/收入', dataIndex: 'payType', slotName: 'payType' },
-    { title: '金额', dataIndex: 'amout' },
-    { title: '状态', dataIndex: 'status', slotName: 'status' },
-    { title: '描述', dataIndex: 'title' },
-    { title: '结算时间',  dataIndex: 'payTime' },
+    { title: 'id', dataIndex: 'id' },
+    { title: '订单号', dataIndex: 'orderNo' },
+    { title: '总金额', dataIndex: 'total' },
+    { title: '服务费', dataIndex: 'serviceAmount' },
+    { title: '结算金额', dataIndex: 'settlementAmount' },
+    { title: '姓名', dataIndex: 'name' },
+    { title: '是否结算', dataIndex: 'settlement', slotName: 'settlement' },
 ];
 
 const statusText = {
@@ -132,13 +128,13 @@ const search = async () => {
     try {
         getAmountByUserId({ userId: userId.value }).then((res:any)=> {
             if (res?.code == 0) {
-                activeBobdy.value.incomeAmount = res?.body?.incomeAmount
-                activeBobdy.value.refundAmount = res?.body?.refundAmount
-                activeBobdy.value.settlementEdAmount = res?.body?.settlementEdAmount
-                activeBobdy.value.settlementAmount = res?.body?.settlementAmount
+                activeBobdy.value.incomeAmount = res?.data?.incomeAmount
+                activeBobdy.value.refundAmount = res?.data?.refundAmount
+                activeBobdy.value.settlementEdAmount = res?.data?.settlementEdAmount
+                activeBobdy.value.settlementAmount = res?.data?.settlementAmount
             }
         })
-        let res: any = await consumptionList(params)
+        let res: any = await orderList(params)
         loading.value = false
         if (res?.code == 0) {
             pagination.value.total = res.total;

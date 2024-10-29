@@ -208,6 +208,11 @@ const pagination = ref({
   }, // 页码改变时的回调函数
 })
 const columns = [
+  {
+    title: 'id',
+    dataIndex: 'id',
+    width: 180
+  },
   { title: '需求描述', dataIndex: 'describe' },
   { title: '期望时间', dataIndex: 'expectdate' },
   {
@@ -218,7 +223,7 @@ const columns = [
   { title: '面基地点', dataIndex: 'address' },
   { title: '用户昵称', dataIndex: 'nickname' },
   { title: '创建时间', dataIndex: 'createTime' },
-  { title: '操作', slotName: 'optional', width: 200 },
+  { title: '操作', slotName: 'optional', width: 200,fixed: 'right', right: 0 },
 ];
 const data = reactive({
   list: []

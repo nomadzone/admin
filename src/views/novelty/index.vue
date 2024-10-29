@@ -124,6 +124,7 @@ import { ref, reactive, onMounted, watch, computed } from 'vue';
 import { Message, Modal } from '@arco-design/web-vue';
 import { getList, onlineUp, onlineDown, audit } from '@/api/activity';
 import router from '@/router';
+import store2 from 'store2'
 
 //   发布中(审核中) 200 
 // 201 已发布
@@ -157,6 +158,11 @@ const pagination = ref({
   }, // 页码改变时的回调函数
 })
 const columns = [
+  {
+    title: 'id',
+    dataIndex: 'id',
+    width: 180
+  },
   { title: '标题', dataIndex: 'title' },
   { title: '定位', dataIndex: 'address' },
   { title: '用户昵称', dataIndex: 'nickname' },
@@ -166,24 +172,14 @@ const columns = [
     slotName: 'status' // 使用 slot 来渲染状态列
   },
   { title: '创建时间', dataIndex: 'createTime' },
-  { title: '操作', slotName: 'optional', width: 200 },
+  { title: '操作', slotName: 'optional', width: 200,fixed: 'right', right: 0 },
 ];
 const data = reactive({
   list: []
 });
 const doLook = (record)=> {
-  try {
-  let _record = {...record}
-  for (let key in _record) {
-    if (_record[key]=== null || _record[key]===undefined) {
-      _record[key] = ''
-    }
-  }
-  localStorage.setItem('noveltyInfo', JSON.stringify(_record))
+  store2.set('noveltyInfo', record)
   router.push('/novelty/info?id=' + record.id)
-  } catch(error) {
-    Message.error(JSON.stringify(error))
-  }
 }
 
 const onOkTime = (value) => { formModel.verifyTime = value }

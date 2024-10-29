@@ -60,14 +60,14 @@
           {{ options.find(item => item.value === record.status)?.label }}
         </template>
         <template #actions="{record}">
-          <a-button style="margin-right: 5px;" text type="primary" v-if="record.status === 100" @click="handleStatus(record)">审核</a-button>
+          <a-button size="mini" style="margin-right: 5px;" text @click="handleToInfo(record)">详情</a-button>
+          <a-button style="margin-right: 5px;" text status="success" size="mini" type="primary" v-if="record.status === 100" @click="handleStatus(record)">审核</a-button>
           <a-popconfirm @ok="downOk(record)" v-if="record.status === 100|| record.status === 101 || record.status === 102 || record.status === 103 || record.status === 104 || record.status === 104" content="确认下架吗？">
-            <a-button type="primary">下架</a-button>
+            <a-button style="margin-right: 5px;"  size="mini" status="danger" type="primary">下架</a-button>
           </a-popconfirm>
           <a-popconfirm @ok="onOk(record)" v-if="record.status === 105" content="确认上架吗？">
-            <a-button type="primary" >上架</a-button>
+            <a-button size="mini" type="primary" >上架</a-button>
           </a-popconfirm>
-          <a-button style="margin-left: 5px;" text type="primary" @click="handleToInfo(record)">详情</a-button>
         </template>
       </a-table>
       <div class="pagination_end">
@@ -118,6 +118,11 @@ const options = ref([
 ]);
 const columns = ref([
   {
+    title: 'id',
+    dataIndex: 'id',
+    width: 180
+  },
+  {
     title: '活动名称',
     dataIndex: 'title',
     width: 100
@@ -136,32 +141,32 @@ const columns = ref([
   {
     title: '报名人数',
     dataIndex: 'signUpNumber',
-    width: 100
+    width: 90
   },
   {
     title: '退款人数',
     dataIndex: 'refundNumber',
-    width: 100
+    width: 90
   },
   {
     title: '报名费',
     dataIndex: 'price',
-    width: 100
+    width: 80
   },
   {
     title: '发起人昵称',
     dataIndex: 'nickname',
-    width: 140
+    width: 110
   },
   {
     title: '发起人手机号',
     dataIndex: 'phone',
-    width: 140
+    width: 130
   },
   {
     title: '发起时间',
     dataIndex: 'createTime',
-    width: 220
+    width: 180
   },
   {
     title: '所在城市',
@@ -179,7 +184,8 @@ const columns = ref([
     dataIndex: 'actions',
     slotName:'actions',
     fixed: 'right',
-    width: 240
+    width: 160,
+    right: 0
   }
 ])
 const tableData = ref([])
