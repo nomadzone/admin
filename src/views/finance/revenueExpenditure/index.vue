@@ -177,6 +177,7 @@ const orderColumns = ref([
     { title: t('finance.revenueExpenditure.financeType'), dataIndex: 'settlementType', key: 'settlementType', width: 100, ellipsis: true },
     { title: t('finance.revenueExpenditure.amount'), dataIndex: 'settlementAmount', key: 'settlementAmount', width: 120, ellipsis: true },
     { title: t('finance.revenueExpenditure.settlementObject'), dataIndex: 'userNikeName', key: 'userNikeName', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.serviceAmount'), dataIndex: 'extends2', key: 'extends2', width: 120, ellipsis: true },
 
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlementStatusName', key: 'settlementStatusName', width: 120, ellipsis: true },
     { title: t('finance.revenueExpenditure.paymentMethod'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 200, ellipsis: true, slotName: 'paymentMethod' },

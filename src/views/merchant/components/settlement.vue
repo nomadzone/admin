@@ -95,6 +95,7 @@ const columns = ref([
     { title: t('finance.revenueExpenditure.orderNum'), dataIndex: 'orderNo', key: 'orderNo', width: 160, ellipsis: true },
     { title: t('finance.settlement.settlementType'), dataIndex: 'settlementType', key: 'settlementType', width: 100, ellipsis: true },
     { title: t('finance.settlement.settlementAmount'), dataIndex: 'settlementAmount', key: 'settlementAmount', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.serviceAmount'), dataIndex: 'extends2', key: 'extends2', width: 120, ellipsis: true },
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlementStatusName', key: 'settlementStatusName', width: 120, ellipsis: true },
     { title: t('finance.settlement.settlementMethod') + '/' + t('finance.settlement.settlementNumber'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 200, ellipsis: true, slotName: 'paymentMethod' },
     { title: t('finance.settlement.settlementTime'), dataIndex: 'extends3', key: 'extends3', width: 180, ellipsis: true },
