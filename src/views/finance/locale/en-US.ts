@@ -17,6 +17,7 @@ export default {
     "finance.revenueExpenditure.activityOrder": "Activity Order",
     "finance.revenueExpenditure.packageOrder": "Package Order",
     "finance.revenueExpenditure.settlement": "Settlement",
+    "finance.revenueExpenditure.serviceAmount": "Service Fee",
 
 
 

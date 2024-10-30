@@ -18,6 +18,8 @@ export default {
     "finance.revenueExpenditure.activityOrder": "活动订单",
     "finance.revenueExpenditure.packageOrder": "套餐订单",
     "finance.revenueExpenditure.settlement": "结算",
+    "finance.revenueExpenditure.serviceAmount": "服务费",
+
 
 
 

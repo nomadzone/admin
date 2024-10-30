@@ -87,6 +87,12 @@
                                 线下
                             </div>
                         </template>
+                        <template #paymentMethod="{ record }">
+                            <div>
+                                微信支付
+
+                            </div>
+                        </template>
                         <template #settlement="{ record }">
                             <div>
                                 <span v-if="record.settlement == 1"> 已结算</span>
@@ -154,6 +160,10 @@ const columns = ref([
     { title: t('finance.revenueExpenditure.orderNum'), dataIndex: 'orderNo', key: 'orderNo', width: 260, ellipsis: true },
     { title: t('finance.revenueExpenditure.financeType'), dataIndex: 'financeType', key: 'financeType', width: 100, ellipsis: true, slotName: 'financeType' },
     { title: t('finance.revenueExpenditure.amount'), dataIndex: 'total', key: 'total', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.serviceAmount'), dataIndex: 'serviceAmount', key: 'serviceAmount', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.settlementObject'), dataIndex: 'name', key: 'name', width: 120, ellipsis: true },
+    { title: t('finance.revenueExpenditure.paymentMethod'), dataIndex: 'paymentMethod', key: 'paymentMethod', width: 120, ellipsis: true, slotName: 'paymentMethod' },
+
     { title: t('finance.settlement.settlementStatus'), dataIndex: 'settlement', key: 'settlement', width: 120, ellipsis: true, slotName: 'settlement' },
     { title: t('finance.revenueExpenditure.receiptTime'), dataIndex: 'createTime', key: 'createTime', width: 180, ellipsis: true },
     { title: t('table.operation'), dataIndex: 'operation', key: 'operation', width: 120, ellipsis: true, slotName: 'action', fixed: 'right' },
