@@ -6,17 +6,17 @@
           <a-form :model="formModel" :label-col-props="{ span: 6 }" :wrapper-col-props="{ span: 18 }"
             label-align="right">
             <a-row :gutter="16">
-              <a-col :span="12"> 
+              <a-col :span="12">
                 <a-form-item field="number" label="用户昵称 ">
-                  <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " allow-clear/>
+                  <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " allow-clear />
                 </a-form-item>
-                <a-form-item field="number" label="手机号码">
-                  <a-input v-model="formModel.phone" placeholder="请输入手机号码" allow-clear/>
+                <a-form-item field="number" label="活动名称">
+                  <a-input v-model="formModel.activityName" placeholder="请输入活动名称" allow-clear />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item field="name" label="状态">
-                  <a-select :style="{width:'340px'}" v-model="formModel.status" placeholder="全部" allow-clear>
+                  <a-select :style="{ width: '340px' }" v-model="formModel.status" placeholder="全部" allow-clear>
                     <a-option value="">全部</a-option>
                     <a-option value="0">已上线</a-option>
                     <a-option value="1">已下线</a-option>
@@ -27,7 +27,7 @@
                 <a-form-item field="name" label="报名时间">
                   <a-range-picker style="width: 360px; margin: 0 24px 24px 0;" show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }" format="YYYY-MM-DD HH:mm"
-                     @select="onSelectTime" @ok="onOkTime" @clear="onClear" allow-clear/>
+                    @select="onSelectTime" @ok="onOkTime" @clear="onClear" allow-clear />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -46,7 +46,8 @@
         </a-col>
       </a-row>
     </a-card>
-    <a-table :columns="columns" :data="formModel.list" style="width: 100%" @row-click="handleRowClick" :loading="loading" :pagination='pagination'>
+    <a-table :columns="columns" :data="formModel.list" style="width: 100%" @row-click="handleRowClick"
+      :loading="loading" :pagination='pagination'>
       <template #status="{ record }">
         <a-tag :color="record.status === '1' ? 'green' : record.status === '2' ? 'red' : 'blue'">
           {{ record.status === '1' ? '报名成功' : record.status === '2' ? '取消报名' : '正在报名' }}
@@ -68,14 +69,13 @@
       <div>
         <div class="line" v-for="field in fields" :key="field.key">
           <span>{{ field.label }}</span>
-            <a-image
-                v-if="field.key === 'images'"
-                width="32"
-                :src="info[field.key]"
-            />
-          <span v-else-if="field.key === 'gender'">{{ info[field.key] == '0' ? '男' : (info[field.key] == '1' ? '女': '未知')  }}</span>
-          <a-tag v-else-if="field.key === 'status'" :color="info[field.key] === '1' ? 'green' : info[field.key] === '2' ? 'red' : 'blue'">
-          {{ info[field.key] === '1' ? '报名成功' : info[field.key] === '2' ? '取消报名' : '正在报名' }}
+          <a-image v-if="field.key === 'images'" width="32" :src="info[field.key]" />
+          <span v-else-if="field.key === 'gender'">{{ info[field.key] == '0' ? '男' : (info[field.key] == '1' ? '女' :
+            '未知')
+            }}</span>
+          <a-tag v-else-if="field.key === 'status'"
+            :color="info[field.key] === '1' ? 'green' : info[field.key] === '2' ? 'red' : 'blue'">
+            {{ info[field.key] === '1' ? '报名成功' : info[field.key] === '2' ? '取消报名' : '正在报名' }}
           </a-tag>
           <span v-else>{{ info[field.key] || '--' }}</span>
         </div>
@@ -93,12 +93,15 @@ import { useModalStore } from '../../store';
 import { userActivityList } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
 const columns = [
-  { title: '手机号码', dataIndex: 'phone' },
-  { title: '用户昵称', dataIndex: 'nickname'},
+  { title: '订单ID', dataIndex: 'id' },
+  { title: '活动名称', dataIndex: 'activityName', width: 120 },
+  { title: '手机号码', dataIndex: 'phone', width: 140 },
+  { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
+  { title: '服务费', dataIndex: 'serviceAmount', width: 90 },
   { title: '状态', slotName: 'status' },
-  { title: '报名时间', dataIndex: 'createTime', width: 130 },
-  { title: '操作', slotName: 'optional', width: 100 },
+  { title: '报名时间', dataIndex: 'orderDate', width: 130 },
+  { title: '操作', slotName: 'optional', width: 100, fixed: 'right' },
 ];
 
 const visible = ref(false);
@@ -146,7 +149,7 @@ const info = ref({
   "endTime": null
 })
 
-const doLook = (item)=> {
+const doLook = (item) => {
   for (let key in item) {
     console.log(key, item[key])
     info.value[key] = item[key] || ''
@@ -165,33 +168,33 @@ const formModel = reactive({
 });
 const loading = ref(false)
 const pagination = ref({
-      total: 0, // 数据总条数
-      current: 1, // 当前页
-      pageSize: 10, // 每页显示的条数
-      showTotal: true, // 是否显示总条数
-      onChange: (page)=> {
-        pagination.value.current = page; // 更新当前页
-        formModel.pageNum = page; // 更新当前页
-        search()
-      }, // 页码改变时的回调函数
+  total: 0, // 数据总条数
+  current: 1, // 当前页
+  pageSize: 10, // 每页显示的条数
+  showTotal: true, // 是否显示总条数
+  onChange: (page) => {
+    pagination.value.current = page; // 更新当前页
+    formModel.pageNum = page; // 更新当前页
+    search()
+  }, // 页码改变时的回调函数
 })
-onMounted(()=> { search() })
+onMounted(() => { search() })
 const onOkTime = (value) => { formModel.verifyTime = value }
-const onClear = ()=> { formModel.verifyTime = []; search() }
-const search = async() => {
+const onClear = () => { formModel.verifyTime = []; search() }
+const search = async () => {
   loading.value = true
   const params = {
     pageNum: formModel.pageNum,
     pageSize: formModel.pageSize,
     // verifyStatus: '1'
   }
-  if (formModel.nickname){
+  if (formModel.nickname) {
     params.nickname = formModel.nickname
   }
-  if (formModel.phone){
+  if (formModel.phone) {
     params.phone = formModel.phone
   }
-  if (formModel.status){
+  if (formModel.status) {
     params.status = formModel.status
   }
   if (formModel.verifyTime?.length === 2 && formModel.verifyTime[0] && formModel.verifyTime[1]) {
@@ -205,13 +208,13 @@ const search = async() => {
       pagination.value.total = res.total;
       formModel.list = res.rows
     } else {
-    Message.error(res?.msg)
-  }
-  } catch(error) {
+      Message.error(res?.msg)
+    }
+  } catch (error) {
     loading.value = false
     Message.error(JSON.stringify(error) || '接口异常')
   }
- }
+}
 </script>
 
 <style scoped>
@@ -245,6 +248,7 @@ const search = async() => {
     padding-bottom: 0;
   }
 }
+
 .line {
   padding: 8px 0;
   display: flex;

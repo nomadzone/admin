@@ -67,6 +67,10 @@
 
             <div class="data-box">
                 <a-tabs type="rounded" size="medium" @change="handleChangeTab">
+                    <template #extra>
+                        <a-button :disabled="selectedKeys.length == 0"
+                            @click="handleSettlementByGroup()">批量结算</a-button>
+                    </template>
                     <a-tab-pane key="1" :title="t('finance.revenueExpenditure.activityOrder')">
                     </a-tab-pane>
                     <a-tab-pane key="2" :title="t('finance.revenueExpenditure.packageOrder')">
@@ -74,9 +78,9 @@
                 </a-tabs>
 
                 <div class="common-table-container">
-
                     <a-table size="small" :columns="columns" :data="data" :loading="tableLoad" :pagination="false"
-                        v-if="activeTab == 1">
+                        v-if="activeTab == 1" row-key="id" :row-selection="rowSelection"
+                        v-model:selectedKeys="selectedKeys">
                         <template #settlementType="{ record }">
                             <div>
                                 线下
@@ -107,7 +111,8 @@
                     </a-table>
 
                     <a-table size="small" :columns="orderColumns" :data="orderData" :loading="tableLoad"
-                        :pagination="false" v-else-if="activeTab == 2">
+                        :pagination="false" v-else-if="activeTab == 2" :row-selection="rowSelection"
+                        v-model:selectedKeys="selectedKeys" row-key="id">
                         <template #paymentMethod="{ record }">
                             <div>
                                 <span>{{ record?.settlementWay }}</span>/
@@ -248,6 +253,7 @@ const activeTab = ref('1')
 const handleChangeTab = (key) => {
     currentPage.value = 1
     activeTab.value = key
+    selectedKeys.value = []
     if (key === '1') {
         searchActivityOrderListData(1, currentSize.value)
         if (summaryRef.value) {
@@ -359,6 +365,47 @@ const handleClickReset = () => {
         }
         searchPackageOrderListData(1, currentSize.value)
     }
+}
+
+const selectedKeys = ref([])
+
+const rowSelection = {
+    selectedRowKeys: selectedKeys.value,
+    onChange: (selectedRowKeys, selectedRows) => {
+        selectedKeys.value = selectedRowKeys
+    }
+}
+
+const handleSettlementByGroup = () => {
+    if (selectedKeys.value.length == 0) {
+        Message.warning('请选择要结算的订单')
+        return
+    }
+    Modal.confirm({
+        title: '批量结算',
+        content: '确定批量结算吗？',
+        onOk: () => {
+            if (activeTab.value == '1') {
+                shopActivitySettlementDeal(selectedKeys.value).then(res => {
+                    if (res.code == 0) {
+                        Message.success('操作成功');
+                        searchActivityOrderListData(currentPage.value, currentSize.value)
+                    }
+                }).catch(err => {
+                    console.log('shopSettlementDeal error:', err);
+                })
+            } else {
+                shopSettlementDeal(selectedKeys.value).then(res => {
+                    if (res.code == 0) {
+                        Message.success('操作成功');
+                        searchPackageOrderListData(currentPage.value, currentSize.value)
+                    }
+                }).catch(err => {
+                    console.log('shopSettlementDeal error:', err);
+                })
+            }
+        }
+    })
 }
 
 // 点击结算
