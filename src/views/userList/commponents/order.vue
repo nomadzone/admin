@@ -89,11 +89,14 @@ const router = useRouter()
 
 // 活动订单
 const columns = [
-  { title: '手机号码', dataIndex: 'phone' },
-  { title: '用户昵称', dataIndex: 'nickname'},
+  { title: '订单ID', dataIndex: 'id' },
+  { title: '活动名称', dataIndex: 'activityName', width: 120 },
+  { title: '手机号码', dataIndex: 'phone', width: 140 },
+  { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
+  { title: '服务费', dataIndex: 'serviceAmount', width: 90 },
   { title: '状态', slotName: 'status' },
-  { title: '报名时间', dataIndex: 'createTime', width: 130 },
+  { title: '报名时间', dataIndex: 'orderDate', width: 130 },
   { title: '操作', slotName: 'optional', width: 100 },
 ];
 const formModel = reactive({
