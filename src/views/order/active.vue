@@ -11,17 +11,16 @@
                   <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " allow-clear />
                 </a-form-item>
                 <a-form-item field="number" label="活动名称">
-                  <a-input v-model="formModel.name" placeholder="请输入活动名称" allow-clear />
+                  <a-input v-model="formModel.activityName" placeholder="请输入活动名称" allow-clear />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item field="name" label="状态">
                   <a-select :style="{ width: '340px' }" v-model="formModel.status" placeholder="全部" allow-clear>
                     <a-option value="">全部</a-option>
-                    <a-option value="0">已上线</a-option>
-                    <a-option value="1">已下线</a-option>
-                    <a-option value="2">待审批</a-option>
-                    <a-option value="3">不通过</a-option>
+                    <a-option value="1">报名成功</a-option>
+                    <a-option value="2">取消报名</a-option>
+                    <a-option value="3">正在报名</a-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item field="name" label="报名时间">
@@ -94,7 +93,7 @@ import { userActivityList } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
 const columns = [
   { title: '订单ID', dataIndex: 'activityid' },
-  { title: '活动名称', dataIndex: 'name'},
+  { title: '活动名称', dataIndex: 'activityName'},
   { title: '手机号码', dataIndex: 'phone', width: 140 },
   { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
@@ -106,7 +105,7 @@ const columns = [
 
 const visible = ref(false);
 const fields = [
-  { label: '活动名称', key: 'name' },
+  { label: '活动名称', key: 'activityName' },
   { label: '活动id', key: 'activityid' },
   { label: '备注', key: 'remark' },
   { label: '票夹ID', key: 'id' },
@@ -153,7 +152,7 @@ const doLook = (item) => {
 
 const formModel = reactive({
   nickname: '',
-  phone: '',
+  activityName: '',
   status: '',
   verifyTime: [],
   pageNum: 1,
@@ -185,8 +184,8 @@ const search = async () => {
   if (formModel.nickname) {
     params.nickname = formModel.nickname
   }
-  if (formModel.phone) {
-    params.phone = formModel.phone
+  if (formModel.activityName) {
+    params.activityName = formModel.activityName
   }
   if (formModel.status) {
     params.status = formModel.status

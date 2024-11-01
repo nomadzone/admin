@@ -90,7 +90,7 @@ const router = useRouter()
 // 活动订单
 const columns = [
   { title: '订单ID', dataIndex: 'activityid' },
-  { title: '活动名称', dataIndex: 'name'},
+  { title: '活动名称', dataIndex: 'activityName'},
   { title: '手机号码', dataIndex: 'phone', width: 140 },
   { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
@@ -145,7 +145,7 @@ const search = async () => {
 }
 const visible = ref(false);
 const fields = [
-  { label: '活动名称', key: 'name' },
+  { label: '活动名称', key: 'activityName' },
   { label: '活动id', key: 'activityid' },
   { label: '备注', key: 'remark' },
   { label: '票夹ID', key: 'id' },
