@@ -89,14 +89,14 @@ const router = useRouter()
 
 // 活动订单
 const columns = [
-  { title: '订单ID', dataIndex: 'id' },
-  { title: '活动名称', dataIndex: 'activityName', width: 120 },
+  { title: '订单ID', dataIndex: 'activityid' },
+  { title: '活动名称', dataIndex: 'name'},
   { title: '手机号码', dataIndex: 'phone', width: 140 },
   { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
   { title: '服务费', dataIndex: 'serviceAmount', width: 90 },
   { title: '状态', slotName: 'status' },
-  { title: '报名时间', dataIndex: 'orderDate', width: 130 },
+  { title: '报名时间', dataIndex: 'createTime', width: 170 },
   { title: '操作', slotName: 'optional', width: 100 },
 ];
 const formModel = reactive({
@@ -145,17 +145,19 @@ const search = async () => {
 }
 const visible = ref(false);
 const fields = [
-  { label: '报名时间', key: 'createTime' },
+  { label: '活动名称', key: 'name' },
+  { label: '活动id', key: 'activityid' },
   { label: '备注', key: 'remark' },
   { label: '票夹ID', key: 'id' },
   { label: '用户ID', key: 'userId' },
   { label: '图片', key: 'images' },
   { label: '用户昵称', key: 'nickname' },
   { label: '价格', key: 'price' },
+  { label: '服务费', key: 'serviceAmount' },
   { label: '电话号码', key: 'phone' },
   { label: '状态', key: 'status' },
   { label: '性别', key: 'gender' },
-  { label: '活动ID', key: 'activityid' },
+  { label: '报名时间', key: 'createTime' },
 ];
 
 const info = ref({

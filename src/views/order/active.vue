@@ -11,7 +11,7 @@
                   <a-input v-model="formModel.nickname" placeholder="请输入用户昵称 " allow-clear />
                 </a-form-item>
                 <a-form-item field="number" label="活动名称">
-                  <a-input v-model="formModel.activityName" placeholder="请输入活动名称" allow-clear />
+                  <a-input v-model="formModel.name" placeholder="请输入活动名称" allow-clear />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
@@ -93,38 +93,32 @@ import { useModalStore } from '../../store';
 import { userActivityList } from '@/api/order'
 import { Message } from '@arco-design/web-vue'
 const columns = [
-  { title: '订单ID', dataIndex: 'id' },
-  { title: '活动名称', dataIndex: 'activityName', width: 120 },
+  { title: '订单ID', dataIndex: 'activityid' },
+  { title: '活动名称', dataIndex: 'name'},
   { title: '手机号码', dataIndex: 'phone', width: 140 },
   { title: '用户昵称', dataIndex: 'nickname', width: 120 },
   { title: '订单金额', slotName: 'price', width: 90 },
   { title: '服务费', dataIndex: 'serviceAmount', width: 90 },
   { title: '状态', slotName: 'status' },
-  { title: '报名时间', dataIndex: 'orderDate', width: 130 },
+  { title: '报名时间', dataIndex: 'createTime', width: 170 },
   { title: '操作', slotName: 'optional', width: 100, fixed: 'right' },
 ];
 
 const visible = ref(false);
 const fields = [
-  // { label: '创建者', key: 'createBy' },
-  { label: '报名时间', key: 'createTime' },
-  // { label: '更新者', key: 'updateBy' },
-  // { label: '更新时间', key: 'updateTime' },
+  { label: '活动名称', key: 'name' },
+  { label: '活动id', key: 'activityid' },
   { label: '备注', key: 'remark' },
-  // { label: '维度ID', key: 'dimensionId' },
-  // { label: '管理员', key: 'adminNew' },
-  // { label: '页码', key: 'pageNum' },
-  // { label: '每页条数', key: 'pageSize' },
   { label: '票夹ID', key: 'id' },
   { label: '用户ID', key: 'userId' },
   { label: '图片', key: 'images' },
   { label: '用户昵称', key: 'nickname' },
   { label: '价格', key: 'price' },
+  { label: '服务费', key: 'serviceAmount' },
   { label: '电话号码', key: 'phone' },
   { label: '状态', key: 'status' },
   { label: '性别', key: 'gender' },
-  { label: '活动ID', key: 'activityid' },
-  // { label: '结束时间', key: 'endTime' },
+  { label: '报名时间', key: 'createTime' },
 ];
 
 const info = ref({
@@ -198,8 +192,8 @@ const search = async () => {
     params.status = formModel.status
   }
   if (formModel.verifyTime?.length === 2 && formModel.verifyTime[0] && formModel.verifyTime[1]) {
-    params.beginVerifyTime = formModel.verifyTime[0]
-    params.endVerifyTime = formModel.verifyTime[1]
+    params.startcreateTime = formModel.verifyTime[0]
+    params.endcreateTime = formModel.verifyTime[1]
   }
   try {
     let res = await userActivityList(params)
