@@ -418,7 +418,7 @@ const handleActivitySet = (record) => {
             shopActivitySettlementDeal([record.id]).then(res => {
                 if (res.code == 0) {
                     Message.success('操作成功');
-                    searchActivityOrderListData(1, currentPage.value)
+                    searchActivityOrderListData()
                 }
             }).catch(err => {
                 console.log('shopSettlementDeal error:', err);
@@ -437,7 +437,7 @@ const handlePackageOrderSet = (record) => {
             shopSettlementDeal([record.id]).then(res => {
                 if (res.code == 0) {
                     Message.success('操作成功');
-                    searchPackageOrderListData(currentPage.value)
+                    searchPackageOrderListData()
                 }
             }).catch(err => {
                 console.log('shopSettlementDeal error:', err);
