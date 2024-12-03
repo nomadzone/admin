@@ -288,7 +288,7 @@ const handleReject = (row) => {
 const handleConfirmReject = () => {
     console.log('rejectReason:', rejectReason.value);
     let params = {
-        shopIds: choosenRow ? [choosenRow.id] : selectedKeys.value,
+        shopIds: choosenRow.value ? [choosenRow.value.id] : selectedKeys.value,
         isAuth: 1,
         rejectReason: rejectReason.value
     }
@@ -297,7 +297,6 @@ const handleConfirmReject = () => {
             Message.success('操作成功');
         }
     }).catch(err => {
-        console.log('reject error:', err);
     }).finally(() => {
         visible.value = false;
     });
