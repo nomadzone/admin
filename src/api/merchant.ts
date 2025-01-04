@@ -146,3 +146,15 @@ export function shopSettlementDeal(data: any) {
         data
       })
 }
+
+// 新建商家
+export function addShop(data: any) {
+    return http({
+        method: 'post',
+        url: `/shop/registerUp`,
+        data
+      })
+}
+
+
+

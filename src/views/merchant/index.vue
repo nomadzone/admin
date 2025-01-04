@@ -70,10 +70,11 @@
                     <div class="left">
                         <a-button class="left-btn" :disabled="!selectedKeys.length" @click="passByGroup()">{{
                             $t('merchant.index.batchApproval')
-                            }}</a-button>
-                        <a-button :disabled="!selectedKeys.length" @click="RejectByGroup()">{{
+                        }}</a-button>
+                        <a-button class="left-btn" :disabled="!selectedKeys.length" @click="RejectByGroup()">{{
                             $t('merchant.index.batchNotPassed')
-                            }}</a-button>
+                        }}</a-button>
+                        <a-button type="primary" @click="handleAdd()">新建</a-button>
                     </div>
                     <a-button> <template #icon>
                             <icon-download />
@@ -130,6 +131,20 @@
                     </a-form-item>
                 </a-form>
             </a-modal>
+
+            <a-modal title-align="start" v-model:visible="addDialogVisible" @ok="handleConfirmAdd"
+                @cancel="handleCancelAdd" title="新建商家">
+                <a-form>
+                    <a-form-item :label-col-props="{ span: 8 }" :wrapper-col-props="{ span: 16 }" label="用户名"
+                        label-width="180px">
+                        <a-input v-model="addForm.username" placeholder="请输入用户名" />
+                    </a-form-item>
+                    <a-form-item :label-col-props="{ span: 8 }" :wrapper-col-props="{ span: 16 }" label="密码"
+                        label-width="180px">
+                        <a-input v-model="addForm.password" placeholder="请输入密码" />
+                    </a-form-item>
+                </a-form>
+            </a-modal>
         </div>
 
     </div>
@@ -138,7 +153,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
-import { shopList, shopStatusChange, merchantCategoryList, shopApprove } from '@/api/merchant';
+import { shopList, shopStatusChange, merchantCategoryList, shopApprove, addShop } from '@/api/merchant';
 
 import { Modal, Message } from '@arco-design/web-vue';
 const router = useRouter();
@@ -197,6 +212,13 @@ const columns = ref([
 // 查询商户分类选项数据
 const categoryNameOptions = ref([])
 
+
+const addDialogVisible = ref(false)
+const addForm = ref({
+    username: '',
+    password: '',
+
+})
 const fetchCategoryOptions = async () => {
     const res = await merchantCategoryList({ pageNum: 1, pageSize: 100000 })
     categoryNameOptions.value = res.rows
@@ -350,6 +372,31 @@ const passByGroup = () => {
     } else {
         handlePass()
     }
+
+}
+
+// 点击新建
+const handleAdd = () => {
+    addDialogVisible.value = true
+}
+
+// 确认新建
+const handleConfirmAdd = () => {
+    let params = {
+        ...addForm.value,
+        smsCode: 2
+    }
+    addShop(params).then(res => {
+        if (res.code == 200) {
+            Message.success('新建成功')
+            fetchData()
+        }
+    })
+
+}
+
+// 取消新建
+const handleCancelAdd = () => {
 
 }
 onMounted(() => {

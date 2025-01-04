@@ -14,6 +14,14 @@ axiosInstance.interceptors.request.use(
     // 在发送请求之前做些什么
     // 例如设置请求头
     const token = getToken();
+
+    if(config.url.indexOf('/registerUp') > -1) {
+      console.log('config=======', config)
+      config = {
+        ...config,
+        baseURL: import.meta.env.VITE_API_BASE_URL
+      }
+    }
     if (token) {
         config.headers['Token'] = token;
     }
