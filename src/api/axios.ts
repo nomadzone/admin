@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
       console.log('config=======', config)
       config = {
         ...config,
-        baseURL: import.meta.env.VITE_API_BASE_URL
+        baseURL: import.meta.env.VITE_API_BASE_URL_SHOP
       }
     }
     if (token) {

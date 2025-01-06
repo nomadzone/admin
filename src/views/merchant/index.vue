@@ -84,7 +84,8 @@
                 <div class="common-table-container">
 
                     <a-table size="small" :columns="columns" :data="data" :row-selection="rowSelection" row-key="id"
-                        v-model:selectedKeys="selectedKeys" @selection-change="handleSelectRow" :loading="tableLoading">
+                        v-model:selectedKeys="selectedKeys" @selection-change="handleSelectRow" :loading="tableLoading"
+                        :pagination="paginationProps">
                         <template #paymentMethod="{ record }">
                             <div>
                                 <span>{{ record?.paymentMethod }}</span>/
@@ -209,6 +210,9 @@ const columns = ref([
 
 ])
 
+
+
+
 // 查询商户分类选项数据
 const categoryNameOptions = ref([])
 
@@ -231,7 +235,17 @@ const pageSize = ref(10)
 const pageNum = ref(1)
 const total = ref(0)
 const tableLoading = ref(false)
+const paginationProps = ref({
+    current: 1, // 当前页码
+    total: 0, // 总页数
+    pageSize: 10, // 每页显示条数
+    showTotal: true, // 是否显示总条数
+    onChange: (currentPage) => {
+        paginationProps.value.current = currentPage; // 
+        fetchData(currentPage, pageSize.value)
+    },
 
+})
 const fetchData = async (page, size) => {
     tableLoading.value = true
     let params = {
@@ -246,6 +260,7 @@ const fetchData = async (page, size) => {
     const res = await shopList(params)
 
     data.value = res.rows
+    paginationProps.value.total = res.total
     tableLoading.value = false
 
 }
